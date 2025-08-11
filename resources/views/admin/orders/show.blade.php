@@ -116,7 +116,7 @@
                 <div class="space-y-4">
                     @foreach($orderItems as $item)
                     <div class="flex items-center p-4 bg-gray-50 border border-gray-200 rounded-xl">
-                        <div class="w-16 h-16 bg-gradient-primary rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                        <div class="w-16 h-16 bg-gradient-primary rounded-lg flex items-center justify-center ml-4 flex-shrink-0">
                             <i class="fas fa-cube text-white text-xl"></i>
                         </div>
 

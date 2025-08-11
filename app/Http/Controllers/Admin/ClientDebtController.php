@@ -80,11 +80,11 @@ class ClientDebtController extends Controller
 
             // TODO: إرسال إيميل ببيانات الدخول
             // سيتم تطوير هذا لاحقاً
-            
+
             DB::commit();
 
             return redirect()->back()
-                ->with('success', 'تم إنشاء حساب العميل بنجاح! تم إنشاء الفاتورة برقم: ' . $invoice->invoice_number . 
+                ->with('success', 'تم إنشاء حساب العميل بنجاح! تم إنشاء الفاتورة برقم: ' . $invoice->invoice_number .
                     '. كلمة المرور المؤقتة: ' . $password);
 
         } catch (\Exception $e) {

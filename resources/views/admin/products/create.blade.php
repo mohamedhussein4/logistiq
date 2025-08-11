@@ -39,10 +39,11 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">رقم المنتج (SKU) <span class="text-red-500">*</span></label>
-                    <input type="text" name="sku" value="{{ old('sku') }}" required
+                    <label class="block text-sm font-bold text-slate-700 mb-2">رقم المنتج (SKU)</label>
+                    <input type="text" name="sku" value="{{ old('sku') }}"
                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all @error('sku') border-red-500 @enderror"
-                           placeholder="مثال: GPS-TRACK-001">
+                           placeholder="مثال: GPS-TRACK-001 (سيتم إنشاؤه تلقائياً إذا تُرك فارغاً)">
+                    <p class="mt-1 text-xs text-slate-500">رقم المنتج الفريد - سيتم إنشاؤه تلقائياً إذا تُرك فارغاً</p>
                     @error('sku')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror

@@ -121,7 +121,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     @foreach($contactRequest->attachments as $attachment)
                     <div class="flex items-center p-3 bg-gray-50 border border-gray-200 rounded-xl">
-                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center ml-3">
                             <i class="fas fa-file text-white"></i>
                         </div>
                         <div class="flex-1">

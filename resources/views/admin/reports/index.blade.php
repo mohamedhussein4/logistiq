@@ -161,7 +161,7 @@
         </div>
 
         <!-- Orders Report Card -->
-        <div class="glass-effect rounded-2xl lg:rounded-3xl p-4 lg:p-8 border border-white/20 hover-lift transition-all cursor-pointer">
+        <div class="glass-effect rounded-2xl lg:rounded-3xl p-4 lg:p-8 border border-white/20 hover-lift transition-all cursor-pointer" onclick="window.location.href='{{ route('admin.reports.orders') }}'">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h3 class="text-xl font-bold text-slate-800 mb-2">تقارير الطلبات</h3>
@@ -190,7 +190,7 @@
         </div>
 
         <!-- Funding Report Card -->
-        <div class="glass-effect rounded-2xl lg:rounded-3xl p-4 lg:p-8 border border-white/20 hover-lift transition-all cursor-pointer">
+        <div class="glass-effect rounded-2xl lg:rounded-3xl p-4 lg:p-8 border border-white/20 hover-lift transition-all cursor-pointer" onclick="window.location.href='{{ route('admin.reports.funding') }}'">
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h3 class="text-xl font-bold text-slate-800 mb-2">تقارير التمويل</h3>

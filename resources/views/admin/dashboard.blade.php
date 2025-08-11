@@ -448,17 +448,6 @@
     setInterval(updateTime, 1000);
     updateTime();
 
-    // Enhanced hover effects for charts
-    document.querySelectorAll('[style*="height"]').forEach(bar => {
-        bar.addEventListener('mouseenter', function() {
-            this.style.transform = 'scaleY(1.1) translateY(-5px)';
-            this.style.transition = 'all 0.3s ease';
-        });
-
-        bar.addEventListener('mouseleave', function() {
-            this.style.transform = 'scaleY(1) translateY(0)';
-        });
-    });
 </script>
 @endpush
 @endsection

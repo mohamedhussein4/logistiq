@@ -24,7 +24,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'account_created', 'invoice_sent', 'paid'])->default('pending');
             $table->unsignedBigInteger('created_user_id')->nullable();
             $table->unsignedBigInteger('created_invoice_id')->nullable();
-            $table->text('notes')->nullable(); 
+            $table->text('notes')->nullable();
             $table->timestamps();
 
             // Foreign key constraints

@@ -138,6 +138,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/create', [LinkingServiceController::class, 'create'])->name('create');
         Route::post('/', [LinkingServiceController::class, 'store'])->name('store');
         Route::get('/{linkingService}', [LinkingServiceController::class, 'show'])->name('show');
+        Route::put('/{linkingService}', [LinkingServiceController::class, 'update'])->name('update');
+        Route::delete('/{linkingService}', [LinkingServiceController::class, 'destroy'])->name('destroy');
         Route::patch('/{linkingService}/status', [LinkingServiceController::class, 'updateStatus'])->name('update_status');
         Route::patch('/{linkingService}/commission', [LinkingServiceController::class, 'updateCommission'])->name('update_commission');
         Route::get('/analytics/data', [LinkingServiceController::class, 'analytics'])->name('analytics');

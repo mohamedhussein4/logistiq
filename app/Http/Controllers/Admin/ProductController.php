@@ -8,6 +8,7 @@ use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -177,10 +178,12 @@ class ProductController extends Controller
             'specifications' => 'nullable|array',
             'new_images' => 'nullable|array|max:5',
             'new_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'string',
             'status' => 'required|in:active,inactive,out_of_stock',
         ]);
 
-        $productData = $request->except(['new_images', 'remove_images']);
+        $productData = $request->except(['new_images']);
 
         // تحويل المصفوفات إلى JSON
         if ($request->has('features')) {
@@ -194,12 +197,36 @@ class ProductController extends Controller
         // معالجة الصور
         $currentImages = json_decode($product->images, true) ?? [];
 
+        // Debug: تسجيل البيانات المستلمة
+        Log::info('Product Update Request', [
+            'product_id' => $product->id,
+            'remove_images' => $request->remove_images,
+            'current_images_before' => $currentImages,
+            'has_remove_images' => $request->has('remove_images'),
+            'all_request_data' => $request->all()
+        ]);
+
         // إزالة الصور المحددة
-        if ($request->has('remove_images')) {
+        if ($request->has('remove_images') && is_array($request->remove_images)) {
             foreach ($request->remove_images as $imageToRemove) {
                 if (in_array($imageToRemove, $currentImages)) {
-                    Storage::disk('public')->delete($imageToRemove);
-                    $currentImages = array_diff($currentImages, [$imageToRemove]);
+                    try {
+                        // حذف الصورة من التخزين
+                        if (Storage::disk('public')->exists($imageToRemove)) {
+                            Storage::disk('public')->delete($imageToRemove);
+                            Log::info("Image deleted from storage: {$imageToRemove}");
+                        } else {
+                            Log::warning("Image not found in storage: {$imageToRemove}");
+                        }
+
+                        // إزالة الصورة من المصفوفة
+                        $currentImages = array_values(array_diff($currentImages, [$imageToRemove]));
+                        Log::info("Image removed from array: {$imageToRemove}");
+                    } catch (\Exception $e) {
+                        Log::error("Error deleting image {$imageToRemove}: " . $e->getMessage());
+                    }
+                } else {
+                    Log::warning("Image not found in current images: {$imageToRemove}");
                 }
             }
         }
@@ -292,7 +319,7 @@ class ProductController extends Controller
     public function categories()
     {
         $categories = ProductCategory::withCount('products')->get();
-        return view('admin.products.categories', compact('categories'));
+        return view('admin.products.categories.manage', compact('categories'));
     }
 
     /**
@@ -302,11 +329,24 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:product_categories,slug',
+            'slug' => 'nullable|string|max:255|unique:product_categories,slug',
             'description' => 'nullable|string',
         ]);
 
-        ProductCategory::create($request->all());
+        // إنشاء slug تلقائياً إذا لم يتم توفيره
+        $data = $request->all();
+        if (empty($data['slug'])) {
+            $data['slug'] = \Str::slug($data['name']);
+            // التأكد من أن الـ slug فريد
+            $originalSlug = $data['slug'];
+            $counter = 1;
+            while (ProductCategory::where('slug', $data['slug'])->exists()) {
+                $data['slug'] = $originalSlug . '-' . $counter;
+                $counter++;
+            }
+        }
+
+        ProductCategory::create($data);
 
         return redirect()->back()->with('success', 'تم إضافة التصنيف بنجاح');
     }
@@ -318,11 +358,24 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:product_categories,slug,' . $category->id,
+            'slug' => 'nullable|string|max:255|unique:product_categories,slug,' . $category->id,
             'description' => 'nullable|string',
         ]);
 
-        $category->update($request->all());
+        // إنشاء slug تلقائياً إذا لم يتم توفيره أو تم تغيير الاسم
+        $data = $request->all();
+        if (empty($data['slug']) || $data['name'] !== $category->name) {
+            $data['slug'] = \Str::slug($data['name']);
+            // التأكد من أن الـ slug فريد
+            $originalSlug = $data['slug'];
+            $counter = 1;
+            while (ProductCategory::where('slug', $data['slug'])->where('id', '!=', $category->id)->exists()) {
+                $data['slug'] = $originalSlug . '-' . $counter;
+                $counter++;
+            }
+        }
+
+        $category->update($data);
 
         return redirect()->back()->with('success', 'تم تحديث التصنيف بنجاح');
     }

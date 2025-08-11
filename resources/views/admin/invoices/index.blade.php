@@ -191,7 +191,7 @@
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center mr-3">
+                                    <div class="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center ml-3">
                                         <i class="fas fa-file-invoice text-white text-sm"></i>
                                     </div>
                                     <div>
@@ -203,7 +203,7 @@
 
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
+                                    <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center ml-3">
                                         <i class="fas fa-building text-white text-sm"></i>
                                     </div>
                                     <div>

@@ -44,12 +44,12 @@ class Invoice extends Model
     // Relationships
     public function serviceCompany()
     {
-        return $this->belongsTo(User::class, 'service_company_id');
+        return $this->belongsTo(ServiceCompany::class, 'service_company_id');
     }
 
     public function logisticsCompany()
     {
-        return $this->belongsTo(User::class, 'logistics_company_id');
+        return $this->belongsTo(LogisticsCompany::class, 'logistics_company_id');
     }
 
     public function payments()

@@ -10,7 +10,7 @@
     <div class="flex items-center justify-between">
         <a href="{{ route('admin.funding_requests.index') }}"
            class="inline-flex items-center px-6 py-3 bg-white/60 text-slate-700 rounded-xl font-semibold border border-white/40 hover:bg-white/80 transition-all">
-            <i class="fas fa-arrow-right mr-3"></i>
+            <i class="fas fa-arrow-right ml-3"></i>
             العودة لقائمة الطلبات
         </a>
 
@@ -70,7 +70,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-6">
                         <div class="flex items-center p-4 bg-blue-50 rounded-2xl">
-                            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mr-4">
+                            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center ml-4">
                                 <i class="fas fa-money-bill-wave text-white"></i>
                             </div>
                             <div>
@@ -80,7 +80,7 @@
                         </div>
 
                         <div class="flex items-center p-4 bg-green-50 rounded-2xl">
-                            <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-4">
+                            <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center ml-4">
                                 <i class="fas fa-calendar text-white"></i>
                             </div>
                             <div>
@@ -93,7 +93,7 @@
                     <div class="space-y-6">
                         @if($fundingRequest->approved_at)
                         <div class="flex items-center p-4 bg-green-50 rounded-2xl">
-                            <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-4">
+                            <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center ml-4">
                                 <i class="fas fa-check text-white"></i>
                             </div>
                             <div>
@@ -105,7 +105,7 @@
 
                         @if($fundingRequest->disbursed_at)
                         <div class="flex items-center p-4 bg-purple-50 rounded-2xl">
-                            <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mr-4">
+                            <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center ml-4">
                                 <i class="fas fa-money-bill-wave text-white"></i>
                             </div>
                             <div>
@@ -117,7 +117,7 @@
 
                         @if($fundingRequest->rejected_at)
                         <div class="flex items-center p-4 bg-red-50 rounded-2xl">
-                            <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center mr-4">
+                            <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center ml-4">
                                 <i class="fas fa-times text-white"></i>
                             </div>
                             <div>
@@ -156,7 +156,7 @@
                     @foreach($recentRequests as $recentRequest)
                     <div class="flex items-center justify-between p-4 bg-white/60 rounded-2xl border border-white/40">
                         <div class="flex items-center">
-                            <div class="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center mr-4">
+                            <div class="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center ml-4">
                                 <i class="fas fa-file-invoice text-white text-sm"></i>
                             </div>
                             <div>
@@ -188,8 +188,8 @@
                     <div class="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-truck text-white text-2xl"></i>
                     </div>
-                    <h4 class="text-xl font-bold text-slate-900">{{ $fundingRequest->logisticsCompany->user->company_name }}</h4>
-                    <p class="text-slate-600">{{ $fundingRequest->logisticsCompany->user->email }}</p>
+                    <h4 class="text-xl font-bold text-slate-900">{{ optional($fundingRequest->logisticsCompany->user)->company_name ?? optional($fundingRequest->logisticsCompany->user)->name ?? 'غير محدد' }}</h4>
+                    <p class="text-slate-600">{{ optional($fundingRequest->logisticsCompany->user)->email ?? 'غير محدد' }}</p>
                 </div>
 
                 <div class="space-y-4">
@@ -246,20 +246,20 @@
                      </div>
                 </div>
 
-                @if($fundingRequest->logisticsCompany->user->profile)
+                @if(optional($fundingRequest->logisticsCompany->user)->profile)
                 <div class="mt-6 pt-6 border-t border-white/20">
                     <h5 class="text-lg font-bold text-slate-800 mb-4">معلومات الاتصال</h5>
                     <div class="space-y-3">
-                        @if($fundingRequest->logisticsCompany->user->profile->phone)
+                        @if(optional($fundingRequest->logisticsCompany->user->profile)->phone)
                         <div class="flex items-center">
-                            <i class="fas fa-phone w-5 text-slate-600 mr-3"></i>
+                            <i class="fas fa-phone w-5 text-slate-600 ml-3"></i>
                             <span class="text-slate-700">{{ $fundingRequest->logisticsCompany->user->profile->phone }}</span>
                         </div>
                         @endif
 
-                        @if($fundingRequest->logisticsCompany->user->profile->address)
+                        @if(optional($fundingRequest->logisticsCompany->user->profile)->address)
                         <div class="flex items-center">
-                            <i class="fas fa-map-marker-alt w-5 text-slate-600 mr-3"></i>
+                            <i class="fas fa-map-marker-alt w-5 text-slate-600 ml-3"></i>
                             <span class="text-slate-700">{{ $fundingRequest->logisticsCompany->user->profile->address }}</span>
                         </div>
                         @endif
@@ -273,11 +273,13 @@
                 <h3 class="text-2xl font-bold gradient-text mb-6">إجراءات سريعة</h3>
 
                 <div class="space-y-4">
+                    @if($fundingRequest->logisticsCompany->user)
                     <a href="{{ route('admin.users.show', $fundingRequest->logisticsCompany->user) }}"
                        class="w-full px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold text-center block hover:bg-blue-700 transition-colors">
                         <i class="fas fa-user mr-2"></i>
                         عرض ملف الشركة
                     </a>
+                    @endif
 
                     <a href="{{ route('admin.funding_requests.index', ['company_id' => $fundingRequest->logisticsCompany->id]) }}"
                        class="w-full px-6 py-3 bg-green-600 text-white rounded-xl font-semibold text-center block hover:bg-green-700 transition-colors">
@@ -337,7 +339,7 @@
                             </div>
                             <div>
                                 @if($debt->invoice_document)
-                                <a href="{{ asset('storage/' . $debt->invoice_document) }}" target="_blank"
+                                <a href="{{ asset('/' . $debt->invoice_document) }}" target="_blank"
                                    class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-lg text-xs hover:bg-blue-200 transition-colors">
                                     <i class="fas fa-file-pdf mr-1"></i>
                                     الفاتورة الأصلية

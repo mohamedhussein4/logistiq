@@ -10,7 +10,7 @@
     <div class="flex items-center justify-between">
         <a href="{{ route('admin.invoices.index') }}"
            class="inline-flex items-center px-6 py-3 bg-white/60 text-slate-700 rounded-xl font-semibold border border-white/40 hover:bg-white/80 transition-all">
-            <i class="fas fa-arrow-right mr-3"></i>
+            <i class="fas fa-arrow-right ml-3"></i>
             العودة لقائمة الفواتير
         </a>
 
@@ -167,7 +167,7 @@
                 <!-- Due Date -->
                 <div class="flex items-center justify-between p-6 bg-slate-50 rounded-2xl">
                     <div class="flex items-center">
-                        <div class="w-12 h-12 bg-slate-600 rounded-xl flex items-center justify-center mr-4">
+                        <div class="w-12 h-12 bg-slate-600 rounded-xl flex items-center justify-center ml-4">
                             <i class="fas fa-calendar text-white"></i>
                         </div>
                         <div>
@@ -223,7 +223,7 @@
                                     'rejected' => 'bg-red-500'
                                 ];
                             @endphp
-                            <div class="w-12 h-12 {{ $paymentStatusClasses[$payment->status] ?? 'bg-gray-500' }} rounded-xl flex items-center justify-center mr-4">
+                            <div class="w-12 h-12 {{ $paymentStatusClasses[$payment->status] ?? 'bg-gray-500' }} rounded-xl flex items-center justify-center ml-4">
                                 <i class="fas fa-money-bill text-white"></i>
                             </div>
                             <div>
@@ -298,7 +298,7 @@
                                     'overdue' => 'bg-red-500'
                                 ];
                             @endphp
-                            <div class="w-10 h-10 {{ $installmentStatusClasses[$installment->status] ?? 'bg-gray-500' }} rounded-xl flex items-center justify-center mr-3">
+                            <div class="w-10 h-10 {{ $installmentStatusClasses[$installment->status] ?? 'bg-gray-500' }} rounded-xl flex items-center justify-center ml-3">
                                 <span class="text-white text-sm font-bold">{{ $installment->installment_number }}</span>
                             </div>
                             <div>

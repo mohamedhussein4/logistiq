@@ -27,8 +27,10 @@ class Payment extends Model
     // Status constants
     const STATUS_PENDING = 'pending';
     const STATUS_CONFIRMED = 'confirmed';
+    const STATUS_REJECTED = 'rejected';
     const STATUS_FAILED = 'failed';
     const STATUS_CANCELLED = 'cancelled';
+    const STATUS_REFUNDED = 'refunded';
 
     // Payment method constants
     const METHOD_BANK_TRANSFER = 'bank_transfer';

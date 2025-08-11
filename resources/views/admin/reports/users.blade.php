@@ -64,7 +64,7 @@
                 <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-user text-white text-xl"></i>
                 </div>
-                <div class="text-2xl font-black text-orange-600 mb-2">{{ $user_types['user'] ?? 815 }}</div>
+                <div class="text-2xl font-black text-orange-600 mb-2">{{ $user_types['regular'] ?? 815 }}</div>
                 <div class="text-sm text-slate-600 mb-2">مستخدمين عاديين</div>
                 <div class="text-xs text-orange-500 font-semibold">65.2%</div>
             </div>
@@ -91,7 +91,7 @@
             <div class="space-y-4">
                 <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100">
                     <div class="flex items-center">
-                        <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                        <div class="w-3 h-3 bg-green-500 rounded-full ml-3"></div>
                         <span class="text-sm font-semibold text-slate-700">نشط اليوم</span>
                     </div>
                     <span class="text-lg font-black text-green-600">{{ $activity['today'] ?? 425 }}</span>
@@ -99,7 +99,7 @@
 
                 <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100">
                     <div class="flex items-center">
-                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                        <div class="w-3 h-3 bg-blue-500 rounded-full ml-3"></div>
                         <span class="text-sm font-semibold text-slate-700">نشط هذا الأسبوع</span>
                     </div>
                     <span class="text-lg font-black text-blue-600">{{ $activity['week'] ?? 892 }}</span>
@@ -107,7 +107,7 @@
 
                 <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100">
                     <div class="flex items-center">
-                        <div class="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
+                        <div class="w-3 h-3 bg-purple-500 rounded-full ml-3"></div>
                         <span class="text-sm font-semibold text-slate-700">نشط هذا الشهر</span>
                     </div>
                     <span class="text-lg font-black text-purple-600">{{ $activity['month'] ?? 1125 }}</span>
@@ -115,7 +115,7 @@
 
                 <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100">
                     <div class="flex items-center">
-                        <div class="w-3 h-3 bg-orange-500 rounded-full mr-3"></div>
+                        <div class="w-3 h-3 bg-orange-500 rounded-full ml-3"></div>
                         <span class="text-sm font-semibold text-slate-700">متوسط الجلسة</span>
                     </div>
                     <span class="text-lg font-black text-orange-600">{{ $activity['avg_session'] ?? '24' }} دقيقة</span>
@@ -192,7 +192,7 @@
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center mr-3">
+                                <div class="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center ml-3">
                                     <i class="fas {{ $type_icons[$user['type']] }} text-white text-sm"></i>
                                 </div>
                                 <div>
@@ -223,7 +223,7 @@
 
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                <div class="flex-1 bg-gray-200 rounded-full h-2 mr-3">
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 ml-3">
                                     <div class="h-2 rounded-full {{ $user['score'] >= 90 ? 'bg-green-500' : ($user['score'] >= 70 ? 'bg-yellow-500' : 'bg-red-500') }}"
                                          style="width: {{ $user['score'] }}%"></div>
                                 </div>
@@ -244,7 +244,7 @@
             <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center">
-                        <div class="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center mr-3">
+                        <div class="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center ml-3">
                             <i class="fas {{ $type_icons[$user['type']] }} text-white text-sm"></i>
                         </div>
                         <div>

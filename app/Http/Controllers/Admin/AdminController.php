@@ -29,7 +29,6 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        // إحصائيات عامة
         $stats = [
             'total_users' => User::count(),
             'active_users' => User::where('status', User::STATUS_ACTIVE)->count(),
@@ -60,7 +59,6 @@ class AdminController extends Controller
                 ->sum('amount'),
         ];
 
-        // آخر الأنشطة
         $recent_activities = [
             'new_users' => User::latest()->take(5)->get(),
             'recent_funding_requests' => FundingRequest::with('logisticsCompany')
@@ -84,7 +82,6 @@ class AdminController extends Controller
                 ->get(),
         ];
 
-        // إحصائيات شهرية للرسوم البيانية
         $monthly_stats = [
             'users_growth' => $this->getMonthlyUserGrowth(),
             'revenue_trend' => $this->getMonthlyRevenueTrend(),

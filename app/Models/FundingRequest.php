@@ -46,7 +46,7 @@ class FundingRequest extends Model
     // Relationships
     public function logisticsCompany()
     {
-        return $this->belongsTo(User::class, 'logistics_company_id');
+        return $this->belongsTo(LogisticsCompany::class, 'logistics_company_id');
     }
 
     /**

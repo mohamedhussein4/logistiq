@@ -40,7 +40,7 @@
                             <div class="flex-shrink-0">
                                 <i class="fas fa-check-circle text-green-600 text-xl"></i>
                             </div>
-                            <div class="mr-3">
+                            <div class="ml-3">
                                 <p class="text-green-800 font-medium">تم الإرسال بنجاح!</p>
                                 <p class="text-green-700 text-sm">تم إرسال رابط تأكيد جديد إلى بريدك الإلكتروني</p>
                             </div>

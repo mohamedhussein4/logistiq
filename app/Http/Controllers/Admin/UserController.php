@@ -176,13 +176,13 @@ class UserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'phone' => 'nullable|string|max:20',
-                'user_type' => 'required|in:admin,logistics,service_company,user',
+                'user_type' => 'required|in:admin,logistics,service_company,regular',
                 'password' => 'required|string|min:8|confirmed',
                 'status' => 'required|in:active,pending,suspended',
                 'admin_notes' => 'nullable|string',
 
                 // Company fields (conditional)
-                'company_name' => 'required_if:user_type,logistics,service_company|string|max:255',
+                'company_name' => 'nullable:user_type,logistics,service_company|string|max:255',
                 'commercial_register' => 'nullable|string|max:100',
                 'address' => 'nullable|string',
                 'city' => 'nullable|string|max:100',
@@ -276,13 +276,13 @@ class UserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
                 'phone' => 'nullable|string|max:20',
-                'user_type' => 'required|in:admin,logistics,service_company,user',
+                'user_type' => 'required|in:admin,logistics,service_company,regular',
                 'password' => 'nullable|string|min:8|confirmed',
                 'status' => 'required|in:active,pending,suspended',
                 'admin_notes' => 'nullable|string',
 
                 // Company fields (conditional)
-                'company_name' => 'required_if:user_type,logistics,service_company|string|max:255',
+                'company_name' => 'nullable:user_type,logistics,service_company|string|max:255',
                 'commercial_register' => 'nullable|string|max:100',
                 'address' => 'nullable|string',
                 'city' => 'nullable|string|max:100',

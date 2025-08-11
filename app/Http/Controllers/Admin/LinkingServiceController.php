@@ -57,6 +57,7 @@ class LinkingServiceController extends Controller
             'active_services' => LinkingService::where('status', 'active')->count(),
             'completed_services' => LinkingService::where('status', 'completed')->count(),
             'pending_services' => LinkingService::where('status', 'pending')->count(),
+            'total_partnerships' => LinkingService::where('status', 'active')->count(),
             'total_amount' => LinkingService::sum('amount'),
             'total_commission' => LinkingService::sum('commission'),
             'avg_service_amount' => LinkingService::avg('amount'),
@@ -173,6 +174,47 @@ class LinkingServiceController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'تم تحديث العمولة بنجاح');
+    }
+
+    /**
+     * تحديث خدمة الربط
+     */
+    public function update(Request $request, LinkingService $linkingService)
+    {
+        $request->validate([
+            'logistics_company_id' => 'required|exists:logistics_companies,id',
+            'service_company_id' => 'required|exists:service_companies,id',
+            'service_type' => 'required|in:financing,logistics,warehousing,distribution',
+            'amount' => 'required|numeric|min:0',
+            'commission_rate' => 'required|numeric|min:0|max:100',
+            'description' => 'nullable|string|max:1000',
+            'status' => 'required|in:pending,active,completed,cancelled',
+        ]);
+
+        $commission = $request->amount * ($request->commission_rate / 100);
+
+        $linkingService->update([
+            'logistics_company_id' => $request->logistics_company_id,
+            'service_company_id' => $request->service_company_id,
+            'service_type' => $request->service_type,
+            'status' => $request->status,
+            'amount' => $request->amount,
+            'commission' => $commission,
+            'commission_rate' => $request->commission_rate,
+            'description' => $request->description,
+            'completed_at' => $request->status === 'completed' ? now() : null,
+        ]);
+
+        return redirect()->route('admin.linking_services.index')->with('success', 'تم تحديث خدمة الربط بنجاح');
+    }
+
+    /**
+     * حذف خدمة الربط
+     */
+    public function destroy(LinkingService $linkingService)
+    {
+        $linkingService->delete();
+        return redirect()->route('admin.linking_services.index')->with('success', 'تم حذف خدمة الربط بنجاح');
     }
 
     /**

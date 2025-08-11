@@ -52,58 +52,8 @@
 
         <!-- Categories Tree -->
         <div class="space-y-4" id="categories-tree">
-            @php
-                $categories = [
-                    [
-                        'id' => 1,
-                        'name' => 'أجهزة تتبع GPS',
-                        'description' => 'أجهزة تتبع متقدمة للمركبات والشحنات',
-                        'products_count' => 45,
-                        'status' => 'active',
-                        'image' => 'categories/gps-devices.jpg',
-                        'subcategories' => [
-                            ['id' => 11, 'name' => 'أجهزة تتبع السيارات', 'products_count' => 25],
-                            ['id' => 12, 'name' => 'أجهزة تتبع الشاحنات', 'products_count' => 20]
-                        ]
-                    ],
-                    [
-                        'id' => 2,
-                        'name' => 'أجهزة استشعار',
-                        'description' => 'أجهزة استشعار ذكية للمراقبة والتحكم',
-                        'products_count' => 32,
-                        'status' => 'active',
-                        'image' => 'categories/sensors.jpg',
-                        'subcategories' => [
-                            ['id' => 21, 'name' => 'استشعار الحرارة', 'products_count' => 15],
-                            ['id' => 22, 'name' => 'استشعار الحركة', 'products_count' => 17]
-                        ]
-                    ],
-                    [
-                        'id' => 3,
-                        'name' => 'الملحقات',
-                        'description' => 'ملحقات وقطع غيار متنوعة',
-                        'products_count' => 28,
-                        'status' => 'active',
-                        'image' => 'categories/accessories.jpg',
-                        'subcategories' => [
-                            ['id' => 31, 'name' => 'كابلات وأسلاك', 'products_count' => 12],
-                            ['id' => 32, 'name' => 'حاملات وقواعد', 'products_count' => 16]
-                        ]
-                    ],
-                    [
-                        'id' => 4,
-                        'name' => 'البرمجيات',
-                        'description' => 'حلول برمجية للإدارة والمراقبة',
-                        'products_count' => 20,
-                        'status' => 'inactive',
-                        'image' => 'categories/software.jpg',
-                        'subcategories' => []
-                    ]
-                ];
-            @endphp
-
-            @foreach($categories as $category)
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm category-item" data-id="{{ $category['id'] }}">
+            @forelse($categories as $category)
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm category-item" data-id="{{ $category->id }}">
                 <!-- Main Category -->
                 <div class="p-6">
                     <div class="flex items-center justify-between">
@@ -114,91 +64,62 @@
                             </div>
 
                             <!-- Category Image -->
-                            <div class="w-16 h-16 bg-gradient-primary rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                            <div class="w-16 h-16 bg-gradient-primary rounded-lg flex items-center justify-center ml-4 flex-shrink-0">
                                 <i class="fas fa-folder text-white text-xl"></i>
                             </div>
 
                             <!-- Category Info -->
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center space-x-3 space-x-reverse mb-2">
-                                    <h4 class="text-lg font-bold text-slate-900">{{ $category['name'] }}</h4>
-                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold {{ $category['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                        {{ $category['status'] === 'active' ? 'نشط' : 'غير نشط' }}
+                                    <h4 class="text-lg font-bold text-slate-900">{{ $category->name }}</h4>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold {{ ($category->status ?? 'active') === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                        {{ ($category->status ?? 'active') === 'active' ? 'نشط' : 'غير نشط' }}
                                     </span>
                                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-                                        {{ $category['products_count'] }} منتج
+                                        {{ $category->products_count ?? 0 }} منتج
                                     </span>
                                 </div>
-                                <p class="text-sm text-slate-600 truncate">{{ $category['description'] }}</p>
+                                <p class="text-sm text-slate-600 truncate">{{ $category->description ?? '' }}</p>
                             </div>
                         </div>
 
                         <!-- Actions -->
                         <div class="flex space-x-2 space-x-reverse ml-4">
-                            <button onclick="editCategory({{ $category['id'] }})"
+                            <button onclick="editCategory({{ $category->id }}, {{ json_encode($category->name) }}, {{ json_encode($category->description ?? '') }}, '{{ $category->parent_id ?? '' }}')"
                                     class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center transition-all hover-lift">
                                 <i class="fas fa-edit text-xs"></i>
                             </button>
 
-                            <button onclick="toggleCategoryStatus({{ $category['id'] }}, '{{ $category['status'] }}')"
-                                    class="w-8 h-8 {{ $category['status'] === 'active' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }} text-white rounded-lg flex items-center justify-center transition-all hover-lift">
-                                <i class="fas {{ $category['status'] === 'active' ? 'fa-pause' : 'fa-play' }} text-xs"></i>
+                            <button onclick="toggleCategoryStatus({{ $category->id }}, '{{ $category->status ?? 'active' }}')"
+                                    class="w-8 h-8 {{ ($category->status ?? 'active') === 'active' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600' }} text-white rounded-lg flex items-center justify-center transition-all hover-lift">
+                                <i class="fas {{ ($category->status ?? 'active') === 'active' ? 'fa-pause' : 'fa-play' }} text-xs"></i>
                             </button>
 
-                            <button onclick="deleteCategory({{ $category['id'] }})"
+                            <button onclick="deleteCategory({{ $category->id }})"
                                     class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center transition-all hover-lift">
                                 <i class="fas fa-trash text-xs"></i>
                             </button>
 
-                            @if(!empty($category['subcategories']))
-                            <button onclick="toggleSubcategories({{ $category['id'] }})"
-                                    class="w-8 h-8 bg-purple-500 hover:bg-purple-600 text-white rounded-lg flex items-center justify-center transition-all hover-lift">
-                                <i class="fas fa-chevron-down text-xs subcategory-toggle" id="toggle-{{ $category['id'] }}"></i>
-                            </button>
-                            @endif
+
                         </div>
                     </div>
                 </div>
 
-                <!-- Subcategories -->
-                @if(!empty($category['subcategories']))
-                <div class="subcategories border-t border-gray-100 bg-gray-50 p-4 hidden" id="subcategories-{{ $category['id'] }}">
-                    <div class="space-y-3">
-                        @foreach($category['subcategories'] as $subcategory)
-                        <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-gradient-secondary rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-folder-open text-white text-sm"></i>
-                                </div>
-                                <div>
-                                    <div class="font-semibold text-slate-900">{{ $subcategory['name'] }}</div>
-                                    <div class="text-xs text-slate-500">{{ $subcategory['products_count'] }} منتج</div>
-                                </div>
-                            </div>
 
-                            <div class="flex space-x-2 space-x-reverse">
-                                <button onclick="editCategory({{ $subcategory['id'] }})"
-                                        class="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded flex items-center justify-center transition-colors">
-                                    <i class="fas fa-edit text-xs"></i>
-                                </button>
-                                <button onclick="deleteCategory({{ $subcategory['id'] }})"
-                                        class="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded flex items-center justify-center transition-colors">
-                                    <i class="fas fa-trash text-xs"></i>
-                                </button>
-                            </div>
-                        </div>
-                        @endforeach
-
-                        <button onclick="addSubcategory({{ $category['id'] }})"
-                                class="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-center hover:border-blue-500 hover:bg-blue-50 transition-all">
-                            <i class="fas fa-plus text-gray-400 mr-2"></i>
-                            <span class="text-gray-600 font-semibold">إضافة تصنيف فرعي</span>
-                        </button>
-                    </div>
-                </div>
-                @endif
             </div>
-            @endforeach
+            @empty
+            <div class="text-center py-12">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-folder-open text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">لا توجد تصنيفات</h3>
+                <p class="text-gray-500 mb-6">ابدأ بإنشاء أول تصنيف للمنتجات</p>
+                <button onclick="openCreateModal()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-plus mr-2"></i>
+                    إضافة تصنيف جديد
+                </button>
+            </div>
+            @endforelse
         </div>
     </div>
 </div>
@@ -286,30 +207,90 @@
     </div>
 </div>
 
+<!-- Category Modal -->
+<div id="category-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-xl w-full max-w-md mx-4">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="modal-title" class="text-xl font-bold text-slate-900">إضافة تصنيف جديد</h3>
+                <button onclick="closeCategoryModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="category-form" method="POST" action="{{ route('admin.products.categories.store') }}">
+                @csrf
+                <div id="method-field"></div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">اسم التصنيف</label>
+                        <input type="text" name="name" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               placeholder="أدخل اسم التصنيف">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
+                        <textarea name="description" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="وصف التصنيف (اختياري)"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">التصنيف الأصلي</label>
+                        <select name="parent_id"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">تصنيف رئيسي</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3 space-x-reverse mt-6">
+                    <button type="submit"
+                            class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        حفظ
+                    </button>
+                    <button type="button" onclick="closeCategoryModal()"
+                            class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
     // Create new category
     function openCreateModal() {
         document.getElementById('category-modal').classList.remove('hidden');
         document.getElementById('modal-title').textContent = 'إضافة تصنيف جديد';
-        document.getElementById('category-form').action = '/admin/products/categories';
+        document.getElementById('category-form').action = '{{ route("admin.products.categories.store") }}';
         document.getElementById('method-field').innerHTML = '';
         document.getElementById('category-form').reset();
-    }
-
-    // Edit category
-    function editCategory(categoryId) {
-        document.getElementById('category-modal').classList.remove('hidden');
-        document.getElementById('modal-title').textContent = 'تعديل التصنيف';
-        document.getElementById('category-form').action = `/admin/products/categories/${categoryId}`;
-        document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PUT">';
-
-        // Here you would typically fetch and populate the form with category data
     }
 
     // Close modal
     function closeCategoryModal() {
         document.getElementById('category-modal').classList.add('hidden');
+    }
+
+    // Edit category
+    function editCategory(categoryId, name, description, parentId) {
+        document.getElementById('category-modal').classList.remove('hidden');
+        document.getElementById('modal-title').textContent = 'تعديل التصنيف';
+        document.getElementById('category-form').action = `/admin/products/categories/${categoryId}`;
+        document.getElementById('method-field').innerHTML = '<input type="hidden" name="_method" value="PUT">';
+
+        // Fill form with category data
+        document.querySelector('input[name="name"]').value = name || '';
+        document.querySelector('textarea[name="description"]').value = description || '';
+        document.querySelector('select[name="parent_id"]').value = parentId || '';
     }
 
     // Toggle subcategories

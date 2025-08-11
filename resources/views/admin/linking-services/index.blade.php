@@ -50,10 +50,10 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">الحالة</label>
                     <select name="status" class="w-full px-4 py-3 lg:px-4 lg:py-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all text-slate-700" onchange="document.getElementById('filters-form').submit()">
                         <option value="">جميع الحالات</option>
-                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>نشط</option>
-                        <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>غير نشط</option>
                         <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>معلق</option>
-                        <option value="suspended" {{ request('status') == 'suspended' ? 'selected' : '' }}>موقوف</option>
+                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>نشط</option>
+                        <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>مكتمل</option>
+                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>ملغي</option>
                     </select>
                 </div>
 
@@ -99,22 +99,26 @@
             <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                 <div class="flex items-start justify-between mb-3">
                     <div>
-                        <div class="text-lg font-bold text-slate-900">{{ $service->name }}</div>
-                        <div class="text-sm text-slate-600">{{ $service->type }}</div>
-                        <div class="text-lg font-black text-slate-900">{{ $service->commission_rate }}% عمولة</div>
+                        <div class="text-lg font-bold text-slate-900">
+                            {{ optional($service->logisticsCompany->user)->company_name ?? optional($service->logisticsCompany->user)->name ?? 'شركة غير محددة' }}
+                            ←
+                            {{ optional($service->serviceCompany->user)->company_name ?? optional($service->serviceCompany->user)->name ?? 'شركة غير محددة' }}
+                        </div>
+                        <div class="text-sm text-slate-600">{{ $service->getServiceTypes()[$service->service_type] ?? $service->service_type }}</div>
+                        <div class="text-lg font-black text-slate-900">{{ $service->commission_rate ?? 0 }}% عمولة</div>
                     </div>
                     @php
                         $statusClasses = [
                             'active' => 'bg-green-100 text-green-800',
-                            'inactive' => 'bg-gray-100 text-gray-800',
                             'pending' => 'bg-yellow-100 text-yellow-800',
-                            'suspended' => 'bg-red-100 text-red-800'
+                            'completed' => 'bg-blue-100 text-blue-800',
+                            'cancelled' => 'bg-red-100 text-red-800'
                         ];
                         $statusNames = [
                             'active' => 'نشط',
-                            'inactive' => 'غير نشط',
                             'pending' => 'معلق',
-                            'suspended' => 'موقوف'
+                            'completed' => 'مكتمل',
+                            'cancelled' => 'ملغي'
                         ];
                     @endphp
                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold {{ $statusClasses[$service->status] ?? 'bg-gray-100 text-gray-800' }}">
@@ -172,7 +176,7 @@
                                 معدل العمولة
                             </th>
                             <th class="px-6 py-4 text-right text-sm font-bold text-slate-700 border-b border-gray-200">
-                                الشراكات
+                                المبلغ
                             </th>
                             <th class="px-6 py-4 text-right text-sm font-bold text-slate-700 border-b border-gray-200">
                                 الحالة
@@ -192,11 +196,15 @@
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
-                                    <div class="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center mr-3">
+                                    <div class="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center ml-3">
                                         <i class="fas fa-link text-white text-sm"></i>
                                     </div>
                                     <div>
-                                        <div class="text-lg font-bold text-slate-900">{{ $service->name }}</div>
+                                        <div class="text-lg font-bold text-slate-900">
+                                            {{ optional($service->logisticsCompany->user)->company_name ?? optional($service->logisticsCompany->user)->name ?? 'شركة لوجستية' }}
+                                            ←
+                                            {{ optional($service->serviceCompany->user)->company_name ?? optional($service->serviceCompany->user)->name ?? 'شركة خدمة' }}
+                                        </div>
                                         @if($service->description)
                                         <div class="text-sm text-slate-600 max-w-xs truncate" title="{{ $service->description }}">
                                             {{ $service->description }}
@@ -207,17 +215,17 @@
                             </td>
 
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-bold text-slate-900">{{ $service->type }}</div>
+                                <div class="text-sm font-bold text-slate-900">{{ $service->getServiceTypes()[$service->service_type] ?? $service->service_type }}</div>
                             </td>
 
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-lg font-black text-slate-900">{{ $service->commission_rate }}%</div>
+                                <div class="text-lg font-black text-slate-900">{{ $service->commission_rate ?? 0 }}%</div>
                                 <div class="text-sm text-slate-500">عمولة</div>
                             </td>
 
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-lg font-black text-slate-900">{{ $service->partnerships_count ?? 0 }}</div>
-                                <div class="text-sm text-slate-500">شراكة نشطة</div>
+                                <div class="text-lg font-black text-slate-900">{{ number_format($service->amount ?? 0) }}</div>
+                                <div class="text-sm text-slate-500">ريال سعودي</div>
                             </td>
 
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -324,23 +332,38 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">اسم الخدمة <span class="text-red-500">*</span></label>
-                        <input type="text" name="name" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                               placeholder="أدخل اسم الخدمة">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">الشركة اللوجستية <span class="text-red-500">*</span></label>
+                        <select name="logistics_company_id" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                            <option value="">اختر الشركة اللوجستية</option>
+                            @foreach($logisticsCompanies as $company)
+                                <option value="{{ $company->id }}">{{ $company->user->company_name ?? $company->user->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">نوع الخدمة <span class="text-red-500">*</span></label>
-                        <select name="type" required
+                        <label class="block text-sm font-bold text-slate-700 mb-2">شركة الخدمة <span class="text-red-500">*</span></label>
+                        <select name="service_company_id" required
                                 class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                            <option value="">اختر نوع الخدمة</option>
-                            <option value="funding">تمويل</option>
-                            <option value="logistics">لوجستية</option>
-                            <option value="payment">مدفوعات</option>
-                            <option value="insurance">تأمين</option>
+                            <option value="">اختر شركة الخدمة</option>
+                            @foreach($serviceCompanies as $company)
+                                <option value="{{ $company->id }}">{{ $company->user->company_name ?? $company->user->name }}</option>
+                            @endforeach
                         </select>
                     </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">نوع الخدمة <span class="text-red-500">*</span></label>
+                    <select name="service_type" required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                        <option value="">اختر نوع الخدمة</option>
+                        <option value="financing">خدمات التمويل</option>
+                        <option value="logistics">خدمات لوجستية</option>
+                        <option value="warehousing">خدمات التخزين</option>
+                        <option value="distribution">خدمات التوزيع</option>
+                    </select>
                 </div>
 
                 <div>
@@ -350,7 +373,14 @@
                               placeholder="وصف موجز للخدمة"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">المبلغ <span class="text-red-500">*</span></label>
+                        <input type="number" name="amount" step="0.01" min="0" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                               placeholder="0.00">
+                    </div>
+
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">معدل العمولة (%) <span class="text-red-500">*</span></label>
                         <input type="number" name="commission_rate" step="0.01" min="0" max="100" required
@@ -362,9 +392,10 @@
                         <label class="block text-sm font-bold text-slate-700 mb-2">الحالة</label>
                         <select name="status"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                            <option value="active">نشط</option>
-                            <option value="inactive">غير نشط</option>
                             <option value="pending">معلق</option>
+                            <option value="active">نشط</option>
+                            <option value="completed">مكتمل</option>
+                            <option value="cancelled">ملغي</option>
                         </select>
                     </div>
                 </div>

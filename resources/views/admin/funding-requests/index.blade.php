@@ -97,7 +97,7 @@
                     <div>
                         <div class="text-sm font-bold text-slate-900">#{{ $request->id }}</div>
                         <div class="text-lg font-black text-slate-900">{{ number_format($request->amount) }} ريال</div>
-                        <div class="text-sm text-slate-600">{{ $request->logisticsCompany->user->company_name }}</div>
+                        <div class="text-sm text-slate-600">{{ optional($request->logisticsCompany->user)->company_name ?? optional($request->logisticsCompany->user)->name ?? 'غير محدد' }}</div>
                     </div>
                     @php
                         $statusClasses = [
@@ -205,12 +205,12 @@
 
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center mr-3">
+                                    <div class="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center ml-3">
                                         <i class="fas fa-truck text-white text-sm"></i>
                                     </div>
                                     <div>
-                                        <div class="text-sm font-bold text-slate-900">{{ $request->logisticsCompany->user->company_name }}</div>
-                                        <div class="text-sm text-slate-500">{{ $request->logisticsCompany->user->email }}</div>
+                                        <div class="text-sm font-bold text-slate-900">{{ optional($request->logisticsCompany->user)->company_name ?? optional($request->logisticsCompany->user)->name ?? 'غير محدد' }}</div>
+                                        <div class="text-sm text-slate-500">{{ optional($request->logisticsCompany->user)->email ?? 'غير محدد' }}</div>
                                     </div>
                                 </div>
                             </td>

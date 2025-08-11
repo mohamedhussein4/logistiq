@@ -40,10 +40,11 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">رقم المنتج (SKU) <span class="text-red-500">*</span></label>
-                    <input type="text" name="sku" value="{{ old('sku', $product->sku ?? 'GPS-TRACK-001') }}" required
+                    <label class="block text-sm font-bold text-slate-700 mb-2">رقم المنتج (SKU)</label>
+                    <input type="text" name="sku" value="{{ old('sku', $product->sku) }}"
                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all @error('sku') border-red-500 @enderror"
                            placeholder="مثال: GPS-TRACK-001">
+                    <p class="mt-1 text-xs text-slate-500">رقم المنتج الفريد</p>
                     @error('sku')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -160,25 +161,35 @@
 
         <!-- Current Images -->
         @php
-            $currentImages = $product->images ?? ['products/gps-tracker-1.jpg', 'products/gps-tracker-2.jpg'];
+            // تحويل images إلى array إذا كانت string
+            $productImages = $product->images;
+            if (is_string($productImages)) {
+                $productImages = json_decode($productImages, true) ?? [];
+            } elseif (is_null($productImages)) {
+                $productImages = [];
+            }
+            $currentImages = !empty($productImages) ? $productImages : ['products/gps-tracker-1.jpg', 'products/gps-tracker-2.jpg'];
         @endphp
 
-        @if(!empty($currentImages))
+        @if(!empty($currentImages) && is_array($currentImages))
         <div class="glass-effect rounded-2xl lg:rounded-3xl p-4 lg:p-8 border border-white/20">
-            <h3 class="text-xl font-bold gradient-text mb-6">الصور الحالية</h3>
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold gradient-text">الصور الحالية</h3>
+                <span class="text-sm text-slate-600 image-counter">{{ count($currentImages) }} صور</span>
+            </div>
 
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-4" id="current-images">
                 @foreach($currentImages as $index => $image)
                 <div class="relative group current-image">
-                    <img src="{{ asset('storage/' . $image) }}" class="w-full h-32 object-cover rounded-xl border-2 border-gray-200">
+                    <img src="{{ asset('/' . $image) }}" class="w-full h-32 object-cover rounded-xl border-2 border-gray-200">
                     <button type="button" onclick="removeCurrentImage(this, '{{ $image }}')"
                             class="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <i class="fas fa-times text-xs"></i>
                     </button>
-                    <div class="absolute bottom-2 left-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+                    <div class="absolute bottom-2 left-2 bg-black bg-opacity-75 text-white text-xs px-2 py-2 rounded">
                         {{ $index + 1 }}
                     </div>
-                    <input type="hidden" name="existing_images[]" value="{{ $image }}">
+                    <!-- لا نحتاج existing_images لأننا نرسل remove_images بدلاً منها -->
                 </div>
                 @endforeach
             </div>
@@ -221,7 +232,14 @@
 
             <div id="specifications-container" class="space-y-4">
                 @php
-                    $specifications = $product->specifications ?? [
+                    // تحويل specifications إلى array إذا كانت string
+                    $productSpecs = $product->specifications;
+                    if (is_string($productSpecs)) {
+                        $productSpecs = json_decode($productSpecs, true) ?? [];
+                    } elseif (is_null($productSpecs)) {
+                        $productSpecs = [];
+                    }
+                    $specifications = !empty($productSpecs) ? $productSpecs : [
                         ['key' => 'نطاق الإرسال', 'value' => '10 كيلومتر'],
                         ['key' => 'عمر البطارية', 'value' => '30 يوم'],
                         ['key' => 'مقاومة الماء', 'value' => 'IP67']
@@ -395,7 +413,26 @@
 
     function removeCurrentImage(button, imagePath) {
         if (confirm('هل أنت متأكد من حذف هذه الصورة؟')) {
+            // إضافة الصورة إلى قائمة الصور المحذوفة
+            const form = button.closest('form');
+            const newInput = document.createElement('input');
+            newInput.type = 'hidden';
+            newInput.name = 'remove_images[]';
+            newInput.value = imagePath;
+            form.appendChild(newInput);
+
+            // Debug: عرض في console
+            console.log('Adding to remove_images:', imagePath);
+            console.log('Form inputs:', form.querySelectorAll('input[name="remove_images[]"]'));
+
+            // حذف العنصر من DOM
             button.closest('.current-image').remove();
+
+            // تحديث عداد الصور
+            updateImageCounter();
+
+            // إظهار رسالة تأكيد
+            showMessage('تم حذف الصورة بنجاح', 'success');
         }
     }
 
@@ -431,7 +468,99 @@
         window.open('/products/{{ $product->id ?? 1 }}', '_blank');
     }
 
-    // Calculate discount percentage
+    // Form submission debugging
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form[method="POST"]');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Debug: عرض جميع البيانات قبل الإرسال
+                const formData = new FormData(form);
+                console.log('=== FORM SUBMISSION DEBUG ===');
+                console.log('Form action:', form.action);
+                console.log('Form method:', form.method);
+
+                // عرض remove_images
+                const removeImages = form.querySelectorAll('input[name="remove_images[]"]');
+                console.log('Remove images count:', removeImages.length);
+                removeImages.forEach((input, index) => {
+                    console.log(`Remove image ${index}:`, input.value);
+                });
+
+                // عرض existing_images
+                const existingImages = form.querySelectorAll('input[name="existing_images[]"]');
+                console.log('Existing images count:', existingImages.length);
+                existingImages.forEach((input, index) => {
+                    console.log(`Existing image ${index}:`, input.value);
+                });
+
+                // عرض new_images
+                const newImages = form.querySelectorAll('input[name="new_images[]"]');
+                console.log('New images count:', newImages.length);
+
+                // عرض جميع البيانات
+                for (let [key, value] of formData.entries()) {
+                    console.log(`${key}:`, value);
+                }
+
+                console.log('=== END DEBUG ===');
+
+                // إذا لم تكن هناك صور محذوفة، إظهار تحذير
+                if (removeImages.length === 0) {
+                    console.warn('No images marked for removal!');
+                }
+            });
+        }
+    });
+
+    // Show message function
+    function showMessage(message, type = 'info') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg text-white font-semibold shadow-lg transition-all duration-300 transform translate-x-full`;
+
+        // تحديد اللون حسب نوع الرسالة
+        switch(type) {
+            case 'success':
+                messageDiv.classList.add('bg-green-500');
+                break;
+            case 'error':
+                messageDiv.classList.add('bg-red-500');
+                break;
+            case 'warning':
+                messageDiv.classList.add('bg-yellow-500');
+                break;
+            default:
+                messageDiv.classList.add('bg-blue-500');
+        }
+
+        messageDiv.textContent = message;
+        document.body.appendChild(messageDiv);
+
+        // إظهار الرسالة
+        setTimeout(() => {
+            messageDiv.classList.remove('translate-x-full');
+        }, 100);
+
+        // إخفاء الرسالة بعد 3 ثواني
+        setTimeout(() => {
+            messageDiv.classList.add('translate-x-full');
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.parentNode.removeChild(messageDiv);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // تحديث عداد الصور
+    function updateImageCounter() {
+        const currentImages = document.querySelectorAll('.current-image');
+        const counter = document.querySelector('.image-counter');
+        if (counter) {
+            counter.textContent = `${currentImages.length} صور`;
+        }
+    }
+
+        // Calculate discount percentage
     const priceInput = document.querySelector('input[name="price"]');
     const originalPriceInput = document.querySelector('input[name="original_price"]');
 

@@ -53,7 +53,7 @@
                         <option value="admin" {{ request('user_type') == 'admin' ? 'selected' : '' }}>مدير النظام</option>
                         <option value="logistics" {{ request('user_type') == 'logistics' ? 'selected' : '' }}>شركة لوجستية</option>
                         <option value="service_company" {{ request('user_type') == 'service_company' ? 'selected' : '' }}>شركة طالبة للخدمة</option>
-                        <option value="user" {{ request('user_type') == 'user' ? 'selected' : '' }}>مستخدم عادي</option>
+                        <option value="regular" {{ request('user_type') == 'regular' ? 'selected' : '' }}>مستخدم عادي</option>
                     </select>
                 </div>
 
@@ -230,7 +230,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     <!-- User Avatar -->
-                                    <div class="w-12 h-12 rounded-xl flex items-center justify-center mr-4
+                                    <div class="w-12 h-12 rounded-xl flex items-center justify-center ml-4
                                         {{ $user->user_type === 'admin' ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
                                            ($user->user_type === 'logistics' ? 'bg-gradient-to-br from-blue-500 to-cyan-500' :
                                            ($user->user_type === 'service_company' ? 'bg-gradient-to-br from-green-500 to-emerald-500' : 'bg-gradient-to-br from-gray-500 to-slate-500')) }}">

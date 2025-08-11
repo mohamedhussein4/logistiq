@@ -366,13 +366,7 @@
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="flex items-center space-x-3 space-x-reverse">
-                    <!-- Notifications -->
-                    <button class="relative w-10 h-10 bg-white/60 rounded-xl flex items-center justify-center text-slate-600 hover:text-slate-800 border border-white/40 hover-lift">
-                        <i class="fas fa-bell"></i>
-                        <span class="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
-                    </button>
-
+                <div class="space-x-3 space-x-reverse">
                     <!-- Profile -->
                     <div class="hidden lg:flex items-center space-x-3 space-x-reverse bg-white/60 rounded-xl px-4 py-2 border border-white/40">
                         <div class="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
@@ -397,7 +391,7 @@
             @if(session('success'))
             <div class="mb-4 p-4 lg:p-6 glass-effect rounded-2xl border border-green-200 bg-green-50/60 text-green-800 animate-slide-down" id="success-message">
                 <div class="flex items-center">
-                    <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center mr-3">
+                    <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center ml-3">
                         <i class="fas fa-check text-white text-sm"></i>
                     </div>
                     <div class="flex-1">
@@ -442,7 +436,7 @@
             @if(session('warning'))
             <div class="mb-4 p-4 lg:p-6 glass-effect rounded-2xl border border-yellow-200 bg-yellow-50/60 text-yellow-800 animate-slide-down" id="warning-message">
                 <div class="flex items-center">
-                    <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
+                    <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center ml-3">
                         <i class="fas fa-exclamation-circle text-white text-sm"></i>
                     </div>
                     <div class="flex-1">
@@ -460,7 +454,7 @@
             @if(session('info'))
             <div class="mb-4 p-4 lg:p-6 glass-effect rounded-2xl border border-blue-200 bg-blue-50/60 text-blue-800 animate-slide-down" id="info-message">
                 <div class="flex items-center">
-                    <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                    <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center ml-3">
                         <i class="fas fa-info-circle text-white text-sm"></i>
                     </div>
                     <div class="flex-1">
@@ -617,7 +611,7 @@
             notification.className = `mb-4 p-4 lg:p-6 glass-effect rounded-2xl border ${color.border} ${color.bg} ${color.text} animate-slide-down`;
             notification.innerHTML = `
                 <div class="flex items-center">
-                    <div class="w-8 h-8 ${color.iconBg} rounded-lg flex items-center justify-center mr-3">
+                    <div class="w-8 h-8 ${color.iconBg} rounded-lg flex items-center justify-center ml-3">
                         <i class="fas ${color.icon} text-white text-sm"></i>
                     </div>
                     <div class="flex-1">

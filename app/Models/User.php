@@ -84,25 +84,25 @@ class User extends Authenticatable
         return $this->hasMany(ProductOrder::class);
     }
 
-    // العلاقات للفواتير والمدفوعات
+    // العلاقات للفواتير والمدفوعات (سيتم استخدام serviceInvoices بدلاً منها)
     public function invoices()
     {
-        return $this->hasMany(Invoice::class, 'service_company_id');
+        return $this->hasManyThrough(Invoice::class, ServiceCompany::class, 'user_id', 'service_company_id');
     }
 
     public function logisticsInvoices()
     {
-        return $this->hasMany(Invoice::class, 'logistics_company_id');
+        return $this->hasManyThrough(Invoice::class, LogisticsCompany::class, 'user_id', 'logistics_company_id');
     }
 
-    public function payments()
+    public function serviceInvoices()
     {
-        return $this->hasMany(Payment::class, 'service_company_id');
+        return $this->hasManyThrough(Invoice::class, ServiceCompany::class, 'user_id', 'service_company_id');
     }
 
     public function fundingRequests()
     {
-        return $this->hasMany(FundingRequest::class, 'logistics_company_id');
+        return $this->hasManyThrough(FundingRequest::class, LogisticsCompany::class, 'user_id', 'logistics_company_id');
     }
 
     // Static methods

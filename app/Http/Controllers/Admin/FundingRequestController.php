@@ -79,7 +79,7 @@ class FundingRequestController extends Controller
     public function show(FundingRequest $fundingRequest)
     {
         $fundingRequest->load([
-            'logisticsCompany.user.profile', 
+            'logisticsCompany.user.profile',
             'logisticsCompany.fundingRequests',
             'clientDebts'
         ]);
@@ -319,7 +319,7 @@ class FundingRequestController extends Controller
             foreach ($requests as $request) {
                 fputcsv($file, [
                     $request->id,
-                    $request->logisticsCompany->user->company_name,
+                    $request->logisticsCompany->user->company_name ?? $request->logisticsCompany->user->name ?? 'غير محدد',
                     number_format($request->amount, 2),
                     $request->reason,
                     $request->getStatusNameAttribute(),

@@ -68,7 +68,7 @@
                         <option value="admin" {{ old('user_type') == 'admin' ? 'selected' : '' }}>مدير النظام</option>
                         <option value="logistics" {{ old('user_type') == 'logistics' ? 'selected' : '' }}>شركة لوجستية</option>
                         <option value="service_company" {{ old('user_type') == 'service_company' ? 'selected' : '' }}>شركة طالبة للخدمة</option>
-                        <option value="user" {{ old('user_type') == 'user' ? 'selected' : '' }}>مستخدم عادي</option>
+                        <option value="regular" {{ old('user_type') == 'regular' ? 'selected' : '' }}>مستخدم عادي</option>
                     </select>
                     @error('user_type')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

@@ -16,13 +16,19 @@ class LinkingService extends Model
         'status',
         'amount',
         'commission',
+        'commission_rate',
+        'description',
+        'admin_notes',
         'linked_at',
+        'completed_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'commission' => 'decimal:2',
+        'commission_rate' => 'decimal:2',
         'linked_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     // Status constants

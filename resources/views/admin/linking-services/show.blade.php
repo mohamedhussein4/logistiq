@@ -141,7 +141,7 @@
                 <div class="space-y-4">
                     @foreach($partners as $partner)
                     <div class="flex items-center p-4 bg-gray-50 border border-gray-200 rounded-xl">
-                        <div class="w-12 h-12 rounded-lg flex items-center justify-center mr-4 {{ $partner['type'] === 'funding_company' ? 'bg-green-500' : 'bg-blue-500' }}">
+                        <div class="w-12 h-12 rounded-lg flex items-center justify-center ml-4 {{ $partner['type'] === 'funding_company' ? 'bg-green-500' : 'bg-blue-500' }}">
                             <i class="fas {{ $partner['type'] === 'funding_company' ? 'fa-university' : 'fa-truck' }} text-white"></i>
                         </div>
 
@@ -151,7 +151,7 @@
                             <p class="text-xs text-slate-500">شريك منذ: {{ $partner['partnership_since'] }}</p>
                         </div>
 
-                        <div class="text-center mr-4">
+                        <div class="text-center ml-4">
                             <div class="text-lg font-black text-slate-900">{{ $partner['total_transactions'] }}</div>
                             <div class="text-xs text-slate-500">معاملة</div>
                         </div>

@@ -160,7 +160,7 @@
                                     <i class="fas fa-plus text-xs"></i>
                                 </button>
                                 <button onclick="removeFromCart({{ $item['product']->id }})"
-                                        class="text-red-500 hover:text-red-700 mr-4">
+                                        class="text-red-500 hover:text-red-700 ml-4">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>

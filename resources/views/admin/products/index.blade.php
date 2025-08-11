@@ -94,7 +94,7 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <a href="{{ route('admin.products.categories.index') }}" class="px-3 lg:px-6 py-2 lg:py-3 bg-gradient-warning text-white rounded-lg lg:rounded-xl font-semibold text-sm lg:text-base hover-lift transition-all">
+                <a href="{{ route('admin.products.categories.manage') }}" class="px-3 lg:px-6 py-2 lg:py-3 bg-gradient-warning text-white rounded-lg lg:rounded-xl font-semibold text-sm lg:text-base hover-lift transition-all">
                     <i class="fas fa-tags mr-2"></i>
                     <span class="hidden lg:inline">إدارة التصنيفات</span>
                     <span class="lg:hidden">تصنيفات</span>
@@ -123,7 +123,7 @@
                     @endphp
 
                     @if($firstImage)
-                        <img src="{{ asset('storage/' . $firstImage) }}" alt="{{ $product->name }}"
+                        <img src="{{ asset('/' . $firstImage) }}" alt="{{ $product->name }}"
                              class="w-16 h-16 rounded-xl object-cover border-2 border-white shadow-lg flex-shrink-0">
                     @else
                         <div class="w-16 h-16 bg-gradient-primary rounded-xl flex items-center justify-center flex-shrink-0">
@@ -235,10 +235,10 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     @if($firstImage)
-                                        <img src="{{ asset('storage/' . $firstImage) }}" alt="{{ $product->name }}"
+                                        <img src="{{ asset('/' . $firstImage) }}" alt="{{ $product->name }}"
                                              class="w-16 h-16 rounded-xl object-cover mr-4 border-2 border-white shadow-lg">
                                     @else
-                                        <div class="w-16 h-16 bg-gradient-primary rounded-xl flex items-center justify-center mr-4">
+                                        <div class="w-16 h-16 bg-gradient-primary rounded-xl flex items-center justify-center ml-4">
                                             <i class="fas fa-box text-white text-xl"></i>
                                         </div>
                                     @endif

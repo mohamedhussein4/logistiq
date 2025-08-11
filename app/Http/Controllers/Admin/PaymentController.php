@@ -75,7 +75,7 @@ class PaymentController extends Controller
     public function updateStatus(Request $request, Payment $payment)
     {
         $request->validate([
-            'status' => 'required|in:pending,confirmed,rejected',
+            'status' => 'required|in:pending,confirmed,rejected,failed,cancelled,refunded',
             'admin_notes' => 'nullable|string|max:1000'
         ]);
 
@@ -94,6 +94,7 @@ class PaymentController extends Controller
 
             // تحديث الفاتورة حسب الحالة الجديدة
             if ($oldStatus !== 'confirmed' && $newStatus === 'confirmed') {
+                // إضافة المبلغ عند التأكيد
                 $invoice->increment('paid_amount', $payment->amount);
                 $invoice->decrement('remaining_amount', $payment->amount);
 
@@ -106,6 +107,21 @@ class PaymentController extends Controller
                 $serviceCompany = $invoice->serviceCompany;
                 $serviceCompany->increment('total_paid', $payment->amount);
                 $serviceCompany->decrement('total_outstanding', $payment->amount);
+            } elseif ($oldStatus === 'confirmed' && in_array($newStatus, ['rejected', 'refunded', 'cancelled'])) {
+                // استرداد المبلغ عند الرفض أو الاسترداد أو الإلغاء
+                $invoice->decrement('paid_amount', $payment->amount);
+                $invoice->increment('remaining_amount', $payment->amount);
+
+                // تحديث حالة الفاتورة
+                if ($invoice->paid_amount <= 0) {
+                    $invoice->update(['payment_status' => 'unpaid']);
+                } else {
+                    $invoice->update(['payment_status' => 'partial']);
+                }
+
+                $serviceCompany = $invoice->serviceCompany;
+                $serviceCompany->decrement('total_paid', $payment->amount);
+                $serviceCompany->increment('total_outstanding', $payment->amount);
             }
         });
 
