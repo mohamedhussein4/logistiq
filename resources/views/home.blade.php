@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'LogistiQ - حلول التمويل اللوجستية المتقدمة')
+@section('title', 'Link2u - حلول التمويل اللوجستية المتقدمة')
 
 @section('content')
 <!-- Hero Section -->
@@ -25,14 +25,14 @@
             </div>
 
             <h1 class="text-4xl md:text-7xl font-bold mb-8 animate-slide-up">
-                <span class="gradient-text">حلول التمويل</span>
+                <span class="gradient-text">منصة الربط</span>
                 <br>
-                <span class="text-secondary-800">اللوجستية المتقدمة</span>
+                <span class="text-secondary-800">اللوجستية الذكية</span>
             </h1>
 
             <p class="text-xl md:text-2xl mb-12 text-secondary-600 leading-relaxed max-w-3xl mx-auto animate-slide-up" style="animation-delay: 0.1s;">
-                نقدم للشركات اللوجستية تمويل مستحقاتها المالية مقدماً ونحصلها من العملاء لاحقاً<br>
-                <span class="text-primary-600 font-semibold">بأحدث التقنيات وأفضل الحلول المالية</span>
+                نربط الشركات اللوجستية بشركات التمويل المرخصة والشركات الطالبة للخدمة<br>
+                <span class="text-primary-600 font-semibold">منصة واحدة لجميع احتياجاتك اللوجستية والمالية</span>
             </p>
 
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.2s;">
@@ -53,16 +53,16 @@
             <!-- Statistics -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 animate-slide-up" style="animation-delay: 0.3s;">
                 <div class="glass rounded-2xl p-6 hover-lift">
-                    <div class="text-3xl font-bold gradient-text mb-2">٥٠٠+</div>
-                    <div class="text-secondary-600 text-sm">شركة موثوقة</div>
+                    <div class="text-3xl font-bold gradient-text mb-2">٢٠٠+</div>
+                    <div class="text-secondary-600 text-sm">شركة مربوطة</div>
                 </div>
                 <div class="glass rounded-2xl p-6 hover-lift">
-                    <div class="text-3xl font-bold gradient-text mb-2">٢.٥ب ر.س</div>
-                    <div class="text-secondary-600 text-sm">إجمالي التمويل</div>
+                    <div class="text-3xl font-bold gradient-text mb-2">٥٠+</div>
+                    <div class="text-secondary-600 text-sm">شركة تمويل مرخصة</div>
                 </div>
                 <div class="glass rounded-2xl p-6 hover-lift">
-                    <div class="text-3xl font-bold gradient-text mb-2">٩٨%</div>
-                    <div class="text-secondary-600 text-sm">معدل الاسترداد</div>
+                    <div class="text-3xl font-bold gradient-text mb-2">٩٥%</div>
+                    <div class="text-secondary-600 text-sm">معدل نجاح الربط</div>
                 </div>
                 <div class="glass rounded-2xl p-6 hover-lift">
                     <div class="text-3xl font-bold gradient-text mb-2">٢٤/٧</div>
@@ -94,7 +94,7 @@
                 </h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full mx-auto mb-8"></div>
                 <p class="text-xl text-secondary-600 leading-relaxed max-w-4xl mx-auto">
-                    نحن شركة متخصصة في تقديم حلول التمويل للشركات اللوجستية. نساعد الشركات على تحسين تدفقاتها النقدية من خلال صرف مستحقاتها المالية مقدماً، بينما نتولى عملية التحصيل من العملاء النهائيين وفق عقود واتفاقيات قانونية واضحة.
+                    نحن منصة ربط ذكية متخصصة في ربط الشركات اللوجستية بشركات التمويل المرخصة والشركات الطالبة للخدمة. نعمل كوسيط تقني موثوق لتسهيل العمليات التجارية والمالية، ونوفر أيضاً حلول أجهزة التتبع المتقدمة لجميع احتياجات النقل واللوجستيات.
                 </p>
             </div>
 
@@ -108,14 +108,14 @@
                                 <i class="fas fa-handshake text-white text-3xl"></i>
                             </div>
                         </div>
-                        <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-primary-600 transition-colors">الثقة والمصداقية</h3>
-                        <p class="text-secondary-600 leading-relaxed">نعمل وفق عقود قانونية واضحة مع جميع الأطراف لضمان الشفافية والثقة في جميع التعاملات</p>
+                        <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-primary-600 transition-colors">منصة ربط موثوقة</h3>
+                        <p class="text-secondary-600 leading-relaxed">نربط الشركات اللوجستية بأفضل شركات التمويل المرخصة في المملكة مع ضمان الشفافية والمصداقية</p>
 
                         <div class="mt-6 pt-6 border-t border-primary-100">
                             <div class="flex items-center justify-center space-x-4 space-x-reverse text-sm text-primary-600">
                                 <div class="flex items-center">
-                                    <i class="fas fa-shield-check ml-2"></i>
-                                    <span>آمن ومضمون</span>
+                                    <i class="fas fa-link ml-2"></i>
+                                    <span>ربط آمن ومضمون</span>
                                 </div>
                             </div>
                         </div>
@@ -130,14 +130,14 @@
                                 <i class="fas fa-rocket text-white text-3xl"></i>
                             </div>
                         </div>
-                        <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-emerald-600 transition-colors">السرعة والكفاءة</h3>
-                        <p class="text-secondary-600 leading-relaxed">نوفر التمويل بسرعة لتحسين التدفقات النقدية وضمان استمرارية العمل والعمليات</p>
+                        <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-emerald-600 transition-colors">ربط سريع وفعال</h3>
+                        <p class="text-secondary-600 leading-relaxed">نربط الشركات اللوجستية بأنسب شركات التمويل خلال وقت قياسي لضمان سرعة الحصول على الخدمات المطلوبة</p>
 
                         <div class="mt-6 pt-6 border-t border-emerald-100">
                             <div class="flex items-center justify-center space-x-4 space-x-reverse text-sm text-emerald-600">
                                 <div class="flex items-center">
-                                    <i class="fas fa-clock ml-2"></i>
-                                    <span>خلال 24 ساعة</span>
+                                    <i class="fas fa-bolt ml-2"></i>
+                                    <span>ربط فوري</span>
                                 </div>
                             </div>
                         </div>
@@ -152,14 +152,14 @@
                                 <i class="fas fa-chart-line text-white text-3xl"></i>
                             </div>
                         </div>
-                        <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-purple-600 transition-colors">النمو والتطور</h3>
-                        <p class="text-secondary-600 leading-relaxed">نساعد شركاء النجاح على النمو والتوسع في السوق المحلية والإقليمية والعالمية</p>
+                        <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-purple-600 transition-colors">شبكة متنوعة ومتنامية</h3>
+                        <p class="text-secondary-600 leading-relaxed">نوسع شبكتنا باستمرار لتشمل المزيد من شركات التمويل المرخصة وحلول التقنية المتطورة</p>
 
                         <div class="mt-6 pt-6 border-t border-purple-100">
                             <div class="flex items-center justify-center space-x-4 space-x-reverse text-sm text-purple-600">
                                 <div class="flex items-center">
-                                    <i class="fas fa-trending-up ml-2"></i>
-                                    <span>نمو مستدام</span>
+                                    <i class="fas fa-network-wired ml-2"></i>
+                                    <span>شبكة متنامية</span>
                                 </div>
                             </div>
                         </div>
@@ -171,20 +171,20 @@
             <div class="mt-20 glass rounded-3xl p-8 animate-slide-up" style="animation-delay: 0.4s;">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                     <div class="group hover-lift">
-                        <div class="text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform">٨+</div>
-                        <div class="text-secondary-600 text-sm">سنوات خبرة</div>
+                        <div class="text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform">٥+</div>
+                        <div class="text-secondary-600 text-sm">سنوات في الربط</div>
                     </div>
                     <div class="group hover-lift">
-                        <div class="text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform">١٥٠+</div>
-                        <div class="text-secondary-600 text-sm">موظف متخصص</div>
+                        <div class="text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform">٣٠+</div>
+                        <div class="text-secondary-600 text-sm">خبير متخصص</div>
                     </div>
                     <div class="group hover-lift">
-                        <div class="text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform">٩٩%</div>
-                        <div class="text-secondary-600 text-sm">رضا العملاء</div>
+                        <div class="text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform">٩٧%</div>
+                        <div class="text-secondary-600 text-sm">نجاح عمليات الربط</div>
                     </div>
                     <div class="group hover-lift">
-                        <div class="text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform">٢٤ساعة</div>
-                        <div class="text-secondary-600 text-sm">وقت الاستجابة</div>
+                        <div class="text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform">٢ساعة</div>
+                        <div class="text-secondary-600 text-sm">متوسط وقت الربط</div>
                     </div>
                 </div>
             </div>
@@ -212,7 +212,7 @@
                 </h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full mx-auto mb-8"></div>
                 <p class="text-xl text-secondary-600 leading-relaxed max-w-3xl mx-auto">
-                    عملية بسيطة ومدروسة لضمان أفضل خدمة تمويل للشركات اللوجستية
+                    عملية ربط بسيطة ومدروسة لضمان أفضل خدمة ربط بين الشركات اللوجستية وشركات التمويل المرخصة
                 </p>
             </div>
 
@@ -229,11 +229,11 @@
                                 </div>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-primary-600 transition-colors">تقديم طلب التمويل</h3>
-                                <p class="text-secondary-600 leading-relaxed">الشركة اللوجستية تقدم طلب للحصول على تمويل مستحقاتها المالية مع تقديم المستندات المطلوبة والبيانات المالية</p>
+                                <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-primary-600 transition-colors">طلب الربط والخدمة</h3>
+                                <p class="text-secondary-600 leading-relaxed">الشركة اللوجستية تقدم طلب للربط مع شركات التمويل المناسبة أو الشركات الطالبة للخدمة مع تقديم البيانات المطلوبة</p>
                                 <div class="mt-4 flex items-center text-primary-600 text-sm font-medium">
                                     <i class="fas fa-clock ml-2"></i>
-                                    خلال 24 ساعة
+                                    خلال ساعات قليلة
                                 </div>
                             </div>
                         </div>
@@ -251,11 +251,11 @@
                                 </div>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-emerald-600 transition-colors">دراسة الطلب والموافقة</h3>
-                                <p class="text-secondary-600 leading-relaxed">نقوم بدراسة الطلب وتقييم المخاطر وإبرام العقود والاتفاقيات القانونية مع جميع الأطراف بشفافية كاملة</p>
+                                <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-emerald-600 transition-colors">التقييم والمطابقة</h3>
+                                <p class="text-secondary-600 leading-relaxed">نقوم بتقييم احتياجات الشركة اللوجستية ومطابقتها مع أنسب شركات التمويل المرخصة في شبكتنا بناءً على المعايير المحددة</p>
                                 <div class="mt-4 flex items-center text-emerald-600 text-sm font-medium">
-                                    <i class="fas fa-shield-check ml-2"></i>
-                                    آمن ومضمون
+                                    <i class="fas fa-search ml-2"></i>
+                                    تقييم دقيق ومطابقة
                                 </div>
                             </div>
                         </div>
@@ -273,11 +273,11 @@
                                 </div>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-purple-600 transition-colors">صرف التمويل</h3>
-                                <p class="text-secondary-600 leading-relaxed">نقوم بصرف المبلغ المطلوب للشركة اللوجستية مقدماً لتحسين تدفقاتها النقدية وضمان استمرارية العمل</p>
+                                <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-purple-600 transition-colors">الربط والتسهيل</h3>
+                                <p class="text-secondary-600 leading-relaxed">نقوم بربط الشركة اللوجستية مع الشريك المناسب وتسهيل عملية التواصل والتفاوض بينهما لضمان أفضل النتائج</p>
                                 <div class="mt-4 flex items-center text-purple-600 text-sm font-medium">
-                                    <i class="fas fa-money-bill-wave ml-2"></i>
-                                    تحويل فوري
+                                    <i class="fas fa-handshake ml-2"></i>
+                                    ربط مباشر
                                 </div>
                             </div>
                         </div>
@@ -295,11 +295,11 @@
                                 </div>
                             </div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-orange-600 transition-colors">تحصيل المستحقات</h3>
-                                <p class="text-secondary-600 leading-relaxed">نتولى عملية تحصيل المبالغ مباشرة من الشركات الطالبة للخدمة وفق الجدول الزمني المتفق عليه مع المتابعة المستمرة</p>
+                                <h3 class="font-bold text-xl mb-4 text-secondary-800 group-hover:text-orange-600 transition-colors">المتابعة والدعم</h3>
+                                <p class="text-secondary-600 leading-relaxed">نقدم الدعم الفني والإداري المستمر لجميع الأطراف لضمان نجاح الشراكة ونوفر أدوات المتابعة والتقييم</p>
                                 <div class="mt-4 flex items-center text-orange-600 text-sm font-medium">
-                                    <i class="fas fa-chart-line ml-2"></i>
-                                    متابعة دقيقة
+                                    <i class="fas fa-headset ml-2"></i>
+                                    دعم مستمر
                                 </div>
                             </div>
                         </div>
@@ -337,7 +337,7 @@
                 </h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full mx-auto mb-8"></div>
                 <p class="text-xl text-secondary-600 leading-relaxed max-w-3xl mx-auto">
-                    نقدم حلول مالية متطورة وأجهزة تقنية حديثة لتطوير قطاع اللوجستيات
+                    نربط الشركات اللوجستية بأفضل شركات التمويل المرخصة ونوفر أجهزة تقنية حديثة لتطوير قطاع اللوجستيات
                 </p>
             </div>
 
@@ -353,11 +353,11 @@
                                     <i class="fas fa-money-bill-wave text-white text-3xl"></i>
                                 </div>
                             </div>
-                            <h3 class="text-2xl font-bold text-secondary-800 mr-4 group-hover:text-primary-600 transition-colors">تمويل المستحقات اللوجستية</h3>
+                            <h3 class="text-2xl font-bold text-secondary-800 mr-4 group-hover:text-primary-600 transition-colors">الربط مع شركات التمويل المرخصة</h3>
                         </div>
 
                         <p class="text-lg text-secondary-600 leading-relaxed mb-8">
-                            نوفر تمويل سريع ومرن للشركات اللوجستية لضمان استمرارية العمليات وتحسين التدفقات النقدية مع أفضل الشروط
+                            نربط الشركات اللوجستية بأفضل شركات التمويل المرخصة في المملكة لضمان الحصول على أنسب الحلول التمويلية
                         </p>
 
                         <div class="space-y-4 mb-8">
@@ -365,23 +365,23 @@
                                 <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center ml-4">
                                     <i class="fas fa-check text-primary-600"></i>
                                 </div>
-                                <span class="text-secondary-700">تمويل سريع خلال 24 ساعة</span>
+                                <span class="text-secondary-700">شركات تمويل مرخصة ومعتمدة</span>
                             </div>
                             <div class="flex items-center">
                                 <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center ml-4">
                                     <i class="fas fa-check text-primary-600"></i>
                                 </div>
-                                <span class="text-secondary-700">شروط مرنة ومناسبة</span>
+                                <span class="text-secondary-700">مطابقة دقيقة للاحتياجات</span>
                             </div>
                             <div class="flex items-center">
                                 <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center ml-4">
                                     <i class="fas fa-check text-primary-600"></i>
                                 </div>
-                                <span class="text-secondary-700">عقود قانونية واضحة</span>
+                                <span class="text-secondary-700">عمولة تنافسية على الربط</span>
                             </div>
                         </div>
 
-                        <a href="{{ route('logistics') }}" class="inline-flex items-center text-primary-600 font-semibold hover:text-primary-700 transition-colors group-hover:translate-x-2 transform duration-300">
+                        <a href="{{ route('logistics.public') }}" class="inline-flex items-center text-primary-600 font-semibold hover:text-primary-700 transition-colors group-hover:translate-x-2 transform duration-300">
                             اعرف المزيد
                             <i class="fas fa-arrow-left mr-2"></i>
                         </a>
@@ -403,7 +403,7 @@
                         </div>
 
                         <p class="text-lg text-secondary-600 leading-relaxed mb-8">
-                            نوفر أحدث أجهزة التتبع وحلول إدارة الأساطيل للشركات اللوجستية بأحدث التقنيات العالمية
+                            نوفر أحدث أجهزة التتبع وحلول إدارة الأساطيل للشركات اللوجستية من خلال متجرنا المتخصص بأحدث التقنيات العالمية
                         </p>
 
                         <div class="space-y-4 mb-8">
@@ -462,7 +462,7 @@
                 </h2>
 
                 <p class="text-xl md:text-2xl mb-12 opacity-90 leading-relaxed max-w-3xl mx-auto">
-                    تواصل معنا اليوم للحصول على حلول التمويل المناسبة لشركتك<br>
+                    تواصل معنا اليوم للربط مع أفضل شركات التمويل المرخصة لشركتك<br>
                     <span class="text-primary-200">وابدأ رحلة النمو والتطور</span>
                 </p>
 
@@ -484,20 +484,20 @@
                 <!-- Trust indicators -->
                 <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 opacity-80">
                     <div class="text-center">
-                        <div class="text-2xl font-bold mb-1">٩٨%</div>
-                        <div class="text-sm text-primary-200">معدل نجاح</div>
+                        <div class="text-2xl font-bold mb-1">٩٥%</div>
+                        <div class="text-sm text-primary-200">معدل نجاح الربط</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold mb-1">٢٤ ساعة</div>
-                        <div class="text-sm text-primary-200">وقت الاستجابة</div>
+                        <div class="text-2xl font-bold mb-1">٢ ساعات</div>
+                        <div class="text-sm text-primary-200">متوسط وقت الربط</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold mb-1">٥٠٠+</div>
-                        <div class="text-sm text-primary-200">عميل راضٍ</div>
+                        <div class="text-2xl font-bold mb-1">٢٠٠+</div>
+                        <div class="text-sm text-primary-200">شركة مربوطة</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold mb-1">٨ سنوات</div>
-                        <div class="text-sm text-primary-200">خبرة موثوقة</div>
+                        <div class="text-2xl font-bold mb-1">٥٠+</div>
+                        <div class="text-sm text-primary-200">شريك تمويل</div>
                     </div>
                 </div>
             </div>
@@ -532,7 +532,7 @@
                 <div class="w-24 h-1 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full mx-auto mb-8"></div>
 
                 <p class="text-xl text-secondary-600 leading-relaxed max-w-3xl mx-auto">
-                    نحن هنا للإجابة على جميع استفساراتك وتقديم أفضل الحلول المالية لشركتك
+                    نحن هنا للإجابة على جميع استفساراتك وربط شركتك بأنسب شركات التمويل المرخصة
                 </p>
             </div>
 
@@ -540,7 +540,35 @@
                 <!-- Contact Form -->
                 <div class="animate-slide-up" style="animation-delay: 0.1s;">
                     <div class="glass rounded-3xl p-8 shadow-soft border border-primary-200/50">
-                        <form class="space-y-6" onsubmit="handleContactSubmit(event)">
+
+                        <!-- Success Message -->
+                        @if(session('success'))
+                            <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative" role="alert">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle ml-2"></i>
+                                    <span class="block sm:inline">{{ session('success') }}</span>
+                                </div>
+                                <span class="absolute top-0 bottom-0 left-0 px-4 py-3 cursor-pointer" onclick="this.parentElement.style.display='none'">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </div>
+                        @endif
+
+                        <!-- Error Message -->
+                        @if(session('error'))
+                            <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative" role="alert">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-triangle ml-2"></i>
+                                    <span class="block sm:inline">{{ session('error') }}</span>
+                                </div>
+                                <span class="absolute top-0 bottom-0 left-0 px-4 py-3 cursor-pointer" onclick="this.parentElement.style.display='none'">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </div>
+                        @endif
+
+                        <form class="space-y-6" action="{{ route('contact.store') }}" method="POST">
+                            @csrf
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="group">
                                     <label class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
@@ -548,9 +576,14 @@
                                         اسم الشركة
                                     </label>
                                     <input type="text"
-                                           class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80"
+                                           name="company_name"
+                                           value="{{ old('company_name') }}"
+                                           class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('company_name') border-red-500 @enderror"
                                            placeholder="اسم شركتك"
                                            required>
+                                    @error('company_name')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 <div class="group">
@@ -559,9 +592,14 @@
                                         اسم المسؤول
                                     </label>
                                     <input type="text"
-                                           class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80"
+                                           name="contact_name"
+                                           value="{{ old('contact_name') }}"
+                                           class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('contact_name') border-red-500 @enderror"
                                            placeholder="اسمك الكامل"
                                            required>
+                                    @error('contact_name')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -572,9 +610,14 @@
                                         رقم الهاتف
                                     </label>
                                     <input type="tel"
-                                           class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80"
+                                           name="phone"
+                                           value="{{ old('phone') }}"
+                                           class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('phone') border-red-500 @enderror"
                                            placeholder="+966 xx xxx xxxx"
                                            required>
+                                    @error('phone')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 <div class="group">
@@ -583,9 +626,14 @@
                                         البريد الإلكتروني
                                     </label>
                                     <input type="email"
-                                           class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80"
+                                           name="email"
+                                           value="{{ old('email') }}"
+                                           class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('email') border-red-500 @enderror"
                                            placeholder="email@company.com"
                                            required>
+                                    @error('email')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -594,13 +642,17 @@
                                     <i class="fas fa-cog ml-2"></i>
                                     نوع الخدمة المطلوبة
                                 </label>
-                                <select class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80" required>
+                                <select name="service_type" class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('service_type') border-red-500 @enderror" required>
                                     <option value="">اختر نوع الخدمة</option>
-                                    <option value="financing">تمويل المستحقات</option>
-                                    <option value="tracking">أجهزة التتبع</option>
-                                    <option value="consultation">استشارة عامة</option>
-                                    <option value="partnership">شراكة استراتيجية</option>
+                                    <option value="financing_link" {{ old('service_type') == 'financing_link' ? 'selected' : '' }}>الربط مع شركات التمويل</option>
+                                    <option value="client_link" {{ old('service_type') == 'client_link' ? 'selected' : '' }}>الربط مع الشركات الطالبة للخدمة</option>
+                                    <option value="tracking" {{ old('service_type') == 'tracking' ? 'selected' : '' }}>أجهزة التتبع</option>
+                                    <option value="consultation" {{ old('service_type') == 'consultation' ? 'selected' : '' }}>استشارة عامة</option>
+                                    <option value="partnership" {{ old('service_type') == 'partnership' ? 'selected' : '' }}>شراكة استراتيجية</option>
                                 </select>
+                                @error('service_type')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div class="group">
@@ -609,8 +661,12 @@
                                     الرسالة
                                 </label>
                                 <textarea rows="5"
-                                          class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 resize-none bg-white/80"
-                                          placeholder="اكتب رسالتك هنا... كلما كانت التفاصيل أكثر، كان بإمكاننا خدمتك بشكل أفضل"></textarea>
+                                          name="message"
+                                          class="w-full px-4 py-3 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 resize-none bg-white/80 @error('message') border-red-500 @enderror"
+                                          placeholder="اكتب رسالتك هنا... كلما كانت التفاصيل أكثر، كان بإمكاننا خدمتك بشكل أفضل">{{ old('message') }}</textarea>
+                                @error('message')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <button type="submit"
@@ -658,7 +714,7 @@
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-secondary-800 mb-1">البريد الإلكتروني</h4>
-                                        <p class="text-secondary-600">info@logistiq.com</p>
+                                        <p class="text-secondary-600">info@Link2u.com</p>
                                         <p class="text-secondary-500 text-sm">نرد خلال ساعة</p>
                                     </div>
                                 </div>
@@ -723,39 +779,7 @@
         }
     }
 
-    function handleContactSubmit(event) {
-        event.preventDefault();
-
-        const submitButton = event.target.querySelector('button[type="submit"]');
-        const originalText = submitButton.innerHTML;
-
-        // Show loading state
-        submitButton.innerHTML = `
-            <span class="relative z-10 flex items-center justify-center">
-                <i class="fas fa-spinner fa-spin ml-2"></i>
-                جاري الإرسال...
-            </span>
-        `;
-        submitButton.disabled = true;
-
-        // Simulate API call
-        setTimeout(() => {
-            // Show success message
-            const form = event.target.parentElement;
-            form.innerHTML = `
-                <div class="text-center py-8">
-                    <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-soft">
-                        <i class="fas fa-check text-green-600 text-4xl"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-secondary-800 mb-4">تم إرسال طلبك بنجاح! 🎉</h3>
-                    <p class="text-lg text-secondary-600 mb-8">سيتم التواصل معك خلال 24 ساعة من قبل فريق المبيعات المتخصص</p>
-                    <div class="glass rounded-2xl p-6 bg-primary-50 border border-primary-200">
-                        <p class="text-primary-700 font-medium">ستصلك رسالة تأكيد على بريدك الإلكتروني قريباً</p>
-                    </div>
-                </div>
-            `;
-        }, 2000);
-    }
+    // تم حذف function handleContactSubmit لأن النموذج يرسل للباك إند مباشرة
 
     // Enhanced form interactions
     document.addEventListener('DOMContentLoaded', function() {

@@ -1,12 +1,12 @@
 @extends('layouts.main')
 
-@section('title', 'إعادة تعيين كلمة المرور - LogistiQ')
+@section('title', 'إعادة تعيين كلمة المرور - Link2u')
 
 @section('content')
 <section class="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden">
     <!-- Background -->
     <div class="absolute inset-0 bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100"></div>
-    
+
     <!-- Animated background elements -->
     <div class="absolute inset-0 opacity-10">
         <div class="absolute top-20 right-20 w-40 h-40 bg-orange-400 rounded-full animate-float"></div>
@@ -20,13 +20,13 @@
             <!-- Header -->
             <div class="relative bg-gradient-to-r from-orange-500 to-primary-600 p-8 text-center">
                 <div class="absolute inset-0 bg-white/10"></div>
-                
+
                 <div class="relative">
                     <!-- Lock Icon -->
                     <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4 animate-bounce-soft">
                         <i class="fas fa-key text-white text-2xl"></i>
                     </div>
-                    
+
                     <h1 class="text-3xl font-bold text-white mb-2">نسيت كلمة المرور؟</h1>
                     <p class="text-primary-100">لا تقلق، سنساعدك في إعادة تعيينها</p>
                 </div>
@@ -52,7 +52,7 @@
                     <div class="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-2xl mb-4">
                         <i class="fas fa-envelope text-orange-600 text-2xl"></i>
                     </div>
-                    
+
                     <p class="text-secondary-600 leading-relaxed">
                         أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور
                     </p>
@@ -67,14 +67,14 @@
                             <i class="fas fa-envelope ml-2"></i>
                             البريد الإلكتروني
                         </label>
-                        <input id="email" 
-                               type="email" 
-                               name="email" 
-                               value="{{ old('email') }}" 
-                               required 
-                               autocomplete="email" 
+                        <input id="email"
+                               type="email"
+                               name="email"
+                               value="{{ old('email') }}"
+                               required
+                               autocomplete="email"
                                autofocus
-                               class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('email') border-red-500 @else border-secondary-200 @enderror" 
+                               class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('email') border-red-500 @else border-secondary-200 @enderror"
                                placeholder="أدخل بريدك الإلكتروني">
 
                         @error('email')
@@ -86,7 +86,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" 
+                    <button type="submit"
                             class="w-full relative overflow-hidden bg-gradient-to-r from-orange-500 to-primary-600 text-white py-3 rounded-xl font-semibold text-lg hover:shadow-glow transition-all duration-300 hover:scale-105 group">
                         <span class="relative z-10 flex items-center justify-center">
                             <i class="fas fa-paper-plane ml-2 group-hover:animate-bounce-soft"></i>
@@ -99,7 +99,7 @@
                     <div class="text-center pt-4 border-t border-secondary-200">
                         <p class="text-secondary-600 text-sm">
                             تذكرت كلمة المرور؟
-                            <a href="{{ route('login') }}" 
+                            <a href="{{ route('login') }}"
                                class="text-primary-600 hover:text-primary-700 font-semibold transition-colors hover:underline">
                                 تسجيل الدخول
                             </a>
@@ -153,8 +153,8 @@
                 <p class="text-secondary-600 text-sm mb-4">
                     لا تتذكر البريد الإلكتروني المسجل أو تواجه مشاكل؟
                 </p>
-                
-                <a href="#contact-section" 
+
+                <a href="#contact-section"
                    onclick="window.location.href='{{ route('home') }}#contact-section'"
                    class="inline-flex items-center justify-center px-6 py-2 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-colors text-sm font-medium">
                     <i class="fas fa-headset ml-2"></i>
@@ -171,11 +171,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         const emailInput = document.getElementById('email');
         const submitButton = document.querySelector('button[type="submit"]');
-        
+
         emailInput.addEventListener('blur', function() {
             validateEmail(this);
         });
-        
+
         emailInput.addEventListener('input', function() {
             if (this.classList.contains('border-red-500')) {
                 validateEmail(this);
@@ -185,7 +185,7 @@
         // Loading state on form submit
         submitButton.closest('form').addEventListener('submit', function() {
             const originalText = submitButton.innerHTML;
-            
+
             submitButton.innerHTML = `
                 <span class="relative z-10 flex items-center justify-center">
                     <i class="fas fa-spinner fa-spin ml-2"></i>
@@ -199,11 +199,11 @@
     function validateEmail(field) {
         const value = field.value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
+
         if (!value) {
             field.classList.add('border-red-500');
             field.classList.remove('border-secondary-200');
-            
+
             // Add shake animation
             field.style.animation = 'shake 0.5s ease-in-out';
             setTimeout(() => {

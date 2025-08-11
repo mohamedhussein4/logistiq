@@ -1,12 +1,12 @@
 @extends('layouts.main')
 
-@section('title', 'تأكيد البريد الإلكتروني - LogistiQ')
+@section('title', 'تأكيد البريد الإلكتروني - Link2u')
 
 @section('content')
 <section class="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden">
     <!-- Background -->
     <div class="absolute inset-0 bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100"></div>
-    
+
     <!-- Animated background elements -->
     <div class="absolute inset-0 opacity-10">
         <div class="absolute top-20 left-20 w-40 h-40 bg-primary-400 rounded-full animate-float"></div>
@@ -20,13 +20,13 @@
             <!-- Header -->
             <div class="relative bg-gradient-to-r from-primary-500 to-emerald-600 p-8 text-center">
                 <div class="absolute inset-0 bg-white/10"></div>
-                
+
                 <div class="relative">
                     <!-- Email Icon -->
                     <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 rounded-3xl mb-6 animate-bounce-soft">
                         <i class="fas fa-envelope-open text-white text-3xl"></i>
                     </div>
-                    
+
                     <h1 class="text-3xl font-bold text-white mb-2">تأكيد البريد الإلكتروني</h1>
                     <p class="text-primary-100">نحتاج للتأكد من صحة بريدك الإلكتروني</p>
                 </div>
@@ -54,9 +54,9 @@
                             <i class="fas fa-mail-bulk text-primary-600 text-2xl"></i>
                         </div>
                     </div>
-                    
+
                     <h2 class="text-xl font-bold text-secondary-800 mb-4">تحقق من صندوق البريد</h2>
-                    
+
                     <p class="text-secondary-600 leading-relaxed mb-6">
                         قمنا بإرسال رابط التأكيد إلى بريدك الإلكتروني. يرجى النقر على الرابط لتأكيد حسابك والمتابعة.
                     </p>
@@ -86,10 +86,10 @@
                     <p class="text-secondary-600 text-sm mb-4">
                         لم تصلك الرسالة؟
                     </p>
-                    
+
                     <form method="POST" action="{{ route('verification.resend') }}" class="inline">
                         @csrf
-                        <button type="submit" 
+                        <button type="submit"
                                 class="relative overflow-hidden bg-gradient-to-r from-primary-500 to-emerald-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-glow transition-all duration-300 hover:scale-105 group">
                             <span class="relative z-10 flex items-center justify-center">
                                 <i class="fas fa-redo ml-2 group-hover:animate-spin"></i>
@@ -102,13 +102,13 @@
 
                 <!-- Alternative Actions -->
                 <div class="mt-8 pt-6 border-t border-secondary-200 space-y-3">
-                    <a href="{{ route('login') }}" 
+                    <a href="{{ route('login') }}"
                        class="block w-full text-center py-3 border-2 border-secondary-200 text-secondary-700 rounded-xl hover:bg-secondary-50 hover:border-primary-300 transition-all duration-300 font-medium">
                         <i class="fas fa-arrow-right ml-2"></i>
                         العودة لتسجيل الدخول
                     </a>
-                    
-                    <a href="{{ route('register') }}" 
+
+                    <a href="{{ route('register') }}"
                        class="block w-full text-center py-3 text-primary-600 hover:text-primary-700 transition-colors font-medium">
                         تسجيل بحساب مختلف
                     </a>
@@ -123,7 +123,7 @@
                 <p class="text-secondary-600 text-sm mb-4">
                     إذا كنت تواجه مشاكل في تأكيد بريدك الإلكتروني
                 </p>
-                
+
                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
                     <a href="#" class="inline-flex items-center justify-center px-4 py-2 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-colors text-sm font-medium">
                         <i class="fas fa-phone ml-2"></i>
@@ -143,11 +143,11 @@
 <script>
     // Auto-refresh after resend to check verification status
     let resendButton = document.querySelector('form[action*="verification.resend"] button');
-    
+
     if (resendButton) {
         resendButton.addEventListener('click', function() {
             const originalText = this.innerHTML;
-            
+
             // Show loading state
             this.innerHTML = `
                 <span class="relative z-10 flex items-center justify-center">
@@ -156,7 +156,7 @@
                 </span>
             `;
             this.disabled = true;
-            
+
             // Reset after form submission
             setTimeout(() => {
                 this.innerHTML = originalText;
@@ -176,7 +176,7 @@
             </div>
         `;
         document.body.appendChild(notification);
-        
+
         // Auto-hide after 5 seconds
         setTimeout(() => {
             notification.remove();

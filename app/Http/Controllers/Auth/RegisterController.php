@@ -28,7 +28,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -52,6 +52,17 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'phone' => ['required', 'string', 'max:20'],
+            'user_type' => ['required', 'string', 'in:logistics,regular'],
+            'company_name' => ['nullable:user_type,logistics', 'string', 'max:255'],
+            'company_license' => ['nullable:user_type,logistics', 'string', 'max:255'],
+            'company_address' => ['nullable:user_type,logistics', 'string', 'max:500'],
+            'contact_person' => ['nullable:user_type,logistics', 'string', 'max:255'],
+        ], [
+            'company_name.required_if' => 'اسم الشركة مطلوب للشركات اللوجستية',
+            'company_license.required_if' => 'رقم الترخيص مطلوب للشركات اللوجستية',
+            'company_address.required_if' => 'عنوان الشركة مطلوب للشركات اللوجستية',
+            'contact_person.required_if' => 'الشخص المسؤول مطلوب للشركات اللوجستية',
         ]);
     }
 
@@ -63,10 +74,36 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'phone' => $data['phone'],
+            'user_type' => $data['user_type'],
         ]);
+
+        // إذا كان المستخدم شركة لوجستية، إنشاء سجل في جدول logistics_companies
+        if ($data['user_type'] === 'logistics') {
+            \App\Models\LogisticsCompany::create([
+                'user_id' => $user->id,
+                'company_name' => $data['company_name'],
+                'license_number' => $data['company_license'],
+                'address' => $data['company_address'],
+                'contact_person' => $data['contact_person'],
+                'credit_limit' => 100000, // الحد الائتماني الافتراضي
+            ]);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showRegistrationForm()
+    {
+        return view('auth.register');
     }
 }

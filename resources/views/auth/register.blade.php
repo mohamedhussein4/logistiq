@@ -1,12 +1,12 @@
 @extends('layouts.main')
 
-@section('title', 'إنشاء حساب جديد - LogistiQ')
+@section('title', 'تسجيل حساب جديد - لوجستيك')
 
 @section('content')
 <section class="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden">
     <!-- Background -->
     <div class="absolute inset-0 bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100"></div>
-    
+
     <!-- Animated background elements -->
     <div class="absolute inset-0 opacity-10">
         <div class="absolute top-20 right-20 w-40 h-40 bg-emerald-400 rounded-full animate-float"></div>
@@ -14,20 +14,20 @@
         <div class="absolute top-1/2 left-1/4 w-24 h-24 bg-purple-400 rounded-full animate-float" style="animation-delay: 2s;"></div>
     </div>
 
-    <div class="relative w-full max-w-lg mx-auto">
+    <div class="relative w-full max-w-4xl mx-auto">
         <!-- Auth Card -->
         <div class="glass rounded-3xl shadow-soft border border-primary-200/50 overflow-hidden animate-scale-in">
             <!-- Header -->
             <div class="relative bg-gradient-to-r from-emerald-500 to-primary-600 p-8 text-center">
                 <div class="absolute inset-0 bg-white/10"></div>
-                
+
                 <div class="relative">
                     <!-- Logo -->
                     <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4 animate-bounce-soft">
                         <i class="fas fa-user-plus text-white text-2xl"></i>
                     </div>
-                    
-                    <h1 class="text-3xl font-bold text-white mb-2">انضم إلى LogistiQ</h1>
+
+                    <h1 class="text-3xl font-bold text-white mb-2">انضم إلى لوجستيك</h1>
                     <p class="text-primary-100">أنشئ حسابك وابدأ رحلتك معنا</p>
                 </div>
             </div>
@@ -37,128 +37,274 @@
                 <form method="POST" action="{{ route('register') }}" class="space-y-6">
                     @csrf
 
-                    <!-- Name Field -->
+                    <!-- نوع المستخدم -->
                     <div class="group">
-                        <label for="name" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
-                            <i class="fas fa-user ml-2"></i>
-                            الاسم الكامل
+                        <label class="block text-sm font-semibold text-secondary-700 mb-4 group-focus-within:text-primary-600 transition-colors">
+                            <i class="fas fa-users ml-2"></i>
+                            نوع الحساب
                         </label>
-                        <input id="name" 
-                               type="text" 
-                               name="name" 
-                               value="{{ old('name') }}" 
-                               required 
-                               autocomplete="name" 
-                               autofocus
-                               class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('name') border-red-500 @else border-secondary-200 @enderror" 
-                               placeholder="أدخل اسمك الكامل">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="relative flex cursor-pointer rounded-xl border border-secondary-200 bg-white/80 p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary-300">
+                                <input type="radio" name="user_type" value="logistics" class="sr-only" required>
+                                <span class="flex flex-1">
+                                    <span class="flex flex-col">
+                                        <span class="block text-sm font-semibold text-secondary-800">شركة لوجستية</span>
+                                        <span class="mt-1 flex items-center text-sm text-secondary-600">
+                                            <i class="fas fa-truck text-primary-600 ml-1"></i>
+                                            خدمات التمويل واللوجستية
+                                        </span>
+                                    </span>
+                                </span>
+                                <span class="pointer-events-none absolute -inset-px rounded-xl border-2" aria-hidden="true"></span>
+                            </label>
 
-                        @error('name')
-                            <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
-                                <i class="fas fa-exclamation-circle ml-2"></i>
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-
-                    <!-- Email Field -->
-                    <div class="group">
-                        <label for="email" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
-                            <i class="fas fa-envelope ml-2"></i>
-                            البريد الإلكتروني
-                        </label>
-                        <input id="email" 
-                               type="email" 
-                               name="email" 
-                               value="{{ old('email') }}" 
-                               required 
-                               autocomplete="email"
-                               class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('email') border-red-500 @else border-secondary-200 @enderror" 
-                               placeholder="أدخل بريدك الإلكتروني">
-
-                        @error('email')
-                            <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
-                                <i class="fas fa-exclamation-circle ml-2"></i>
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-
-                    <!-- Password Field -->
-                    <div class="group">
-                        <label for="password" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
-                            <i class="fas fa-lock ml-2"></i>
-                            كلمة المرور
-                        </label>
-                        <div class="relative">
-                            <input id="password" 
-                                   type="password" 
-                                   name="password" 
-                                   required 
-                                   autocomplete="new-password"
-                                   class="w-full px-4 py-3 pl-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('password') border-red-500 @else border-secondary-200 @enderror" 
-                                   placeholder="أدخل كلمة مرور قوية">
-                            
-                            <button type="button" 
-                                    onclick="togglePassword('password')"
-                                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-primary-600 transition-colors">
-                                <i class="fas fa-eye" id="password-eye"></i>
-                            </button>
-                        </div>
-
-                        @error('password')
-                            <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
-                                <i class="fas fa-exclamation-circle ml-2"></i>
-                                {{ $message }}
-                            </div>
-                        @enderror
-
-                        <!-- Password Strength Indicator -->
-                        <div class="mt-2">
-                            <div class="flex space-x-1 space-x-reverse">
-                                <div id="strength-1" class="h-1 w-full bg-secondary-200 rounded-full transition-colors duration-300"></div>
-                                <div id="strength-2" class="h-1 w-full bg-secondary-200 rounded-full transition-colors duration-300"></div>
-                                <div id="strength-3" class="h-1 w-full bg-secondary-200 rounded-full transition-colors duration-300"></div>
-                                <div id="strength-4" class="h-1 w-full bg-secondary-200 rounded-full transition-colors duration-300"></div>
-                            </div>
-                            <p id="strength-text" class="text-xs text-secondary-500 mt-1">قوة كلمة المرور</p>
+                            <label class="relative flex cursor-pointer rounded-xl border border-secondary-200 bg-white/80 p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary-300">
+                                <input type="radio" name="user_type" value="regular" class="sr-only" required>
+                                <span class="flex flex-1">
+                                    <span class="flex flex-col">
+                                        <span class="block text-sm font-semibold text-secondary-800">مستخدم عادي</span>
+                                        <span class="mt-1 flex items-center text-sm text-secondary-600">
+                                            <i class="fas fa-user text-emerald-600 ml-1"></i>
+                                            خدمات عامة ومتجر
+                                        </span>
+                                    </span>
+                                </span>
+                                <span class="pointer-events-none absolute -inset-px rounded-xl border-2" aria-hidden="true"></span>
+                            </label>
                         </div>
                     </div>
 
-                    <!-- Confirm Password Field -->
-                    <div class="group">
-                        <label for="password-confirm" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
-                            <i class="fas fa-lock ml-2"></i>
-                            تأكيد كلمة المرور
-                        </label>
-                        <div class="relative">
-                            <input id="password-confirm" 
-                                   type="password" 
-                                   name="password_confirmation" 
-                                   required 
-                                   autocomplete="new-password"
-                                   class="w-full px-4 py-3 pl-12 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80" 
-                                   placeholder="أعد إدخال كلمة المرور">
-                            
-                            <button type="button" 
-                                    onclick="togglePassword('password-confirm')"
-                                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-primary-600 transition-colors">
-                                <i class="fas fa-eye" id="password-confirm-eye"></i>
-                            </button>
+                    <!-- البيانات الأساسية -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Name Field -->
+                        <div class="group">
+                            <label for="name" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
+                                <i class="fas fa-user ml-2"></i>
+                                الاسم الكامل
+                            </label>
+                            <input id="name"
+                                   type="text"
+                                   name="name"
+                                   value="{{ old('name') }}"
+                                   required
+                                   autocomplete="name"
+                                   class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('name') border-red-500 @else border-secondary-200 @enderror"
+                                   placeholder="أدخل اسمك الكامل">
+
+                            @error('name')
+                                <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
+                                    <i class="fas fa-exclamation-circle ml-2"></i>
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
-                        <div id="password-match" class="mt-1 text-xs hidden">
-                            <span id="match-text"></span>
+
+                        <!-- Email Field -->
+                        <div class="group">
+                            <label for="email" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
+                                <i class="fas fa-envelope ml-2"></i>
+                                البريد الإلكتروني
+                            </label>
+                            <input id="email"
+                                   type="email"
+                                   name="email"
+                                   value="{{ old('email') }}"
+                                   required
+                                   autocomplete="email"
+                                   class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('email') border-red-500 @else border-secondary-200 @enderror"
+                                   placeholder="أدخل بريدك الإلكتروني">
+
+                            @error('email')
+                                <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
+                                    <i class="fas fa-exclamation-circle ml-2"></i>
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <!-- Phone Field -->
+                        <div class="group">
+                            <label for="phone" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
+                                <i class="fas fa-phone ml-2"></i>
+                                رقم الهاتف
+                            </label>
+                            <input id="phone"
+                                   type="tel"
+                                   name="phone"
+                                   value="{{ old('phone') }}"
+                                   required
+                                   class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('phone') border-red-500 @else border-secondary-200 @enderror"
+                                   placeholder="05xxxxxxxx">
+
+                            @error('phone')
+                                <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
+                                    <i class="fas fa-exclamation-circle ml-2"></i>
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="group">
+                            <label for="password" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
+                                <i class="fas fa-lock ml-2"></i>
+                                كلمة المرور
+                            </label>
+                            <div class="relative">
+                                <input id="password"
+                                       type="password"
+                                       name="password"
+                                       required
+                                       autocomplete="new-password"
+                                       class="w-full px-4 py-3 pl-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('password') border-red-500 @else border-secondary-200 @enderror"
+                                       placeholder="أدخل كلمة مرور قوية">
+
+                                <button type="button"
+                                        onclick="togglePassword('password')"
+                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-primary-600 transition-colors">
+                                    <i class="fas fa-eye" id="password-eye"></i>
+                                </button>
+                            </div>
+
+                            @error('password')
+                                <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
+                                    <i class="fas fa-exclamation-circle ml-2"></i>
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <!-- Confirm Password Field -->
+                        <div class="group">
+                            <label for="password-confirm" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
+                                <i class="fas fa-lock ml-2"></i>
+                                تأكيد كلمة المرور
+                            </label>
+                            <div class="relative">
+                                <input id="password-confirm"
+                                       type="password"
+                                       name="password_confirmation"
+                                       required
+                                       autocomplete="new-password"
+                                       class="w-full px-4 py-3 pl-12 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80"
+                                       placeholder="أعد إدخال كلمة المرور">
+
+                                <button type="button"
+                                        onclick="togglePassword('password-confirm')"
+                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-primary-600 transition-colors">
+                                    <i class="fas fa-eye" id="password-confirm-eye"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- بيانات الشركة اللوجستية (تظهر عند اختيار شركة لوجستية) -->
+                    <div id="logistics-fields" class="space-y-6" style="display: none;">
+                        <div class="border-t border-secondary-200 pt-6">
+                            <h3 class="text-xl font-semibold text-secondary-800 mb-6 flex items-center">
+                                <i class="fas fa-building text-primary-600 ml-2"></i>
+                                بيانات الشركة اللوجستية
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="group">
+                                <label for="company_name" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
+                                    <i class="fas fa-building ml-2"></i>
+                                    اسم الشركة
+                                </label>
+                                <input id="company_name"
+                                       type="text"
+                                       name="company_name"
+                                       value="{{ old('company_name') }}"
+                                       class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('company_name') border-red-500 @else border-secondary-200 @enderror"
+                                       placeholder="اسم الشركة اللوجستية">
+
+                                @error('company_name')
+                                    <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
+                                        <i class="fas fa-exclamation-circle ml-2"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <div class="group">
+                                <label for="company_license" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
+                                    <i class="fas fa-certificate ml-2"></i>
+                                    رقم الترخيص التجاري
+                                </label>
+                                <input id="company_license"
+                                       type="text"
+                                       name="company_license"
+                                       value="{{ old('company_license') }}"
+                                       class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('company_license') border-red-500 @else border-secondary-200 @enderror"
+                                       placeholder="رقم الترخيص التجاري">
+
+                                @error('company_license')
+                                    <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
+                                        <i class="fas fa-exclamation-circle ml-2"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <div class="group md:col-span-2">
+                                <label for="company_address" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
+                                    <i class="fas fa-map-marker-alt ml-2"></i>
+                                    عنوان الشركة
+                                </label>
+                                <textarea id="company_address"
+                                          name="company_address"
+                                          rows="3"
+                                          class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('company_address') border-red-500 @else border-secondary-200 @enderror"
+                                          placeholder="العنوان التفصيلي للشركة">{{ old('company_address') }}</textarea>
+
+                                @error('company_address')
+                                    <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
+                                        <i class="fas fa-exclamation-circle ml-2"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <div class="group">
+                                <label for="contact_person" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
+                                    <i class="fas fa-user-tie ml-2"></i>
+                                    الشخص المسؤول
+                                </label>
+                                <input id="contact_person"
+                                       type="text"
+                                       name="contact_person"
+                                       value="{{ old('contact_person') }}"
+                                       class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('contact_person') border-red-500 @else border-secondary-200 @enderror"
+                                       placeholder="اسم الشخص المسؤول عن التواصل">
+
+                                @error('contact_person')
+                                    <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
+                                        <i class="fas fa-exclamation-circle ml-2"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- رسائل الخطأ العامة -->
+                    @error('user_type')
+                        <div class="text-red-600 text-sm flex items-center animate-slide-down">
+                            <i class="fas fa-exclamation-circle ml-2"></i>
+                            {{ $message }}
+                        </div>
+                    @enderror
 
                     <!-- Terms & Conditions -->
                     <div class="flex items-start space-x-3 space-x-reverse">
-                        <input id="terms" 
-                               type="checkbox" 
+                        <input id="terms"
+                               type="checkbox"
                                required
                                class="w-4 h-4 text-primary-600 bg-white border-secondary-300 rounded focus:ring-primary-500 focus:ring-2 mt-0.5">
                         <label for="terms" class="text-sm text-secondary-600 cursor-pointer">
-                            أوافق على 
+                            أوافق على
                             <a href="#" class="text-primary-600 hover:text-primary-700 font-semibold hover:underline">شروط الخدمة</a>
                             و
                             <a href="#" class="text-primary-600 hover:text-primary-700 font-semibold hover:underline">سياسة الخصوصية</a>
@@ -166,7 +312,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" 
+                    <button type="submit"
                             class="w-full relative overflow-hidden bg-gradient-to-r from-emerald-500 to-primary-600 text-white py-3 rounded-xl font-semibold text-lg hover:shadow-glow transition-all duration-300 hover:scale-105 group">
                         <span class="relative z-10 flex items-center justify-center">
                             <i class="fas fa-user-plus ml-2 group-hover:animate-bounce-soft"></i>
@@ -179,7 +325,7 @@
                     <div class="text-center pt-4 border-t border-secondary-200">
                         <p class="text-secondary-600 text-sm">
                             تملك حساباً بالفعل؟
-                            <a href="{{ route('login') }}" 
+                            <a href="{{ route('login') }}"
                                class="text-primary-600 hover:text-primary-700 font-semibold transition-colors hover:underline">
                                 تسجيل الدخول
                             </a>
@@ -198,7 +344,7 @@
                 <h3 class="font-semibold text-secondary-800 text-sm mb-1">آمن ومحمي</h3>
                 <p class="text-xs text-secondary-600">بياناتك محمية بأعلى معايير الأمان</p>
             </div>
-            
+
             <div class="glass rounded-2xl p-4 text-center border border-emerald-200/50">
                 <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-2">
                     <i class="fas fa-bolt text-emerald-600"></i>
@@ -206,7 +352,7 @@
                 <h3 class="font-semibold text-secondary-800 text-sm mb-1">سريع وسهل</h3>
                 <p class="text-xs text-secondary-600">تسجيل سريع في دقائق معدودة</p>
             </div>
-            
+
             <div class="glass rounded-2xl p-4 text-center border border-purple-200/50">
                 <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-2">
                     <i class="fas fa-headset text-purple-600"></i>
@@ -223,7 +369,7 @@
     function togglePassword(inputId) {
         const input = document.getElementById(inputId);
         const eye = document.getElementById(inputId + '-eye');
-        
+
         if (input.type === 'password') {
             input.type = 'text';
             eye.classList.remove('fa-eye');
@@ -235,75 +381,55 @@
         }
     }
 
-    // Password strength checker
-    function checkPasswordStrength(password) {
-        let strength = 0;
-        const indicators = ['strength-1', 'strength-2', 'strength-3', 'strength-4'];
-        const strengthText = document.getElementById('strength-text');
-        
-        // Reset indicators
-        indicators.forEach(id => {
-            document.getElementById(id).className = 'h-1 w-full bg-secondary-200 rounded-full transition-colors duration-300';
-        });
-        
-        if (password.length >= 8) strength++;
-        if (/[a-z]/.test(password)) strength++;
-        if (/[A-Z]/.test(password)) strength++;
-        if (/[0-9]/.test(password) || /[^A-Za-z0-9]/.test(password)) strength++;
-        
-        for (let i = 0; i < strength; i++) {
-            const indicator = document.getElementById(indicators[i]);
-            if (i === 0) indicator.className = 'h-1 w-full bg-red-500 rounded-full transition-colors duration-300';
-            else if (i === 1) indicator.className = 'h-1 w-full bg-yellow-500 rounded-full transition-colors duration-300';
-            else if (i === 2) indicator.className = 'h-1 w-full bg-blue-500 rounded-full transition-colors duration-300';
-            else indicator.className = 'h-1 w-full bg-green-500 rounded-full transition-colors duration-300';
-        }
-        
-        const strengthLabels = ['ضعيفة جداً', 'ضعيفة', 'متوسطة', 'قوية'];
-        const strengthColors = ['text-red-600', 'text-yellow-600', 'text-blue-600', 'text-green-600'];
-        
-        if (password.length > 0) {
-            strengthText.textContent = strengthLabels[strength - 1] || 'ضعيفة جداً';
-            strengthText.className = `text-xs mt-1 ${strengthColors[strength - 1] || 'text-red-600'}`;
-        } else {
-            strengthText.textContent = 'قوة كلمة المرور';
-            strengthText.className = 'text-xs text-secondary-500 mt-1';
-        }
-    }
-
-    // Password confirmation checker
-    function checkPasswordMatch() {
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('password-confirm').value;
-        const matchDiv = document.getElementById('password-match');
-        const matchText = document.getElementById('match-text');
-        
-        if (confirmPassword.length > 0) {
-            matchDiv.classList.remove('hidden');
-            if (password === confirmPassword) {
-                matchText.innerHTML = '<i class="fas fa-check text-green-600 ml-1"></i><span class="text-green-600">كلمات المرور متطابقة</span>';
-            } else {
-                matchText.innerHTML = '<i class="fas fa-times text-red-600 ml-1"></i><span class="text-red-600">كلمات المرور غير متطابقة</span>';
-            }
-        } else {
-            matchDiv.classList.add('hidden');
-        }
-    }
-
     // Enhanced form validation
     document.addEventListener('DOMContentLoaded', function() {
-        const passwordInput = document.getElementById('password');
-        const confirmPasswordInput = document.getElementById('password-confirm');
-        
-        passwordInput.addEventListener('input', function() {
-            checkPasswordStrength(this.value);
-            if (confirmPasswordInput.value) {
-                checkPasswordMatch();
+        const userTypeRadios = document.querySelectorAll('input[name="user_type"]');
+        const logisticsFields = document.getElementById('logistics-fields');
+        const logisticsInputs = logisticsFields.querySelectorAll('input, textarea');
+
+        function toggleLogisticsFields() {
+            const selectedType = document.querySelector('input[name="user_type"]:checked');
+
+            if (selectedType && selectedType.value === 'logistics') {
+                logisticsFields.style.display = 'block';
+                logisticsInputs.forEach(input => {
+                    input.required = true;
+                });
+            } else {
+                logisticsFields.style.display = 'none';
+                logisticsInputs.forEach(input => {
+                    input.required = false;
+                });
             }
+        }
+
+        // إضافة event listeners للراديو buttons
+        userTypeRadios.forEach(radio => {
+            radio.addEventListener('change', toggleLogisticsFields);
         });
-        
-        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
-        
+
+        // تشغيل الدالة عند تحميل الصفحة
+        toggleLogisticsFields();
+
+        // إضافة تأثيرات بصرية للراديو buttons
+        userTypeRadios.forEach(radio => {
+            const label = radio.closest('label');
+
+            radio.addEventListener('change', function() {
+                // إزالة التحديد من جميع labels
+                document.querySelectorAll('input[name="user_type"]').forEach(r => {
+                    r.closest('label').classList.remove('ring-2', 'ring-primary-500', 'border-primary-500');
+                    r.closest('label').classList.add('border-secondary-200');
+                });
+
+                // إضافة التحديد للـ label المختار
+                if (this.checked) {
+                    label.classList.add('ring-2', 'ring-primary-500', 'border-primary-500');
+                    label.classList.remove('border-secondary-200');
+                }
+            });
+        });
+
         const inputs = document.querySelectorAll('input[required]');
         inputs.forEach(input => {
             input.addEventListener('blur', function() {
@@ -314,11 +440,11 @@
 
     function validateField(field) {
         const value = field.value.trim();
-        
+
         if (!value) {
             field.classList.add('border-red-500');
             field.classList.remove('border-secondary-200');
-            
+
             // Add shake animation
             field.style.animation = 'shake 0.5s ease-in-out';
             setTimeout(() => {

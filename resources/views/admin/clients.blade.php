@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'إدارة الشركات الطالبة للخدمة - LogistiQ')
+@section('title', 'إدارة الشركات الطالبة للخدمة - لوحة الإدارة - Link2u')
 
 @section('content')
 <!-- Header Section -->
@@ -9,7 +9,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl md:text-4xl font-bold mb-2">إدارة الشركات الطالبة للخدمة</h1>
-                <p class="text-green-100">متابعة المستحقات المالية وحالات السداد</p>
+                <p class="text-green-100">لوحة الإدارة - متابعة المستحقات المالية وحالات السداد</p>
             </div>
             <div class="hidden md:block">
                 <div class="bg-white bg-opacity-20 rounded-lg p-4 text-center">

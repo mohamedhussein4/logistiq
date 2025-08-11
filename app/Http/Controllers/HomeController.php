@@ -13,16 +13,27 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        // إزالة middleware auth للصفحة الرئيسية العامة
     }
 
     /**
-     * Show the application dashboard.
+     * عرض الصفحة الرئيسية للجمهور
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index()
     {
+        return view('home');
+    }
+
+    /**
+     * عرض لوحة التحكم للمستخدمين المسجلين
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function dashboard()
+    {
+        $this->middleware('auth');
         return view('home');
     }
 }

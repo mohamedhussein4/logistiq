@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>@yield('title', 'LogistiQ - حلول التمويل اللوجستية')</title>
+    <title>@yield('title', 'Link2u - حلول التمويل اللوجستية')</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -164,6 +164,9 @@
         href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
 
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <style>
         * {
             scroll-behavior: smooth;
@@ -260,10 +263,128 @@
         .shadow-glow {
             box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
         }
+
+        /* Message Animations */
+        @keyframes slide-down {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slide-up {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .animate-slide-down {
+            animation: slide-down 0.5s ease-out;
+        }
+
+        .animate-slide-up {
+            animation: slide-up 0.3s ease-in;
+        }
     </style>
 </head>
 
 <body class="text-secondary-800 animate-fade-in">
+
+    <!-- Messages Area -->
+    @if(session('success') || session('error') || session('warning') || session('info') || $errors->any())
+    <div class="fixed top-20 left-4 right-4 z-[9999] max-w-md mx-auto">
+        <!-- Success Messages -->
+        @if(session('success'))
+        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg shadow-lg animate-slide-down" id="success-message">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h4 class="font-bold">تمت العملية بنجاح!</h4>
+                    <p class="text-sm">{{ session('success') }}</p>
+                </div>
+                <button onclick="closeMessage('success-message')" class="flex-shrink-0 ml-4 text-green-500 hover:text-green-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        @endif
+
+        <!-- Error Messages -->
+        @if(session('error') || $errors->any())
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg shadow-lg animate-slide-down" id="error-message">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h4 class="font-bold">حدث خطأ!</h4>
+                    @if(session('error'))
+                        <p class="text-sm">{{ session('error') }}</p>
+                    @endif
+                    @if($errors->any())
+                        <ul class="text-sm mt-2 list-disc list-inside">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+                <button onclick="closeMessage('error-message')" class="flex-shrink-0 ml-4 text-red-500 hover:text-red-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        @endif
+
+        <!-- Warning Messages -->
+        @if(session('warning'))
+        <div class="mb-4 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg shadow-lg animate-slide-down" id="warning-message">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-yellow-500"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h4 class="font-bold">تحذير!</h4>
+                    <p class="text-sm">{{ session('warning') }}</p>
+                </div>
+                <button onclick="closeMessage('warning-message')" class="flex-shrink-0 ml-4 text-yellow-500 hover:text-yellow-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        @endif
+
+        <!-- Info Messages -->
+        @if(session('info'))
+        <div class="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg shadow-lg animate-slide-down" id="info-message">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h4 class="font-bold">معلومة</h4>
+                    <p class="text-sm">{{ session('info') }}</p>
+                </div>
+                <button onclick="closeMessage('info-message')" class="flex-shrink-0 ml-4 text-blue-500 hover:text-blue-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        @endif
+    </div>
+    @endif
+
     <!-- Preloader -->
     <div id="preloader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white overflow-hidden">
         <!-- Subtle Background -->
@@ -286,7 +407,7 @@
 
             <!-- Brand Name -->
             <div class="mb-8 animate-slide-up" style="animation-delay: 0.2s;">
-                <h1 class="text-3xl font-bold text-primary-600 mb-2">LogistiQ</h1>
+                <h1 class="text-3xl font-bold text-primary-600 mb-2">Link2u</h1>
                 <p class="text-sm text-secondary-500">حلول التمويل اللوجستية</p>
             </div>
 
@@ -318,7 +439,7 @@
                             </div>
                         </div>
                         <span
-                            class="text-2xl font-bold gradient-text group-hover:scale-105 transition-transform duration-300">LogistiQ</span>
+                            class="text-2xl font-bold gradient-text group-hover:scale-105 transition-transform duration-300">Link2u</span>
                     </a>
                 </div>
 
@@ -335,25 +456,7 @@
                             @endif
                         </a>
 
-                        <a href="{{ route('logistics') }}"
-                            class="relative group px-4 py-2 rounded-lg transition-all duration-300 {{ request()->routeIs('logistics') ? 'text-primary-600 font-semibold bg-primary-50' : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50/50' }}">
-                            <span class="relative z-10">الشركات اللوجستية</span>
-                            @if (request()->routeIs('logistics'))
-                                <div
-                                    class="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full">
-                                </div>
-                            @endif
-                        </a>
 
-                        <a href="{{ route('clients') }}"
-                            class="relative group px-4 py-2 rounded-lg transition-all duration-300 {{ request()->routeIs('clients') ? 'text-primary-600 font-semibold bg-primary-50' : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50/50' }}">
-                            <span class="relative z-10">الشركات الطالبة</span>
-                            @if (request()->routeIs('clients'))
-                                <div
-                                    class="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full">
-                                </div>
-                            @endif
-                        </a>
 
                         <a href="{{ route('store') }}"
                             class="relative group px-4 py-2 rounded-lg transition-all duration-300 {{ request()->routeIs('store') ? 'text-primary-600 font-semibold bg-primary-50' : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50/50' }}">
@@ -372,12 +475,76 @@
                     </div>
                 </div>
 
-                <!-- Login Button - Right Side -->
-                <div class="hidden md:flex items-center">
-                    <a href="{{ route('login') }}"
-                        class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-glow transition-all duration-300 hover:scale-105">
-                        تسجيل الدخول
-                    </a>
+                <!-- Auth Section - Right Side -->
+                <div class="hidden md:flex items-center space-x-4 space-x-reverse">
+                    @auth
+                        <!-- User Menu -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center space-x-2 space-x-reverse text-secondary-700 hover:text-primary-600 transition-colors">
+                                <i class="fas fa-user"></i>
+                                <span>{{ auth()->user()->name }}</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div x-show="open" @click.away="open = false"
+                                 class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-secondary-200 py-2 z-50">
+                                @if(auth()->user()->user_type === 'regular')
+                                    <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-secondary-700 hover:bg-primary-50 hover:text-primary-600">
+                                        <i class="fas fa-tachometer-alt ml-2"></i>
+                                        لوحة التحكم
+                                    </a>
+                                @elseif(auth()->user()->user_type === 'logistics')
+                                    <a href="{{ route('logistics.dashboard') }}" class="block px-4 py-2 text-secondary-700 hover:bg-primary-50 hover:text-primary-600">
+                                        <i class="fas fa-tachometer-alt ml-2"></i>
+                                        لوحة التحكم
+                                    </a>
+                                @elseif(auth()->user()->user_type === 'service_company')
+                                    <a href="{{ route('service_company.dashboard') }}" class="block px-4 py-2 text-secondary-700 hover:bg-primary-50 hover:text-primary-600">
+                                        <i class="fas fa-tachometer-alt ml-2"></i>
+                                        لوحة التحكم
+                                    </a>
+                                @elseif(auth()->user()->user_type === 'admin')
+                                    <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 text-secondary-700 hover:bg-primary-50 hover:text-primary-600">
+                                        <i class="fas fa-cog ml-2"></i>
+                                        لوحة الإدارة
+                                    </a>
+                                @endif
+
+                                <!-- الملف الشخصي -->
+                                @if(auth()->user()->user_type === 'logistics')
+                                    <a href="{{ route('logistics.profile') }}" class="block px-4 py-2 text-secondary-700 hover:bg-primary-50 hover:text-primary-600">
+                                        <i class="fas fa-user-circle ml-2"></i>
+                                        الملف الشخصي
+                                    </a>
+                                @elseif(auth()->user()->user_type === 'service_company')
+                                    <a href="{{ route('service_company.profile') }}" class="block px-4 py-2 text-secondary-700 hover:bg-primary-50 hover:text-primary-600">
+                                        <i class="fas fa-user-circle ml-2"></i>
+                                        الملف الشخصي
+                                    </a>
+                                @elseif(auth()->user()->user_type === 'regular')
+                                    <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-secondary-700 hover:bg-primary-50 hover:text-primary-600">
+                                        <i class="fas fa-user-circle ml-2"></i>
+                                        الملف الشخصي
+                                    </a>
+                                @endif
+
+                                <div class="border-t border-secondary-200 my-2"></div>
+                                <a href="{{ route('logout') }}"
+                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                                   class="block px-4 py-2 text-red-600 hover:bg-red-50">
+                                    <i class="fas fa-sign-out-alt ml-2"></i>
+                                    تسجيل الخروج
+                                </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    @csrf
+                                </form>
+                            </div>
+                        </div>
+                    @else
+                        <a href="{{ route('login') }}"
+                            class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-glow transition-all duration-300 hover:scale-105">
+                            تسجيل الدخول
+                        </a>
+                    @endauth
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -405,16 +572,7 @@
                         <i class="fas fa-home ml-3 w-4"></i>
                         الرئيسية
                     </a>
-                    <a href="{{ route('logistics') }}"
-                        class="px-4 py-3 rounded-lg transition-all duration-300 {{ request()->routeIs('logistics') ? 'text-primary-600 font-semibold bg-primary-50' : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50/50' }}">
-                        <i class="fas fa-truck ml-3 w-4"></i>
-                        الشركات اللوجستية
-                    </a>
-                    <a href="{{ route('clients') }}"
-                        class="px-4 py-3 rounded-lg transition-all duration-300 {{ request()->routeIs('clients') ? 'text-primary-600 font-semibold bg-primary-50' : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50/50' }}">
-                        <i class="fas fa-building ml-3 w-4"></i>
-                        الشركات الطالبة
-                    </a>
+
                     <a href="{{ route('store') }}"
                         class="px-4 py-3 rounded-lg transition-all duration-300 {{ request()->routeIs('store') ? 'text-primary-600 font-semibold bg-primary-50' : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50/50' }}">
                         <i class="fas fa-shopping-cart ml-3 w-4"></i>
@@ -471,7 +629,7 @@
                                     <i class="fas fa-truck text-white text-2xl"></i>
                                 </div>
                             </div>
-                            <span class="text-2xl font-bold gradient-text">LogistiQ</span>
+                            <span class="text-2xl font-bold gradient-text">Link2u</span>
                         </div>
                         <p class="text-secondary-300 text-base leading-relaxed mb-6 max-w-md">
                             نقدم حلول التمويل المتقدمة للشركات اللوجستية وخدمات بيع أجهزة التتبع بأحدث التقنيات
@@ -511,24 +669,7 @@
                             </div>
                         </h3>
                         <ul class="space-y-3">
-                            <li>
-                                <a href="{{ route('logistics') }}"
-                                    class="group flex items-center text-secondary-300 hover:text-primary-400 transition-all duration-300">
-                                    <div
-                                        class="w-1 h-1 bg-primary-500 rounded-full ml-3 group-hover:w-3 transition-all duration-300">
-                                    </div>
-                                    تمويل الشركات اللوجستية
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('clients') }}"
-                                    class="group flex items-center text-secondary-300 hover:text-primary-400 transition-all duration-300">
-                                    <div
-                                        class="w-1 h-1 bg-primary-500 rounded-full ml-3 group-hover:w-3 transition-all duration-300">
-                                    </div>
-                                    إدارة المستحقات
-                                </a>
-                            </li>
+
                             <li>
                                 <a href="{{ route('store') }}"
                                     class="group flex items-center text-secondary-300 hover:text-primary-400 transition-all duration-300">
@@ -567,7 +708,7 @@
                                 </div>
                                 <div>
                                     <p class="text-secondary-300 group-hover:text-primary-400 transition-colors">
-                                        info@logistiq.com</p>
+                                        info@Link2u.com</p>
                                 </div>
                             </div>
 
@@ -607,7 +748,7 @@
                     <div
                         class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 md:space-x-reverse mb-6 lg:mb-0">
                         <p class="text-secondary-400 text-sm font-medium">
-                            &copy; {{ date('Y') }} LogistiQ. جميع الحقوق محفوظة.
+                            &copy; {{ date('Y') }} Link2u. جميع الحقوق محفوظة.
                         </p>
                         <div class="flex items-center space-x-4 space-x-reverse text-xs">
                             <a href="#"
@@ -959,6 +1100,84 @@
     </style>
 
     @stack('scripts')
+
+    <!-- Messages Management -->
+    <script>
+        // دالة إغلاق الرسائل
+        function closeMessage(messageId) {
+            const message = document.getElementById(messageId);
+            if (message) {
+                message.classList.remove('animate-slide-down');
+                message.classList.add('animate-slide-up');
+                setTimeout(() => {
+                    message.remove();
+                }, 300);
+            }
+        }
+
+        // إغلاق رسائل النجاح تلقائياً بعد 5 ثوان
+        setTimeout(() => {
+            const successMessage = document.getElementById('success-message');
+            if (successMessage) {
+                closeMessage('success-message');
+            }
+        }, 5000);
+
+        // إغلاق رسائل المعلومات تلقائياً بعد 8 ثوان
+        setTimeout(() => {
+            const infoMessage = document.getElementById('info-message');
+            if (infoMessage) {
+                closeMessage('info-message');
+            }
+        }, 8000);
+
+        // دالة لإنشاء رسائل جديدة من JavaScript
+        window.showMessage = function(type, title, message) {
+            const colors = {
+                success: { bg: 'bg-green-100', border: 'border-green-400', text: 'text-green-700', icon: 'fa-check-circle', iconColor: 'text-green-500' },
+                error: { bg: 'bg-red-100', border: 'border-red-400', text: 'text-red-700', icon: 'fa-exclamation-triangle', iconColor: 'text-red-500' },
+                warning: { bg: 'bg-yellow-100', border: 'border-yellow-400', text: 'text-yellow-700', icon: 'fa-exclamation-circle', iconColor: 'text-yellow-500' },
+                info: { bg: 'bg-blue-100', border: 'border-blue-400', text: 'text-blue-700', icon: 'fa-info-circle', iconColor: 'text-blue-500' }
+            };
+
+            const color = colors[type] || colors.info;
+            const messageId = 'dynamic-message-' + Date.now();
+
+            const messageHtml = `
+                <div class="mb-4 p-4 ${color.bg} border ${color.border} ${color.text} rounded-lg shadow-lg animate-slide-down" id="${messageId}">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas ${color.icon} ${color.iconColor}"></i>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <h4 class="font-bold">${title}</h4>
+                            <p class="text-sm">${message}</p>
+                        </div>
+                        <button onclick="closeMessage('${messageId}')" class="flex-shrink-0 ml-4 ${color.iconColor} hover:opacity-70">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // البحث عن منطقة الرسائل أو إنشاؤها
+            let messagesContainer = document.querySelector('.fixed.top-4.left-4.right-4.z-50');
+            if (!messagesContainer) {
+                messagesContainer = document.createElement('div');
+                messagesContainer.className = 'fixed top-4 left-4 right-4 z-50 max-w-md mx-auto';
+                document.body.appendChild(messagesContainer);
+            }
+
+            messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+
+            // إغلاق تلقائي للرسائل الإيجابية
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    closeMessage(messageId);
+                }, type === 'success' ? 5000 : 8000);
+            }
+        };
+    </script>
 </body>
 
 </html>

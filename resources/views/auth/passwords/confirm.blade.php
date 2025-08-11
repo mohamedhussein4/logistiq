@@ -1,12 +1,12 @@
 @extends('layouts.main')
 
-@section('title', 'تأكيد كلمة المرور - LogistiQ')
+@section('title', 'تأكيد كلمة المرور - Link2u')
 
 @section('content')
 <section class="min-h-screen flex items-center justify-center py-12 px-4 relative overflow-hidden">
     <!-- Background -->
     <div class="absolute inset-0 bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100"></div>
-    
+
     <!-- Animated background elements -->
     <div class="absolute inset-0 opacity-10">
         <div class="absolute top-20 right-20 w-40 h-40 bg-blue-400 rounded-full animate-float"></div>
@@ -20,13 +20,13 @@
             <!-- Header -->
             <div class="relative bg-gradient-to-r from-blue-500 to-primary-600 p-8 text-center">
                 <div class="absolute inset-0 bg-white/10"></div>
-                
+
                 <div class="relative">
                     <!-- Lock Icon -->
                     <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4 animate-bounce-soft">
                         <i class="fas fa-lock text-white text-2xl"></i>
                     </div>
-                    
+
                     <h1 class="text-3xl font-bold text-white mb-2">تأكيد كلمة المرور</h1>
                     <p class="text-primary-100">للمتابعة يرجى تأكيد كلمة المرور</p>
                 </div>
@@ -38,7 +38,7 @@
                     <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-4">
                         <i class="fas fa-shield-check text-blue-600 text-2xl"></i>
                     </div>
-                    
+
                     <h2 class="text-xl font-bold text-secondary-800 mb-2">تأكيد هويتك</h2>
                     <p class="text-secondary-600 leading-relaxed text-sm">
                         لأسباب أمنية، يرجى تأكيد كلمة المرور الخاصة بك قبل المتابعة للمنطقة المحمية
@@ -55,16 +55,16 @@
                             كلمة المرور
                         </label>
                         <div class="relative">
-                            <input id="password" 
-                                   type="password" 
-                                   name="password" 
-                                   required 
+                            <input id="password"
+                                   type="password"
+                                   name="password"
+                                   required
                                    autocomplete="current-password"
                                    autofocus
-                                   class="w-full px-4 py-3 pl-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('password') border-red-500 @else border-secondary-200 @enderror" 
+                                   class="w-full px-4 py-3 pl-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('password') border-red-500 @else border-secondary-200 @enderror"
                                    placeholder="أدخل كلمة المرور">
-                            
-                            <button type="button" 
+
+                            <button type="button"
                                     onclick="togglePassword('password')"
                                     class="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-primary-600 transition-colors">
                                 <i class="fas fa-eye" id="password-eye"></i>
@@ -80,7 +80,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" 
+                    <button type="submit"
                             class="w-full relative overflow-hidden bg-gradient-to-r from-blue-500 to-primary-600 text-white py-3 rounded-xl font-semibold text-lg hover:shadow-glow transition-all duration-300 hover:scale-105 group">
                         <span class="relative z-10 flex items-center justify-center">
                             <i class="fas fa-check ml-2 group-hover:animate-bounce-soft"></i>
@@ -95,7 +95,7 @@
                             <p class="text-secondary-600 text-sm mb-3">
                                 نسيت كلمة المرور؟
                             </p>
-                            <a href="{{ route('password.request') }}" 
+                            <a href="{{ route('password.request') }}"
                                class="inline-flex items-center justify-center px-6 py-2 border-2 border-primary-200 text-primary-600 rounded-xl hover:bg-primary-50 hover:border-primary-300 transition-all duration-300 font-medium text-sm">
                                 <i class="fas fa-key ml-2"></i>
                                 إعادة تعيين كلمة المرور
@@ -105,7 +105,7 @@
 
                     <!-- Back to Login -->
                     <div class="text-center">
-                        <a href="{{ route('login') }}" 
+                        <a href="{{ route('login') }}"
                            class="text-secondary-600 hover:text-primary-600 transition-colors text-sm">
                             العودة لتسجيل الدخول
                         </a>
@@ -158,7 +158,7 @@
     function togglePassword(inputId) {
         const input = document.getElementById(inputId);
         const eye = document.getElementById(inputId + '-eye');
-        
+
         if (input.type === 'password') {
             input.type = 'text';
             eye.classList.remove('fa-eye');
@@ -174,11 +174,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         const passwordInput = document.getElementById('password');
         const submitButton = document.querySelector('button[type="submit"]');
-        
+
         passwordInput.addEventListener('blur', function() {
             validateField(this);
         });
-        
+
         passwordInput.addEventListener('input', function() {
             if (this.classList.contains('border-red-500')) {
                 validateField(this);
@@ -188,7 +188,7 @@
         // Loading state on form submit
         submitButton.closest('form').addEventListener('submit', function() {
             const originalText = submitButton.innerHTML;
-            
+
             submitButton.innerHTML = `
                 <span class="relative z-10 flex items-center justify-center">
                     <i class="fas fa-spinner fa-spin ml-2"></i>
@@ -204,11 +204,11 @@
 
     function validateField(field) {
         const value = field.value.trim();
-        
+
         if (!value) {
             field.classList.add('border-red-500');
             field.classList.remove('border-secondary-200');
-            
+
             // Add shake animation
             field.style.animation = 'shake 0.5s ease-in-out';
             setTimeout(() => {
