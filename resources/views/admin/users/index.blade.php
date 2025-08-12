@@ -96,11 +96,11 @@
                     <span class="hidden lg:inline">تصدير Excel</span>
                     <span class="lg:hidden">تصدير</span>
                 </button>
-                <button class="px-4 lg:px-6 py-2 lg:py-3 bg-gradient-secondary text-white rounded-lg lg:rounded-xl font-semibold text-sm lg:text-base hover-lift transition-all">
+                <a href="{{ route('admin.users.create') }}" class="px-4 lg:px-6 py-2 lg:py-3 bg-gradient-secondary text-white rounded-lg lg:rounded-xl font-semibold text-sm lg:text-base hover-lift transition-all">
                     <i class="fas fa-plus mr-2"></i>
                     <span class="hidden lg:inline">مستخدم جديد</span>
                     <span class="lg:hidden">جديد</span>
-                </button>
+                </a>
             </div>
         </div>
 

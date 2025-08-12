@@ -45,7 +45,7 @@ class SettingController extends Controller
     {
         try {
             $section = $request->input('section', 'general');
-            
+
             if ($section === 'general') {
                 $request->validate([
                     'site_name' => 'required|string|max:100',
@@ -140,13 +140,13 @@ class SettingController extends Controller
                     $logo = $request->file('website_logo');
                     $logoName = 'logo_' . time() . '.' . $logo->getClientOriginalExtension();
                     $logo->move(public_path('images'), $logoName);
-                    
+
                     // حذف الشعار القديم إذا وجد
                     $oldLogo = Setting::get('website.logo');
                     if ($oldLogo && file_exists(public_path('images/' . $oldLogo))) {
                         unlink(public_path('images/' . $oldLogo));
                     }
-                    
+
                     Setting::set('website.logo', $logoName);
                 }
 
@@ -155,13 +155,13 @@ class SettingController extends Controller
                     $favicon = $request->file('website_favicon');
                     $faviconName = 'favicon_' . time() . '.' . $favicon->getClientOriginalExtension();
                     $favicon->move(public_path('images'), $faviconName);
-                    
+
                     // حذف Favicon القديم إذا وجد
                     $oldFavicon = Setting::get('website.favicon');
                     if ($oldFavicon && file_exists(public_path('images/' . $oldFavicon))) {
                         unlink(public_path('images/' . $oldFavicon));
                     }
-                    
+
                     Setting::set('website.favicon', $faviconName);
                 }
 
