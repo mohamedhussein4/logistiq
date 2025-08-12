@@ -566,32 +566,183 @@
             </div>
 
             <!-- Mobile Menu -->
-            <div id="mobile-menu" class="hidden md:hidden border-t border-white/20 pt-4 pb-4 animate-slide-down">
-                <div class="flex flex-col space-y-2">
-                    <a href="{{ route('home') }}"
-                        class="px-4 py-3 rounded-lg transition-all duration-300 {{ request()->routeIs('home') ? 'text-primary-600 font-semibold bg-primary-50' : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50/50' }}">
-                        <i class="fas fa-home ml-3 w-4"></i>
-                        الرئيسية
+            <div id="mobile-menu" class="hidden md:hidden border-t border-white/20 pt-6 pb-6 animate-slide-down">
+                <div class="space-y-4">
+                    <!-- Main Navigation -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold text-secondary-500 uppercase tracking-wider px-4 mb-3">القائمة الرئيسية</h3>
+
+                        <a href="{{ route('home') }}"
+                            class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('home') ? 'text-primary-600 font-semibold bg-gradient-to-r from-primary-50 to-primary-100 border-r-4 border-primary-500' : 'text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50' }}">
+                            <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center ml-3">
+                                <i class="fas fa-home text-white text-sm"></i>
+                            </div>
+                            <span class="font-medium">الرئيسية</span>
+                            @if(request()->routeIs('home'))
+                                <div class="mr-auto w-2 h-2 bg-primary-500 rounded-full"></div>
+                            @endif
+                        </a>
+
+                        <a href="{{ route('store') }}"
+                            class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('store') ? 'text-primary-600 font-semibold bg-gradient-to-r from-primary-50 to-primary-100 border-r-4 border-primary-500' : 'text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50' }}">
+                            <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center ml-3">
+                                <i class="fas fa-shopping-cart text-white text-sm"></i>
+                            </div>
+                            <span class="font-medium">متجر الأجهزة</span>
+                            @if(request()->routeIs('store'))
+                                <div class="mr-auto w-2 h-2 bg-primary-500 rounded-full"></div>
+                            @endif
+                        </a>
+
+                        <a href="{{ route('home') }}#contact-section" onclick="scrollToContact(event)"
+                        class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('store') ? 'text-primary-600 font-semibold bg-gradient-to-r from-primary-50 to-primary-100 border-r-4 border-primary-500' : 'text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50' }}">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center ml-3">
+                            <i class="fas fa-envelope text-white text-sm"></i>
+                        </div>
+                        <span class="font-medium">تواصل معنا</span>
+                        @if(request()->routeIs('home'))
+                            <div class="mr-auto w-2 h-2 bg-primary-500 rounded-full"></div>
+                        @endif
                     </a>
 
-                    <a href="{{ route('store') }}"
-                        class="px-4 py-3 rounded-lg transition-all duration-300 {{ request()->routeIs('store') ? 'text-primary-600 font-semibold bg-primary-50' : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50/50' }}">
-                        <i class="fas fa-shopping-cart ml-3 w-4"></i>
-                        متجر الأجهزة
-                    </a>
-
-                    <div class="border-t border-white/20 pt-2 mt-2">
-                        <a href="#contact-section" onclick="scrollToContact(event)"
-                            class="px-4 py-3 rounded-lg transition-all duration-300 text-secondary-700 hover:text-primary-600 hover:bg-primary-50/50">
-                            <i class="fas fa-envelope ml-3 w-4"></i>
-                            تواصل معنا
-                        </a>
-                        <a href="{{ route('login') }}"
-                            class="mx-4 mt-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-4 py-3 rounded-lg font-medium hover:shadow-glow transition-all duration-300 inline-flex items-center">
-                            <i class="fas fa-sign-in-alt ml-3 w-4"></i>
-                            تسجيل الدخول
-                        </a>
                     </div>
+
+                    @auth
+                        <!-- User Profile Section -->
+                        <div class="border-t border-white/20 pt-4">
+                            <h3 class="text-xs font-bold text-secondary-500 uppercase tracking-wider px-4 mb-3">حسابي</h3>
+
+                            <!-- User Info Card -->
+                            <div class="mx-4 mb-4 bg-gradient-to-r from-primary-50 to-blue-50 rounded-2xl p-4 border border-primary-100">
+                                <div class="flex items-center space-x-3 space-x-reverse">
+                                    <div class="relative">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center shadow-lg">
+                                            <i class="fas fa-user text-white text-lg"></i>
+                                        </div>
+                                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="font-bold text-primary-800 text-lg">{{ auth()->user()->name }}</p>
+                                        <div class="flex items-center space-x-2 space-x-reverse">
+                                            <span class="px-2 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full">
+                                                @if(auth()->user()->user_type === 'regular')
+                                                    <i class="fas fa-user ml-1"></i>مستخدم عادي
+                                                @elseif(auth()->user()->user_type === 'logistics')
+                                                    <i class="fas fa-truck ml-1"></i>شركة لوجستية
+                                                @elseif(auth()->user()->user_type === 'service_company')
+                                                    <i class="fas fa-building ml-1"></i>شركة طالبة
+                                                @elseif(auth()->user()->user_type === 'admin')
+                                                    <i class="fas fa-crown ml-1"></i>مدير النظام
+                                                @endif
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="space-y-2">
+                                <!-- Dashboard Link -->
+                                @if(auth()->user()->user_type === 'regular')
+                                    <a href="{{ route('user.dashboard') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50 group">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center ml-3 group-hover:scale-110 transition-transform">
+                                            <i class="fas fa-tachometer-alt text-white text-sm"></i>
+                                        </div>
+                                        <span class="font-medium">لوحة التحكم</span>
+                                        <i class="fas fa-chevron-left mr-auto text-secondary-400 group-hover:text-primary-500 transition-colors"></i>
+                                    </a>
+                                @elseif(auth()->user()->user_type === 'logistics')
+                                    <a href="{{ route('logistics.dashboard') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50 group">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center ml-3 group-hover:scale-110 transition-transform">
+                                            <i class="fas fa-tachometer-alt text-white text-sm"></i>
+                                        </div>
+                                        <span class="font-medium">لوحة التحكم</span>
+                                        <i class="fas fa-chevron-left mr-auto text-secondary-400 group-hover:text-primary-500 transition-colors"></i>
+                                    </a>
+                                @elseif(auth()->user()->user_type === 'service_company')
+                                    <a href="{{ route('service_company.dashboard') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50 group">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center ml-3 group-hover:scale-110 transition-transform">
+                                            <i class="fas fa-tachometer-alt text-white text-sm"></i>
+                                        </div>
+                                        <span class="font-medium">لوحة التحكم</span>
+                                        <i class="fas fa-chevron-left mr-auto text-secondary-400 group-hover:text-primary-500 transition-colors"></i>
+                                    </a>
+                                @elseif(auth()->user()->user_type === 'admin')
+                                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50 group">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center ml-3 group-hover:scale-110 transition-transform">
+                                            <i class="fas fa-cog text-white text-sm"></i>
+                                        </div>
+                                        <span class="font-medium">لوحة الإدارة</span>
+                                        <i class="fas fa-chevron-left mr-auto text-secondary-400 group-hover:text-primary-500 transition-colors"></i>
+                                    </a>
+                                @endif
+
+                                <!-- Profile Link -->
+                                @if(auth()->user()->user_type === 'logistics')
+                                    <a href="{{ route('logistics.profile') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50 group">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center ml-3 group-hover:scale-110 transition-transform">
+                                            <i class="fas fa-user-circle text-white text-sm"></i>
+                                        </div>
+                                        <span class="font-medium">الملف الشخصي</span>
+                                        <i class="fas fa-chevron-left mr-auto text-secondary-400 group-hover:text-primary-500 transition-colors"></i>
+                                    </a>
+                                @elseif(auth()->user()->user_type === 'service_company')
+                                    <a href="{{ route('service_company.profile') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50 group">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center ml-3 group-hover:scale-110 transition-transform">
+                                            <i class="fas fa-user-circle text-white text-sm"></i>
+                                        </div>
+                                        <span class="font-medium">الملف الشخصي</span>
+                                        <i class="fas fa-chevron-left mr-auto text-secondary-400 group-hover:text-primary-500 transition-colors"></i>
+                                    </a>
+                                @elseif(auth()->user()->user_type === 'regular')
+                                    <a href="{{ route('user.dashboard') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50 group">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center ml-3 group-hover:scale-110 transition-transform">
+                                            <i class="fas fa-user-circle text-white text-sm"></i>
+                                        </div>
+                                        <span class="font-medium">الملف الشخصي</span>
+                                        <i class="fas fa-chevron-left mr-auto text-secondary-400 group-hover:text-primary-500 transition-colors"></i>
+                                    </a>
+                                @endif
+                            </div>
+
+                            <!-- Logout Section -->
+                            <div class="border-t border-white/20 pt-4 mt-4">
+                                <a href="{{ route('logout') }}"
+                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                                   class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-red-600 hover:text-red-700 hover:bg-gradient-to-r hover:from-red-50/50 hover:to-red-100/50 group">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center ml-3 group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-sign-out-alt text-white text-sm"></i>
+                                    </div>
+                                    <span class="font-medium">تسجيل الخروج</span>
+                                    <i class="fas fa-chevron-left mr-auto text-red-400 group-hover:text-red-500 transition-colors"></i>
+                                </a>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Guest User Section -->
+                        <div class="border-t border-white/20 pt-4">
+                            <h3 class="text-xs font-bold text-secondary-500 uppercase tracking-wider px-4 mb-3">زائر</h3>
+
+                            <div class="space-y-2">
+                                <a href="#contact-section" onclick="scrollToContact(event)"
+                                    class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50 group">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center ml-3 group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-envelope text-white text-sm"></i>
+                                    </div>
+                                    <span class="font-medium">تواصل معنا</span>
+                                    <i class="fas fa-chevron-left mr-auto text-secondary-400 group-hover:text-primary-500 transition-colors"></i>
+                                </a>
+
+                                <a href="{{ route('login') }}"
+                                    class="mx-4 mt-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-xl font-medium hover:shadow-glow transition-all duration-300 inline-flex items-center justify-center w-auto group">
+                                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center ml-3 group-hover:scale-110 transition-transform">
+                                        <i class="fas fa-sign-in-alt text-white text-sm"></i>
+                                    </div>
+                                    <span>تسجيل الدخول</span>
+                                </a>
+                            </div>
+                        </div>
+                    @endauth
                 </div>
             </div>
         </div>
@@ -831,6 +982,24 @@
             }
         }
 
+        // Function to close mobile menu
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const line1 = document.getElementById('menu-line-1');
+            const line2 = document.getElementById('menu-line-2');
+            const line3 = document.getElementById('menu-line-3');
+
+            if (mobileMenuOpen) {
+                menu.classList.add('hidden');
+                mobileMenuOpen = false;
+
+                // Animate X back to hamburger
+                line1.style.transform = 'rotate(0deg) translate(0px, 0px)';
+                line2.style.opacity = '1';
+                line3.style.transform = 'rotate(0deg) translate(0px, 0px)';
+            }
+        }
+
         // Back to top functionality
         window.addEventListener('scroll', function() {
             const backToTop = document.getElementById('backToTop');
@@ -882,6 +1051,18 @@
             // Observe all elements with animation classes
             document.querySelectorAll('.animate-slide-up, .animate-scale-in, .hover-lift').forEach(el => {
                 observer.observe(el);
+            });
+
+            // Close mobile menu when clicking on any link
+            const mobileMenuLinks = document.querySelectorAll('#mobile-menu a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    // Don't close menu for logout form submission
+                    if (this.getAttribute('onclick') && this.getAttribute('onclick').includes('logout-form')) {
+                        return;
+                    }
+                    closeMobileMenu();
+                });
             });
         });
 
