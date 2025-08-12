@@ -18,54 +18,11 @@ use Illuminate\Support\Facades\Log;
 
 class SettingController extends Controller
 {
-    //
+    /**
+     * عرض صفحة الإعدادات
+     */
     public function index()
     {
-        // جلب الإعدادات من قاعدة البيانات مع قيم افتراضية
-        $settings = [
-            // General Settings
-            'app_name' => Setting::get('app_name', config('app.name', 'Link2u')),
-            'maintenance_mode' => Setting::get('maintenance_mode', false),
-            'max_upload_size' => Setting::get('max_upload_size', '10MB'),
-            'default_currency' => Setting::get('default_currency', 'SAR'),
-            'timezone' => Setting::get('timezone', 'Asia/Riyadh'),
-            'app_version' => Setting::get('app_version', '1.0.0'),
-            'last_backup' => Setting::get('last_backup', now()->format('Y-m-d H:i:s')),
-
-            // Email Settings
-            'mail_host' => Setting::get('mail_host', 'smtp.gmail.com'),
-            'mail_port' => Setting::get('mail_port', 587),
-            'mail_username' => Setting::get('mail_username', 'noreply@Link2u.com'),
-            'mail_password' => Setting::get('mail_password', ''),
-            'mail_from_address' => Setting::get('mail_from_address', 'noreply@Link2u.com'),
-            'mail_from_name' => Setting::get('mail_from_name', 'Link2u'),
-            'mail_encryption' => Setting::get('mail_encryption', 'tls'),
-
-            // Payment Settings
-            'merchant_id' => Setting::get('merchant_id', 'MERCHANT_123456'),
-            'payment_api_key' => Setting::get('payment_api_key', ''),
-            'payment_gateway' => Setting::get('payment_gateway', 'moyasar'),
-            'payment_methods' => Setting::get('payment_methods', ['credit_card', 'mada', 'stc_pay']),
-            'auto_capture' => Setting::get('auto_capture', true),
-            'payment_webhook_url' => Setting::get('payment_webhook_url', ''),
-
-            // Security Settings
-            'session_lifetime' => Setting::get('session_lifetime', 120),
-            'max_login_attempts' => Setting::get('max_login_attempts', 5),
-            'password_min_length' => Setting::get('password_min_length', 8),
-            'password_require_uppercase' => Setting::get('password_require_uppercase', true),
-            'password_require_numbers' => Setting::get('password_require_numbers', true),
-            'password_require_symbols' => Setting::get('password_require_symbols', false),
-            'two_factor_enabled' => Setting::get('two_factor_enabled', false),
-            'lockout_duration' => Setting::get('lockout_duration', 15),
-
-            // Backup Settings
-            'backup_frequency' => Setting::get('backup_frequency', 'daily'),
-            'backup_retention' => Setting::get('backup_retention', 30),
-            'backup_location' => Setting::get('backup_location', 'local'),
-            'backup_notification' => Setting::get('backup_notification', true),
-        ];
-
         // إحصائيات النظام
         $systemStats = [
             'total_users' => User::count(),
@@ -78,7 +35,7 @@ class SettingController extends Controller
             'cache_size' => $this->getCacheSize(),
         ];
 
-        return view('admin.settings.index', compact('settings', 'systemStats'));
+        return view('admin.settings.index', compact('systemStats'));
     }
 
     /**
@@ -88,119 +45,177 @@ class SettingController extends Controller
     {
         try {
             $section = $request->input('section', 'general');
-
+            
             if ($section === 'general') {
                 $request->validate([
-                    'app_name' => 'required|string|max:255',
+                    'site_name' => 'required|string|max:100',
+                    'site_description' => 'nullable|string|max:500',
+                    'site_email' => 'required|email|max:100',
+                    'site_phone' => 'required|string|max:20',
+                    'site_address' => 'required|string|max:200',
+                    'site_currency' => 'required|string|max:10',
+                    'site_timezone' => 'required|string|max:50',
                     'maintenance_mode' => 'boolean',
-                    'max_upload_size' => 'required|string',
-                    'default_currency' => 'required|string|max:10',
-                    'timezone' => 'required|string',
+                    'registration_enabled' => 'boolean'
                 ]);
 
-                // حفظ الإعدادات العامة
-                Setting::set('app_name', $request->app_name, Setting::TYPE_STRING, Setting::GROUP_GENERAL);
-                Setting::set('maintenance_mode', $request->boolean('maintenance_mode'), Setting::TYPE_BOOLEAN, Setting::GROUP_GENERAL);
-                Setting::set('max_upload_size', $request->max_upload_size, Setting::TYPE_STRING, Setting::GROUP_GENERAL);
-                Setting::set('default_currency', $request->default_currency, Setting::TYPE_STRING, Setting::GROUP_GENERAL);
-                Setting::set('timezone', $request->timezone, Setting::TYPE_STRING, Setting::GROUP_GENERAL);
+                Setting::set('general.site_name', $request->site_name);
+                Setting::set('general.site_description', $request->site_description);
+                Setting::set('general.site_email', $request->site_email);
+                Setting::set('general.site_phone', $request->site_phone);
+                Setting::set('general.site_address', $request->site_address);
+                Setting::set('general.site_currency', $request->site_currency);
+                Setting::set('general.site_timezone', $request->timezone);
+                Setting::set('general.maintenance_mode', $request->boolean('maintenance_mode'));
+                Setting::set('general.registration_enabled', $request->boolean('registration_enabled'));
 
-                return redirect()->back()->with('success', 'تم تحديث الإعدادات العامة بنجاح');
-
-            } elseif ($section === 'email') {
+            } elseif ($section === 'seo') {
                 $request->validate([
-                    'mail_host' => 'required|string',
-                    'mail_port' => 'required|integer',
-                    'mail_username' => 'required|email',
-                    'mail_password' => 'nullable|string',
-                    'mail_from_address' => 'required|email',
-                    'mail_from_name' => 'required|string',
-                    'mail_encryption' => 'required|in:tls,ssl,none',
+                    'seo_title' => 'required|string|max:100',
+                    'seo_description' => 'required|string|max:160',
+                    'seo_keywords' => 'nullable|string|max:200',
+                    'seo_author' => 'nullable|string|max:100',
+                    'seo_robots' => 'nullable|string|max:100',
+                    'google_analytics' => 'nullable|string|max:100',
+                    'facebook_pixel' => 'nullable|string|max:100'
                 ]);
 
-                // حفظ إعدادات البريد الإلكتروني
-                Setting::set('mail_host', $request->mail_host, Setting::TYPE_STRING, Setting::GROUP_EMAIL);
-                Setting::set('mail_port', $request->mail_port, Setting::TYPE_NUMBER, Setting::GROUP_EMAIL);
-                Setting::set('mail_username', $request->mail_username, Setting::TYPE_STRING, Setting::GROUP_EMAIL);
-                if ($request->filled('mail_password')) {
-                    Setting::set('mail_password', encrypt($request->mail_password), Setting::TYPE_STRING, Setting::GROUP_EMAIL);
-                }
-                Setting::set('mail_from_address', $request->mail_from_address, Setting::TYPE_STRING, Setting::GROUP_EMAIL);
-                Setting::set('mail_from_name', $request->mail_from_name, Setting::TYPE_STRING, Setting::GROUP_EMAIL);
-                Setting::set('mail_encryption', $request->mail_encryption, Setting::TYPE_STRING, Setting::GROUP_EMAIL);
+                Setting::set('seo.title', $request->seo_title);
+                Setting::set('seo.description', $request->seo_description);
+                Setting::set('seo.keywords', $request->seo_keywords);
+                Setting::set('seo.author', $request->seo_author);
+                Setting::set('seo.robots', $request->seo_robots);
+                Setting::set('seo.google_analytics', $request->google_analytics);
+                Setting::set('seo.facebook_pixel', $request->facebook_pixel);
 
-                return redirect()->back()->with('success', 'تم تحديث إعدادات البريد الإلكتروني بنجاح');
-
-            } elseif ($section === 'payment') {
+            } elseif ($section === 'contact') {
                 $request->validate([
-                    'merchant_id' => 'required|string',
-                    'payment_api_key' => 'required|string',
-                    'payment_gateway' => 'required|string',
-                    'payment_methods' => 'array',
-                    'auto_capture' => 'boolean',
-                    'payment_webhook_url' => 'nullable|url',
+                    'contact_email' => 'required|email|max:100',
+                    'contact_phone' => 'required|string|max:20',
+                    'contact_address' => 'required|string|max:200',
+                    'contact_working_hours' => 'nullable|string|max:100',
+                    'contact_support_hours' => 'nullable|string|max:100'
                 ]);
 
-                // حفظ إعدادات الدفع
-                Setting::set('merchant_id', $request->merchant_id, Setting::TYPE_STRING, Setting::GROUP_PAYMENT);
-                Setting::set('payment_api_key', encrypt($request->payment_api_key), Setting::TYPE_STRING, Setting::GROUP_PAYMENT);
-                Setting::set('payment_gateway', $request->payment_gateway, Setting::TYPE_STRING, Setting::GROUP_PAYMENT);
-                Setting::set('payment_methods', $request->payment_methods, Setting::TYPE_JSON, Setting::GROUP_PAYMENT);
-                Setting::set('auto_capture', $request->boolean('auto_capture'), Setting::TYPE_BOOLEAN, Setting::GROUP_PAYMENT);
-                if ($request->filled('payment_webhook_url')) {
-                    Setting::set('payment_webhook_url', $request->payment_webhook_url, Setting::TYPE_STRING, Setting::GROUP_PAYMENT);
+                Setting::set('contact.email', $request->contact_email);
+                Setting::set('contact.phone', $request->contact_phone);
+                Setting::set('contact.address', $request->contact_address);
+                Setting::set('contact.working_hours', $request->contact_working_hours);
+                Setting::set('contact.support_hours', $request->contact_support_hours);
+
+            } elseif ($section === 'social') {
+                $request->validate([
+                    'social_facebook' => 'nullable|url|max:200',
+                    'social_twitter' => 'nullable|url|max:200',
+                    'social_instagram' => 'nullable|url|max:200',
+                    'social_linkedin' => 'nullable|url|max:200',
+                    'social_youtube' => 'nullable|url|max:200',
+                    'social_whatsapp' => 'nullable|string|max:20'
+                ]);
+
+                Setting::set('social.facebook', $request->social_facebook);
+                Setting::set('social.twitter', $request->social_twitter);
+                Setting::set('social.instagram', $request->social_instagram);
+                Setting::set('social.linkedin', $request->social_linkedin);
+                Setting::set('social.youtube', $request->social_youtube);
+                Setting::set('social.whatsapp', $request->social_whatsapp);
+
+            } elseif ($section === 'website') {
+                $request->validate([
+                    'website_name' => 'required|string|max:100',
+                    'website_description' => 'nullable|string|max:500',
+                    'website_keywords' => 'nullable|string|max:200',
+                    'website_url' => 'nullable|url|max:200',
+                    'website_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                    'website_favicon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,ico|max:1024'
+                ]);
+
+                Setting::set('website.name', $request->website_name);
+                Setting::set('website.description', $request->website_description);
+                Setting::set('website.keywords', $request->website_keywords);
+                Setting::set('website.url', $request->website_url);
+
+                // معالجة رفع الشعار
+                if ($request->hasFile('website_logo')) {
+                    $logo = $request->file('website_logo');
+                    $logoName = 'logo_' . time() . '.' . $logo->getClientOriginalExtension();
+                    $logo->move(public_path('images'), $logoName);
+                    
+                    // حذف الشعار القديم إذا وجد
+                    $oldLogo = Setting::get('website.logo');
+                    if ($oldLogo && file_exists(public_path('images/' . $oldLogo))) {
+                        unlink(public_path('images/' . $oldLogo));
+                    }
+                    
+                    Setting::set('website.logo', $logoName);
                 }
 
-                return redirect()->back()->with('success', 'تم تحديث إعدادات الدفع بنجاح');
+                // معالجة رفع Favicon
+                if ($request->hasFile('website_favicon')) {
+                    $favicon = $request->file('website_favicon');
+                    $faviconName = 'favicon_' . time() . '.' . $favicon->getClientOriginalExtension();
+                    $favicon->move(public_path('images'), $faviconName);
+                    
+                    // حذف Favicon القديم إذا وجد
+                    $oldFavicon = Setting::get('website.favicon');
+                    if ($oldFavicon && file_exists(public_path('images/' . $oldFavicon))) {
+                        unlink(public_path('images/' . $oldFavicon));
+                    }
+                    
+                    Setting::set('website.favicon', $faviconName);
+                }
+
+            } elseif ($section === 'footer') {
+                $request->validate([
+                    'footer_description' => 'nullable|string|max:500',
+                    'footer_copyright' => 'required|string|max:200',
+                    'footer_links' => 'nullable|string|max:1000'
+                ]);
+
+                Setting::set('footer.description', $request->footer_description);
+                Setting::set('footer.copyright', $request->footer_copyright);
+                Setting::set('footer.links', $request->footer_links);
 
             } elseif ($section === 'security') {
                 $request->validate([
-                    'session_lifetime' => 'required|integer|min:30',
-                    'max_login_attempts' => 'required|integer|min:3',
-                    'password_min_length' => 'required|integer|min:6',
-                    'password_require_uppercase' => 'boolean',
-                    'password_require_numbers' => 'boolean',
-                    'password_require_symbols' => 'boolean',
-                    'two_factor_enabled' => 'boolean',
-                    'lockout_duration' => 'required|integer|min:1',
+                    'security_session_timeout' => 'required|integer|min:15|max:480',
+                    'security_max_login_attempts' => 'required|integer|min:3|max:10',
+                    'security_password_min_length' => 'required|integer|min:6|max:20',
+                    'security_two_factor_enabled' => 'boolean',
+                    'security_captcha_enabled' => 'boolean'
                 ]);
 
-                // حفظ إعدادات الأمان
-                Setting::set('session_lifetime', $request->session_lifetime, Setting::TYPE_NUMBER, Setting::GROUP_SECURITY);
-                Setting::set('max_login_attempts', $request->max_login_attempts, Setting::TYPE_NUMBER, Setting::GROUP_SECURITY);
-                Setting::set('password_min_length', $request->password_min_length, Setting::TYPE_NUMBER, Setting::GROUP_SECURITY);
-                Setting::set('password_require_uppercase', $request->boolean('password_require_uppercase'), Setting::TYPE_BOOLEAN, Setting::GROUP_SECURITY);
-                Setting::set('password_require_numbers', $request->boolean('password_require_numbers'), Setting::TYPE_BOOLEAN, Setting::GROUP_SECURITY);
-                Setting::set('password_require_symbols', $request->boolean('password_require_symbols'), Setting::TYPE_BOOLEAN, Setting::GROUP_SECURITY);
-                Setting::set('two_factor_enabled', $request->boolean('two_factor_enabled'), Setting::TYPE_BOOLEAN, Setting::GROUP_SECURITY);
-                Setting::set('lockout_duration', $request->lockout_duration, Setting::TYPE_NUMBER, Setting::GROUP_SECURITY);
+                Setting::set('security.session_timeout', $request->security_session_timeout);
+                Setting::set('security.max_login_attempts', $request->security_max_login_attempts);
+                Setting::set('security.password_min_length', $request->security_password_min_length);
+                Setting::set('security.two_factor_enabled', $request->boolean('security_two_factor_enabled'));
+                Setting::set('security.captcha_enabled', $request->boolean('security_captcha_enabled'));
 
-                return redirect()->back()->with('success', 'تم تحديث إعدادات الأمان بنجاح');
-
-            } elseif ($section === 'backup') {
+            } elseif ($section === 'performance') {
                 $request->validate([
-                    'backup_frequency' => 'required|in:daily,weekly,monthly',
-                    'backup_retention' => 'required|integer|min:1',
-                    'backup_location' => 'required|in:local,cloud',
-                    'backup_notification' => 'boolean',
+                    'performance_cache_enabled' => 'boolean',
+                    'performance_cache_duration' => 'required|integer|min:1|max:1440',
+                    'performance_image_optimization' => 'boolean',
+                    'performance_compression_enabled' => 'boolean'
                 ]);
 
-                // حفظ إعدادات النسخ الاحتياطي
-                Setting::set('backup_frequency', $request->backup_frequency, Setting::TYPE_STRING, Setting::GROUP_BACKUP);
-                Setting::set('backup_retention', $request->backup_retention, Setting::TYPE_NUMBER, Setting::GROUP_BACKUP);
-                Setting::set('backup_location', $request->backup_location, Setting::TYPE_STRING, Setting::GROUP_BACKUP);
-                Setting::set('backup_notification', $request->boolean('backup_notification'), Setting::TYPE_BOOLEAN, Setting::GROUP_BACKUP);
+                Setting::set('performance.cache_enabled', $request->boolean('performance_cache_enabled'));
+                Setting::set('performance.cache_duration', $request->performance_cache_duration);
+                Setting::set('performance.image_optimization', $request->boolean('performance_image_optimization'));
+                Setting::set('performance.compression_enabled', $request->boolean('performance_compression_enabled'));
 
-                return redirect()->back()->with('success', 'تم تحديث إعدادات النسخ الاحتياطي بنجاح');
+            } else {
+                return redirect()->back()->with('error', 'قسم غير صحيح');
             }
 
-            return redirect()->back()->with('warning', 'قسم غير معروف في الإعدادات');
+            Setting::clearCache();
+            return redirect()->back()->with('success', 'تم تحديث الإعدادات بنجاح');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            Log::error('خطأ في تحديث الإعدادات: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث الإعدادات: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('خطأ في تحديث الإعدادات: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث الإعدادات');
         }
     }
 

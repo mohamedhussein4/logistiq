@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             ProductsSeeder::class,      // إنشاء المنتجات والطلبات
             InvoicesSeeder::class,      // إنشاء الفواتير والمدفوعات
             PaymentAccountsSeeder::class, // إضافة Seeder الحسابات البنكية والمحافظ
+            WebsiteSettingsSeeder::class, // إضافة Seeder إعدادات الموقع
         ]);
 
         $this->command->info('✅ تم إنشاء جميع البيانات التجريبية بنجاح!');
@@ -31,6 +32,7 @@ class DatabaseSeeder extends Seeder
         $this->command->line('🧾 الفواتير: فواتير مع مدفوعات وخطط تقسيط');
         $this->command->line('📞 طلبات التواصل: طلبات من عملاء محتملين');
         $this->command->line('🔗 خدمات الربط: ربط بين الشركات');
+        $this->command->line('⚙️ إعدادات الموقع: SEO، تواصل، سوشيال ميديا، فوتر');
         $this->command->line('');
         $this->command->info('🔑 بيانات تسجيل الدخول:');
         $this->command->line('📧 الأدمن: admin@Link2u.com');
