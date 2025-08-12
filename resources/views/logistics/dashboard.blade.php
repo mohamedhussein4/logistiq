@@ -253,7 +253,7 @@
                 @endif
                 <!-- Hidden Payment Amount (Auto-calculated) -->
                 <input type="hidden" name="payment_amount" id="payment-amount" value="0">
-                
+
                 <!-- Payment Amount Display -->
                 <div class="mb-4">
                     <div class="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -356,23 +356,23 @@
                                         total += parseFloat(checkbox.dataset.amount) || 0;
                                     }
                                 });
-                                
+
                                 // تحديث عرض الإجمالي
                                 if (selectedTotal) {
                                     selectedTotal.textContent = total.toLocaleString() + ' ر.س';
                                 }
-                                
+
                                 // تحديث مبلغ السداد التلقائي
                                 if (paymentAmount) {
                                     paymentAmount.value = total;
                                 }
-                                
+
                                 // تحديث عرض مبلغ السداد
                                 const paymentAmountDisplay = document.getElementById('payment-amount-display');
                                 if (paymentAmountDisplay) {
                                     paymentAmountDisplay.textContent = total.toLocaleString() + ' ر.س';
                                 }
-                                
+
                                 console.log('إجمالي المحدد ومبلغ السداد:', total);
                                 return total;
                             }
@@ -419,7 +419,7 @@
                                         alert('يرجى تحديد فاتورة واحدة على الأقل');
                                         return false;
                                     }
-                                    
+
                                     // التحقق من أن مبلغ السداد أكبر من صفر
                                     const paymentAmountValue = parseFloat(paymentAmount.value) || 0;
                                     if (paymentAmountValue <= 0) {
@@ -427,7 +427,7 @@
                                         alert('مبلغ السداد يجب أن يكون أكبر من صفر');
                                         return false;
                                     }
-                                    
+
                                     // التحقق من اختيار طريقة الدفع
                                     const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
                                     if (!paymentMethod) {
@@ -435,7 +435,7 @@
                                         alert('يرجى اختيار طريقة الدفع');
                                         return false;
                                     }
-                                    
+
                                     // التحقق من اختيار الحساب
                                     const paymentAccount = document.querySelector('input[name="payment_account_id"]:checked');
                                     if (!paymentAccount) {
@@ -443,7 +443,7 @@
                                         alert('يرجى اختيار الحساب للدفع');
                                         return false;
                                     }
-                                    
+
                                     console.log('تم إرسال النموذج بمبلغ:', paymentAmountValue);
                                 });
                             }
@@ -457,19 +457,19 @@
                         function showPaymentAccounts(type) {
                             const bankDiv = document.getElementById('bank-accounts');
                             const walletDiv = document.getElementById('electronic-wallets');
-                            
+
                             if (bankDiv && walletDiv) {
                                 // إخفاء جميع الأقسام أولاً
                                 bankDiv.classList.add('hidden');
                                 walletDiv.classList.add('hidden');
-                                
+
                                 // إظهار القسم المطلوب
                                 if (type === 'bank') {
                                     bankDiv.classList.remove('hidden');
                                 } else if (type === 'wallet') {
                                     walletDiv.classList.remove('hidden');
                                 }
-                                
+
                                 // مسح التحديدات السابقة
                                 document.querySelectorAll('input[name="payment_account_id"]').forEach(radio => {
                                     radio.checked = false;

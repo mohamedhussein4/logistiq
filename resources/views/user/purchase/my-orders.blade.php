@@ -141,16 +141,16 @@
 
                             <!-- إجراءات -->
                             <div class="flex space-x-3 space-x-reverse mt-4 lg:mt-0">
-                                <a href="{{ route('user.purchase.order_details', $order->id) }}" 
+                                <a href="{{ route('user.purchase.order_details', $order->id) }}"
                                    class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-all hover-lift shadow-soft">
                                     <i class="fas fa-eye ml-1"></i>
                                     عرض التفاصيل
                                 </a>
-                                
+
                                 @if($order->status === 'pending_payment' && $order->paymentRequests->count() > 0)
                                     @php $paymentRequest = $order->paymentRequests->first(); @endphp
                                     @if($paymentRequest->status === 'pending')
-                                        <a href="{{ route('user.purchase.success', $order->id) }}" 
+                                        <a href="{{ route('user.purchase.success', $order->id) }}"
                                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-all hover-lift shadow-soft">
                                             <i class="fas fa-upload ml-1"></i>
                                             رفع إثبات الدفع
@@ -175,7 +175,7 @@
                     </div>
                     <h3 class="text-2xl font-semibold text-secondary-600 mb-4">لا توجد طلبات بعد</h3>
                     <p class="text-secondary-500 mb-8 max-w-md mx-auto">لم تقم بإنشاء أي طلبات حتى الآن. ابدأ بتصفح منتجاتنا واختر ما يناسبك.</p>
-                    <a href="{{ route('store') }}" 
+                    <a href="{{ route('store') }}"
                        class="inline-flex items-center bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-xl font-semibold transition-all hover-lift shadow-glow">
                         <i class="fas fa-shopping-cart ml-2"></i>
                         تصفح المنتجات
