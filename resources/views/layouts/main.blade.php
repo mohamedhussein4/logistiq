@@ -609,7 +609,7 @@
                             <h3 class="text-xs font-bold text-secondary-500 uppercase tracking-wider px-4 mb-3">حسابي</h3>
 
                             <!-- User Info Card -->
-                            <div class="mx-4 mb-4 bg-gradient-to-r from-primary-50 to-blue-50 rounded-2xl p-4 border border-primary-100">
+                            <div class="mx-2 mb-4 bg-gradient-to-r from-primary-50 to-blue-50 rounded-2xl p-4 border border-primary-100">
                                 <div class="flex items-center space-x-3 space-x-reverse">
                                     <div class="relative">
                                         <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center shadow-lg">
@@ -1257,6 +1257,31 @@
             transition-property: color, background-color, border-color, transform, opacity, box-shadow;
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
             transition-duration: 150ms;
+        }
+
+        /* Custom scrollbar for mobile menu */
+        #mobile-menu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #mobile-menu::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        #mobile-menu::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #0ea5e9, #0284c7);
+            border-radius: 3px;
+        }
+
+        #mobile-menu::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #0284c7, #0369a1);
+        }
+
+        /* Smooth scrolling for mobile menu */
+        #mobile-menu {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Loading skeleton */
