@@ -566,8 +566,8 @@
             </div>
 
             <!-- Mobile Menu -->
-            <div id="mobile-menu" class="hidden md:hidden border-t border-white/20 pt-6 pb-6 animate-slide-down">
-                <div class="space-y-4">
+            <div id="mobile-menu" class="hidden md:hidden border-t border-white/20 pt-6 pb-6 animate-slide-down max-h-[80vh] overflow-y-auto">
+                <div class="space-y-4 px-2">
                     <!-- Main Navigation -->
                     <div class="space-y-2">
                         <h3 class="text-xs font-bold text-secondary-500 uppercase tracking-wider px-4 mb-3">القائمة الرئيسية</h3>
@@ -595,16 +595,12 @@
                         </a>
 
                         <a href="{{ route('home') }}#contact-section" onclick="scrollToContact(event)"
-                        class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 {{ request()->routeIs('store') ? 'text-primary-600 font-semibold bg-gradient-to-r from-primary-50 to-primary-100 border-r-4 border-primary-500' : 'text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50' }}">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center ml-3">
-                            <i class="fas fa-envelope text-white text-sm"></i>
-                        </div>
-                        <span class="font-medium">تواصل معنا</span>
-                        @if(request()->routeIs('home'))
-                            <div class="mr-auto w-2 h-2 bg-primary-500 rounded-full"></div>
-                        @endif
-                    </a>
-
+                            class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 text-secondary-700 hover:text-primary-600 hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-primary-100/50">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center ml-3">
+                                <i class="fas fa-envelope text-white text-sm"></i>
+                            </div>
+                            <span class="font-medium">تواصل معنا</span>
+                        </a>
                     </div>
 
                     @auth
