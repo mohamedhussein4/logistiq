@@ -45,9 +45,9 @@ class UserDashboardController extends Controller
             'pending_orders' => ProductOrder::where('user_id', $user->id)
                 ->where('status', 'pending')->count(),
             'completed_orders' => ProductOrder::where('user_id', $user->id)
-                ->where('status', 'completed')->count(),
+                ->where('status', 'delivered')->count(),
             'total_spent' => ProductOrder::where('user_id', $user->id)
-                ->whereIn('status', ['completed', 'delivered'])->sum('original_amount'),
+                ->whereIn('status', ['delivered'])->sum('total_amount'),
         ];
 
         // آخر الطلبات مع المنتجات
@@ -105,7 +105,7 @@ class UserDashboardController extends Controller
             'completed_orders' => ProductOrder::where('user_id', $user->id)
                 ->where('status', 'completed')->count(),
             'total_spent' => ProductOrder::where('user_id', $user->id)
-                ->whereIn('status', ['completed', 'delivered'])->sum('original_amount'),
+                ->whereIn('status', ['delivered'])->sum('total_amount'),
         ];
 
         // جميع الطلبات مع المنتجات

@@ -7,10 +7,15 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\PaymentRequest;
+use App\Models\BankAccount;
+use App\Models\ElectronicWallet;
 use App\Models\ServiceCompany;
 use App\Models\InstallmentPlan;
+use App\Models\ProductOrder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class ServiceCompanyController extends Controller
 {
@@ -107,7 +112,11 @@ class ServiceCompanyController extends Controller
                 return $payment;
             });
 
-        return view('service-company.dashboard', compact('serviceCompany', 'stats', 'recentInvoices', 'recentPayments'));
+        // الحصول على البنوك والمحافظ الإلكترونية النشطة لنظام الدفع
+        $bankAccounts = BankAccount::active()->ordered()->get();
+        $electronicWallets = ElectronicWallet::active()->ordered()->get();
+
+        return view('service-company.dashboard', compact('serviceCompany', 'stats', 'recentInvoices', 'recentPayments', 'bankAccounts', 'electronicWallets'));
     }
 
     /**
@@ -125,9 +134,9 @@ class ServiceCompanyController extends Controller
         $request->validate([
             'invoice_number' => 'required|string',
             'amount' => 'required|numeric|min:1',
-            'payment_method' => 'required|in:bank_transfer,online_payment,check,cash',
-            'reference_number' => 'nullable|string',
-            'notes' => 'nullable|string|max:500'
+            'payment_method' => 'required|in:bank_transfer,electronic_wallet',
+            'payment_account_id' => 'required|integer',
+            'payment_notes' => 'nullable|string|max:1000',
         ]);
 
         // البحث عن الفاتورة
@@ -147,28 +156,32 @@ class ServiceCompanyController extends Controller
             return redirect()->back()->with('error', 'المبلغ المدخل أكبر من المبلغ المستحق');
         }
 
-        // إنشاء سجل الدفع
-        $payment = Payment::create([
-            'invoice_id' => $invoice->id,
-            'amount' => $request->amount,
-            'payment_date' => now(),
-            'payment_method' => $request->payment_method,
-            'reference_number' => $request->reference_number,
-            'notes' => $request->notes,
-            'status' => 'pending', // في انتظار التأكيد
-        ]);
+        try {
+            DB::beginTransaction();
 
-        // تحديث الفاتورة
-        $newPaidAmount = $invoice->paid_amount + $request->amount;
-        $newRemainingAmount = $invoice->original_amount - $newPaidAmount;
+            // إنشاء طلب دفع جديد
+            $paymentRequest = PaymentRequest::create([
+                'user_id' => $user->id,
+                'request_number' => 'SRV-PAY-' . date('Ymd') . '-' . str_pad(PaymentRequest::count() + 1, 6, '0', STR_PAD_LEFT),
+                'payment_type' => 'invoice',
+                'related_id' => $invoice->id,
+                'related_type' => Invoice::class,
+                'amount' => $request->amount,
+                'payment_method' => $request->payment_method,
+                'payment_account_id' => $request->payment_account_id,
+                'payment_account_type' => $request->payment_method === 'bank_transfer' ? BankAccount::class : ElectronicWallet::class,
+                'payment_notes' => $request->payment_notes ?: 'دفع سريع من لوحة تحكم الشركة الطالبة',
+                'status' => 'pending',
+            ]);
 
-        $invoice->update([
-            'paid_amount' => $newPaidAmount,
-            'remaining_amount' => $newRemainingAmount,
-            'payment_status' => $newRemainingAmount <= 0 ? 'paid' : 'partial',
-        ]);
+            DB::commit();
 
-        return redirect()->back()->with('success', 'تم إرسال طلب الدفع بنجاح وهو في انتظار التأكيد');
+            return redirect()->back()->with('success', 'تم إرسال طلب الدفع بنجاح. رقم الطلب: ' . $paymentRequest->request_number . '. يرجى رفع إثبات التحويل لإتمام العملية.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إرسال طلب الدفع: ' . $e->getMessage());
+        }
     }
 
     public function profile()
@@ -307,13 +320,29 @@ class ServiceCompanyController extends Controller
                 return $logistics;
             });
 
+        // طلبات الدفع للمستخدم الحالي
+        $paymentRequests = PaymentRequest::where('user_id', $user->id)
+            ->with(['related', 'bankAccount', 'electronicWallet'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // طلبات المنتجات للمستخدم الحالي (إذا كان لديه)
+        $productOrders = ProductOrder::where('user_id', $user->id)
+            ->with(['product', 'paymentRequests'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
         return view('service-company.profile', compact(
             'serviceCompany',
             'stats',
             'invoices',
             'payments',
             'installmentPlans',
-            'logisticsCompanies'
+            'logisticsCompanies',
+            'paymentRequests',
+            'productOrders'
         ));
     }
 

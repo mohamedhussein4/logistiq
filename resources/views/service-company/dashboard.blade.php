@@ -92,6 +92,44 @@
                         سداد سريع
                     </h3>
 
+                    @if($errors->any())
+                        <div class="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+                            <div class="flex">
+                                <i class="fas fa-exclamation-circle text-red-400 mt-0.5"></i>
+                                <div class="mr-3">
+                                    <h3 class="text-sm font-medium text-red-800">يوجد أخطاء:</h3>
+                                    <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if(session('success'))
+                        <div class="mb-4 bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="flex">
+                                <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                                <div class="mr-3">
+                                    <p class="text-sm text-green-800">{{ session('success') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+                            <div class="flex">
+                                <i class="fas fa-exclamation-triangle text-red-400 mt-0.5"></i>
+                                <div class="mr-3">
+                                    <p class="text-sm text-red-800">{{ session('error') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <form class="space-y-4" action="{{ route('service_company.quick_payment') }}" method="POST">
                         @csrf
                         <div>
@@ -117,42 +155,70 @@
                                    required>
                         </div>
 
+                        <!-- Payment Method -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                طريقة الدفع
-                            </label>
-                            <select name="payment_method" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" required>
-                                <option value="">اختر طريقة الدفع</option>
-                                <option value="bank_transfer">تحويل بنكي</option>
-                                <option value="online_payment">دفع إلكتروني</option>
-                                <option value="check">شيك</option>
-                                <option value="cash">نقداً</option>
-                            </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">طريقة الدفع</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50">
+                                    <input type="radio" name="payment_method" value="bank_transfer" class="text-purple-600 focus:ring-purple-500" onchange="showPaymentAccounts('bank')">
+                                    <i class="fas fa-university text-purple-600 mx-2"></i>
+                                    <span class="font-medium">تحويل بنكي</span>
+                                </label>
+                                <label class="flex items-center p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-green-50">
+                                    <input type="radio" name="payment_method" value="electronic_wallet" class="text-green-600 focus:ring-green-500" onchange="showPaymentAccounts('wallet')">
+                                    <i class="fas fa-mobile-alt text-green-600 mx-2"></i>
+                                    <span class="font-medium">محفظة إلكترونية</span>
+                                </label>
+                            </div>
                         </div>
+
+                        <!-- Bank Accounts -->
+                        <div id="bank-accounts" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">اختر الحساب البنكي</label>
+                            <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                                @foreach($bankAccounts ?? [] as $bank)
+                                <label class="flex items-center p-2 bg-blue-50 rounded hover:bg-blue-100 cursor-pointer">
+                                    <input type="radio" name="payment_account_id" value="{{ $bank->id }}" class="text-purple-600 focus:ring-purple-500">
+                                    <div class="mr-3 flex-1">
+                                        <div class="font-medium">{{ $bank->bank_name }}</div>
+                                        <div class="text-sm text-gray-600">{{ $bank->account_number }} - {{ $bank->account_holder_name }}</div>
+                                    </div>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Electronic Wallets -->
+                        <div id="electronic-wallets" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">اختر المحفظة الإلكترونية</label>
+                            <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                                @foreach($electronicWallets ?? [] as $wallet)
+                                <label class="flex items-center p-2 bg-green-50 rounded hover:bg-green-100 cursor-pointer">
+                                    <input type="radio" name="payment_account_id" value="{{ $wallet->id }}" class="text-green-600 focus:ring-green-500">
+                                    <div class="mr-3 flex-1">
+                                        <div class="font-medium">{{ $wallet->wallet_name }}</div>
+                                        <div class="text-sm text-gray-600">{{ $wallet->wallet_number }} - {{ $wallet->wallet_holder_name }}</div>
+                                    </div>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                رقم المرجع
-                            </label>
-                            <input type="text"
-                                   name="reference_number"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                   placeholder="REF123456">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                ملاحظات
+                                ملاحظات إضافية
                             </label>
                             <textarea rows="3"
-                                      name="notes"
+                                      name="payment_notes"
                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                      placeholder="أي ملاحظات إضافية..."></textarea>
+                                      placeholder="اكتب ملاحظات إضافية حول عملية الدفع..."></textarea>
                         </div>
 
                         <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 transition-colors font-medium">
                             <i class="fas fa-paper-plane ml-2"></i>
-                            إرسال الدفع
+                            إرسال طلب الدفع
                         </button>
                     </form>
                 </div>
@@ -717,6 +783,54 @@
                 searchId: 'payments-search',
                 statusFilterId: 'payments-status-filter',
                 rowsPerPage: 5
+            });
+        }
+    });
+
+    // دالة إظهار حسابات الدفع للشركات الطالبة
+    function showPaymentAccounts(type) {
+        const bankDiv = document.getElementById('bank-accounts');
+        const walletDiv = document.getElementById('electronic-wallets');
+
+        if (bankDiv && walletDiv) {
+            // إخفاء جميع الأقسام أولاً
+            bankDiv.classList.add('hidden');
+            walletDiv.classList.add('hidden');
+
+            // إظهار القسم المطلوب
+            if (type === 'bank') {
+                bankDiv.classList.remove('hidden');
+            } else if (type === 'wallet') {
+                walletDiv.classList.remove('hidden');
+            }
+
+            // مسح التحديدات السابقة
+            document.querySelectorAll('input[name="payment_account_id"]').forEach(radio => {
+                radio.checked = false;
+            });
+        }
+    }
+
+    // إضافة validation للنموذج
+    document.addEventListener('DOMContentLoaded', function() {
+        const quickPaymentForm = document.querySelector('form[action*="quick_payment"]');
+        if (quickPaymentForm) {
+            quickPaymentForm.addEventListener('submit', function(e) {
+                // التحقق من اختيار طريقة الدفع
+                const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+                if (!paymentMethod) {
+                    e.preventDefault();
+                    alert('يرجى اختيار طريقة الدفع');
+                    return false;
+                }
+
+                // التحقق من اختيار الحساب
+                const paymentAccount = document.querySelector('input[name="payment_account_id"]:checked');
+                if (!paymentAccount) {
+                    e.preventDefault();
+                    alert('يرجى اختيار الحساب للدفع');
+                    return false;
+                }
             });
         }
     });

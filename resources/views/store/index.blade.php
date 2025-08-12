@@ -119,10 +119,17 @@
                         </div>
                     </div>
 
-                    <button onclick="orderDevice('{{ $product->id }}')" class="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition-colors font-medium">
-                        <i class="fas fa-shopping-cart ml-2"></i>
-                        طلب شراء
-                    </button>
+                    @auth
+                        <a href="{{ route('user.purchase.product', $product->id) }}" class="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition-colors font-medium inline-block text-center">
+                            <i class="fas fa-shopping-cart ml-2"></i>
+                            شراء الآن
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 transition-colors font-medium inline-block text-center">
+                            <i class="fas fa-sign-in-alt ml-2"></i>
+                            سجل دخولك للشراء
+                        </a>
+                    @endauth
                 </div>
             </div>
             @empty
@@ -187,134 +194,7 @@
     </div>
 </section>
 
-<!-- Order Modal -->
-<div id="orderModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 p-6">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-semibold">طلب شراء جهاز</h3>
-            <button onclick="closeOrderModal()" class="text-gray-500 hover:text-gray-700">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
 
-        <form class="space-y-4">
-            <div id="selectedDevice" class="bg-gray-50 p-4 rounded-md mb-4">
-                <!-- Device info will be inserted here -->
-            </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">اسم الشركة</label>
-                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="اسم شركتك">
-            </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">اسم المسؤول</label>
-                <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="اسمك الكامل">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">رقم الهاتف</label>
-                <input type="tel" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="+966 xx xxx xxxx">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني</label>
-                <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="email@company.com">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">الكمية المطلوبة</label>
-                <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="1" min="1" value="1">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">عنوان التسليم</label>
-                <textarea rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="العنوان الكامل للتسليم"></textarea>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">ملاحظات إضافية</label>
-                <textarea rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="أي ملاحظات أو متطلبات خاصة"></textarea>
-            </div>
-
-            <div class="flex space-x-3 space-x-reverse pt-4">
-                <button type="submit" class="flex-1 bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700 font-medium">
-                    <i class="fas fa-paper-plane ml-2"></i>
-                    إرسال الطلب
-                </button>
-                <button type="button" onclick="closeOrderModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-400">
-                    إلغاء
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-@push('scripts')
-<script>
-    const devices = {
-        'GT06N': {
-            name: 'جهاز تتبع GT06N',
-            price: '٤٥٠ ر.س',
-            originalPrice: '٥٠٠ ر.س'
-        },
-        'TK905': {
-            name: 'جهاز تتبع TK905',
-            price: '٦٨٠ ر.س'
-        },
-        'ST940': {
-            name: 'جهاز تتبع ST940',
-            price: '١,٢٠٠ ر.س'
-        },
-        'PT02': {
-            name: 'جهاز تتبع شخصي PT02',
-            price: '٣٢٠ ر.س'
-        },
-        'OBD-CABLE': {
-            name: 'كابل توصيل OBD',
-            price: '١٨٠ ر.س'
-        }
-    };
-
-    function orderDevice(deviceId) {
-        const device = devices[deviceId];
-        if (!device) return;
-
-        const selectedDeviceDiv = document.getElementById('selectedDevice');
-        selectedDeviceDiv.innerHTML = `
-            <div class="flex items-center">
-                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center ml-3">
-                    <i class="fas fa-satellite-dish text-purple-600"></i>
-                </div>
-                <div>
-                    <div class="font-medium">${device.name}</div>
-                    <div class="text-purple-600 font-bold">${device.price}</div>
-                </div>
-            </div>
-        `;
-
-        document.getElementById('orderModal').classList.remove('hidden');
-        document.getElementById('orderModal').classList.add('flex');
-    }
-
-    function closeOrderModal() {
-        document.getElementById('orderModal').classList.add('hidden');
-        document.getElementById('orderModal').classList.remove('flex');
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('orderModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeOrderModal();
-        }
-    });
-
-    // Form submission
-    document.querySelector('#orderModal form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('تم إرسال طلبك بنجاح! سيتم التواصل معك قريباً.');
-        closeOrderModal();
-    });
-</script>
-@endpush
 @endsection

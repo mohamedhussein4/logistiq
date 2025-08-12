@@ -166,115 +166,180 @@
 @if($isOverLimit)
 <section class="py-6 bg-red-50">
     <div class="container mx-auto px-4">
-        <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-red-500">
+        <!-- Header Alert -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6 border-l-4 border-red-500">
             <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-semibold text-red-800 mb-2">
-                        <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
-                        تنبيه: تجاوز الحد الائتماني
-                    </h3>
-                                               <p class="text-red-700 mb-4">
-                               تم تجاوز الحد الائتماني بمبلغ {{ number_format($excessAmount) }} ر.س.
-                               يمكنك سداد أي مبلغ من الفواتير المستحقة أدناه.
-                           </p>
-
-                                        <!-- Outstanding Invoices Selection -->
-                    @php
-                        $outstandingInvoices = \App\Models\Invoice::where('logistics_company_id', auth()->id())
-                            ->whereIn('payment_status', ['unpaid', 'partial'])
-                            ->orderBy('due_date', 'asc')
-                            ->get();
-                    @endphp
-
-                    <!-- Payment Form -->
-                    <form action="{{ route('logistics.credit.pay') }}" method="POST" class="space-y-4">
-                        @csrf
-
-                        @if($outstandingInvoices->count() > 0)
-                        <div class="mb-4">
-                            <div class="flex items-center justify-between mb-3">
-                                <h4 class="text-sm font-semibold text-gray-800">اختر الفواتير المراد سدادها:</h4>
-                                <div class="flex items-center space-x-2 space-x-reverse">
-                                    <button type="button" id="select-all-invoices" class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
-                                        تحديد الكل
-                </button>
-                                    <button type="button" id="deselect-all-invoices" class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">
-                                        إلغاء التحديد
-                </button>
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl mr-3"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold text-red-800">تجاوز الحد الائتماني</h3>
+                        <p class="text-red-700">تم تجاوز الحد بمبلغ {{ number_format($excessAmount) }} ر.س - يرجى سداد بعض الفواتير</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-sm text-red-600">المبلغ المتجاوز</div>
+                    <div class="text-xl font-bold text-red-800">{{ number_format($excessAmount) }} ر.س</div>
+                </div>
             </div>
         </div>
 
-                            <div class="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
-                                @foreach($outstandingInvoices as $invoice)
-                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded text-sm hover:bg-gray-100">
-                                    <div class="flex items-center space-x-3 space-x-reverse">
-                                        <input type="checkbox"
-                                               name="selected_invoices[]"
-                                               value="{{ $invoice->id }}"
-                                               data-amount="{{ $invoice->remaining_amount }}"
-                                               class="invoice-checkbox rounded border-gray-300 text-red-600 focus:ring-red-500"
-                                               data-debug="Invoice ID: {{ $invoice->id }}, Amount: {{ $invoice->remaining_amount }}">
-                                        <div>
-                                            <span class="font-medium">{{ $invoice->invoice_number }}</span>
-                                            <span class="text-xs text-gray-500 block">استحقاق: {{ $invoice->due_date->format('Y-m-d') }}</span>
-        </div>
-    </div>
-                                    <span class="text-red-600 font-semibold">{{ number_format($invoice->remaining_amount) }} ر.س</span>
-                                </div>
-                                @endforeach
-        </div>
+        <!-- Payment Form -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
 
-                            <div class="mt-3 p-2 bg-blue-50 rounded text-sm">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-blue-800">إجمالي المحدد:</span>
-                                    <span id="selected-total" class="font-bold text-blue-900">0 ر.س</span>
+                                                        <!-- Outstanding Invoices Selection -->
+                @php
+                    $outstandingInvoices = \App\Models\Invoice::where('logistics_company_id', auth()->id())
+                        ->whereIn('payment_status', ['unpaid', 'partial'])
+                        ->orderBy('due_date', 'asc')
+                        ->get();
+                @endphp
+
+            <form action="{{ route('logistics.credit.pay') }}" method="POST" class="space-y-6">
+                @csrf
+
+                @if($outstandingInvoices->count() > 0)
+                <!-- Invoice Selection -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-semibold text-gray-800">
+                            <i class="fas fa-file-invoice text-blue-600 mr-2"></i>
+                            الفواتير المستحقة
+                        </h4>
+                        <div class="space-x-2 space-x-reverse">
+                            <button type="button" id="select-all-invoices" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                                تحديد الكل
+                            </button>
+                            <button type="button" id="deselect-all-invoices" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
+                                إلغاء
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-4">
+                        @foreach($outstandingInvoices as $invoice)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer" onclick="toggleInvoice({{ $invoice->id }})">
+                            <div class="flex items-center space-x-3 space-x-reverse">
+                                <input type="checkbox"
+                                       name="selected_invoices[]"
+                                       value="{{ $invoice->id }}"
+                                       data-amount="{{ $invoice->remaining_amount }}"
+                                       id="invoice-{{ $invoice->id }}"
+                                       class="invoice-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <div>
+                                    <div class="font-medium text-gray-800">{{ $invoice->invoice_number }}</div>
+                                    <div class="text-sm text-gray-600">
+                                        استحقاق: {{ $invoice->due_date ? $invoice->due_date->format('Y-m-d') : 'غير محدد' }} |
+                                        {{ $invoice->serviceCompany->name ?? 'عميل غير محدد' }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-red-600">{{ number_format($invoice->remaining_amount) }} ر.س</div>
+                                <div class="text-xs text-gray-500">
+                                    {{ $invoice->payment_status === 'unpaid' ? 'غير مدفوع' : 'مدفوع جزئياً' }}
                                 </div>
                             </div>
                         </div>
-                        @endif
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">مبلغ السداد</label>
-                                <input type="number"
-                                       name="payment_amount"
-                                       id="payment-amount"
-                                       value="{{ $excessAmount }}"
-                                       min="1"
-                                       max="{{ $stats['used_credit'] }}"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                                       required>
-                                <div class="flex items-center space-x-2 space-x-reverse mt-1">
-                                    <button type="button" id="use-excess-amount" class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200">
-                                        سداد المتجاوز
-                                    </button>
-                                    <button type="button" id="use-selected-amount" class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
-                                        سداد المحدد
-                                    </button>
-                                    <button type="button" id="clear-amount" class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">
-                                        مسح المبلغ
-                                    </button>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">طريقة السداد</label>
-                                <select name="payment_method" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" required>
-                                    <option value="">اختر طريقة السداد</option>
-                                    <option value="bank_transfer">تحويل بنكي</option>
-                                    <option value="check">شيك</option>
-                                    <option value="cash">نقداً</option>
-                                    <option value="other">أخرى</option>
-                                </select>
-            </div>
-                            <div class="flex items-center">
-                                <button type="submit" id="submit-payment" class="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
-                                    <i class="fas fa-credit-card mr-2"></i>
-                                    سداد الفواتير المحددة
-                                </button>
-            </div>
-        </div>
-                    </form>
+                        @endforeach
+                    </div>
 
-                    <script>
+                    <div class="mt-3 p-3 bg-blue-50 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-800 font-medium">إجمالي المحدد:</span>
+                            <span id="selected-total" class="font-bold text-blue-900 text-lg">0 ر.س</span>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                <!-- Hidden Payment Amount (Auto-calculated) -->
+                <input type="hidden" name="payment_amount" id="payment-amount" value="0">
+                
+                <!-- Payment Amount Display -->
+                <div class="mb-4">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-calculator text-green-600 mr-3"></i>
+                                <span class="text-green-800 font-semibold">مبلغ السداد التلقائي:</span>
+                            </div>
+                            <div class="text-right">
+                                <span id="payment-amount-display" class="text-2xl font-bold text-green-900">0 ر.س</span>
+                                <div class="text-sm text-green-700">سيتم حسابه تلقائياً حسب الفواتير المحددة</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                                                                            <!-- Payment Method -->
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-credit-card text-blue-600 mr-2"></i>
+                        طريقة السداد
+                    </h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50">
+                            <input type="radio" name="payment_method" value="bank_transfer" class="text-blue-600 focus:ring-blue-500" onchange="showPaymentAccounts('bank')">
+                            <i class="fas fa-university text-blue-600 mx-3"></i>
+                            <span class="font-medium">تحويل بنكي</span>
+                        </label>
+                        <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-green-50">
+                            <input type="radio" name="payment_method" value="electronic_wallet" class="text-green-600 focus:ring-green-500" onchange="showPaymentAccounts('wallet')">
+                            <i class="fas fa-mobile-alt text-green-600 mx-3"></i>
+                            <span class="font-medium">محفظة إلكترونية</span>
+                        </label>
+                    </div>
+
+                    <!-- Bank Accounts -->
+                    <div id="bank-accounts" class="hidden mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">اختر الحساب البنكي</label>
+                        <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                            @foreach($bankAccounts ?? [] as $bank)
+                            <label class="flex items-center p-2 bg-blue-50 rounded hover:bg-blue-100 cursor-pointer">
+                                <input type="radio" name="payment_account_id" value="{{ $bank->id }}" class="text-blue-600 focus:ring-blue-500">
+                                <div class="mr-3 flex-1">
+                                    <div class="font-medium">{{ $bank->bank_name }}</div>
+                                    <div class="text-sm text-gray-600">{{ $bank->account_number }} - {{ $bank->account_holder_name }}</div>
+                                </div>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Electronic Wallets -->
+                    <div id="electronic-wallets" class="hidden mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">اختر المحفظة الإلكترونية</label>
+                        <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                            @foreach($electronicWallets ?? [] as $wallet)
+                            <label class="flex items-center p-2 bg-green-50 rounded hover:bg-green-100 cursor-pointer">
+                                <input type="radio" name="payment_account_id" value="{{ $wallet->id }}" class="text-green-600 focus:ring-green-500">
+                                <div class="mr-3 flex-1">
+                                    <div class="font-medium">{{ $wallet->wallet_name }}</div>
+                                    <div class="text-sm text-gray-600">{{ $wallet->wallet_number }} - {{ $wallet->wallet_holder_name }}</div>
+                                </div>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ملاحظات إضافية</label>
+                    <textarea name="payment_notes" rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="أضف أي ملاحظات حول عملية الدفع..."></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" id="submit-payment" class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition-colors font-medium">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        إرسال طلب السداد
+                    </button>
+                </div>
+            </form>
+
+            <script>
                         document.addEventListener('DOMContentLoaded', function() {
                             const checkboxes = document.querySelectorAll('.invoice-checkbox');
                             const selectAllBtn = document.getElementById('select-all-invoices');
@@ -283,97 +348,146 @@
                             const paymentAmount = document.getElementById('payment-amount');
                             const submitBtn = document.getElementById('submit-payment');
 
+                            // دالة تحديث إجمالي المحدد ومبلغ السداد التلقائي
                             function updateSelectedTotal() {
                                 let total = 0;
                                 checkboxes.forEach(checkbox => {
                                     if (checkbox.checked) {
-                                        total += parseFloat(checkbox.dataset.amount);
+                                        total += parseFloat(checkbox.dataset.amount) || 0;
                                     }
                                 });
-                                selectedTotal.textContent = total.toLocaleString() + ' ر.س';
-
-                                // تحديث مبلغ السداد تلقائياً
-                                if (total > 0) {
+                                
+                                // تحديث عرض الإجمالي
+                                if (selectedTotal) {
+                                    selectedTotal.textContent = total.toLocaleString() + ' ر.س';
+                                }
+                                
+                                // تحديث مبلغ السداد التلقائي
+                                if (paymentAmount) {
                                     paymentAmount.value = total;
                                 }
+                                
+                                // تحديث عرض مبلغ السداد
+                                const paymentAmountDisplay = document.getElementById('payment-amount-display');
+                                if (paymentAmountDisplay) {
+                                    paymentAmountDisplay.textContent = total.toLocaleString() + ' ر.س';
+                                }
+                                
+                                console.log('إجمالي المحدد ومبلغ السداد:', total);
+                                return total;
                             }
 
                             // تحديث عند تغيير التحديد
                             checkboxes.forEach(checkbox => {
-                                checkbox.addEventListener('change', updateSelectedTotal);
+                                checkbox.addEventListener('change', function() {
+                                    console.log('تم تغيير الفاتورة:', this.value, 'المبلغ:', this.dataset.amount, 'محدد:', this.checked);
+                                    updateSelectedTotal();
+                                });
                             });
 
                             // تحديد الكل
-                            selectAllBtn.addEventListener('click', function() {
-                                checkboxes.forEach(checkbox => {
-                                    checkbox.checked = true;
+                            if (selectAllBtn) {
+                                selectAllBtn.addEventListener('click', function() {
+                                    console.log('تحديد الكل');
+                                    checkboxes.forEach(checkbox => {
+                                        checkbox.checked = true;
+                                    });
+                                    updateSelectedTotal();
                                 });
-                                updateSelectedTotal();
-                            });
+                            }
 
                             // إلغاء التحديد
-                            deselectAllBtn.addEventListener('click', function() {
-                                checkboxes.forEach(checkbox => {
-                                    checkbox.checked = false;
+                            if (deselectAllBtn) {
+                                deselectAllBtn.addEventListener('click', function() {
+                                    console.log('إلغاء التحديد');
+                                    checkboxes.forEach(checkbox => {
+                                        checkbox.checked = false;
+                                    });
+                                    updateSelectedTotal();
                                 });
-                                updateSelectedTotal();
-                            });
+                            }
+
+                            // لا حاجة لأزرار سداد لأن المبلغ يتم حسابه تلقائياً
 
                             // التحقق من التحديد قبل الإرسال
-                            document.querySelector('form').addEventListener('submit', function(e) {
-                                const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
-                                if (checkedBoxes.length === 0) {
-                                    e.preventDefault();
-                                    alert('يرجى تحديد فاتورة واحدة على الأقل');
-                                    return false;
-                                }
-                            });
-
-                            // سداد المتجاوز فقط
-                            document.getElementById('use-excess-amount').addEventListener('click', function() {
-                                paymentAmount.value = {{ $excessAmount }};
-                                // تحديد الفواتير التي تغطي المتجاوز
-                                let totalNeeded = {{ $excessAmount }};
-                                checkboxes.forEach(checkbox => {
-                                    checkbox.checked = false;
-                                });
-
-                                for (let checkbox of checkboxes) {
-                                    if (totalNeeded <= 0) break;
-                                    const amount = parseFloat(checkbox.dataset.amount);
-                                    if (amount <= totalNeeded) {
-                                        checkbox.checked = true;
-                                        totalNeeded -= amount;
+                            const form = document.querySelector('form');
+                            if (form) {
+                                form.addEventListener('submit', function(e) {
+                                    const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
+                                    if (checkedBoxes.length === 0) {
+                                        e.preventDefault();
+                                        alert('يرجى تحديد فاتورة واحدة على الأقل');
+                                        return false;
                                     }
-                                }
-                                updateSelectedTotal();
-                            });
-
-                            // سداد المحدد
-                            document.getElementById('use-selected-amount').addEventListener('click', function() {
-                                const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
-                                if (checkedBoxes.length === 0) {
-                                    alert('يرجى تحديد فواتير أولاً');
-                                    return;
-                                }
-                                let total = 0;
-                                checkedBoxes.forEach(checkbox => {
-                                    total += parseFloat(checkbox.dataset.amount);
+                                    
+                                    // التحقق من أن مبلغ السداد أكبر من صفر
+                                    const paymentAmountValue = parseFloat(paymentAmount.value) || 0;
+                                    if (paymentAmountValue <= 0) {
+                                        e.preventDefault();
+                                        alert('مبلغ السداد يجب أن يكون أكبر من صفر');
+                                        return false;
+                                    }
+                                    
+                                    // التحقق من اختيار طريقة الدفع
+                                    const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+                                    if (!paymentMethod) {
+                                        e.preventDefault();
+                                        alert('يرجى اختيار طريقة الدفع');
+                                        return false;
+                                    }
+                                    
+                                    // التحقق من اختيار الحساب
+                                    const paymentAccount = document.querySelector('input[name="payment_account_id"]:checked');
+                                    if (!paymentAccount) {
+                                        e.preventDefault();
+                                        alert('يرجى اختيار الحساب للدفع');
+                                        return false;
+                                    }
+                                    
+                                    console.log('تم إرسال النموذج بمبلغ:', paymentAmountValue);
                                 });
-                                paymentAmount.value = total;
-                            });
+                            }
 
-                            // مسح المبلغ
-                            document.getElementById('clear-amount').addEventListener('click', function() {
-                                paymentAmount.value = '';
-                            });
-
-                            // تهيئة
+                            // تهيئة أولية
                             updateSelectedTotal();
+                            console.log('تم تحميل JavaScript للدفع');
                         });
-                    </script>
-            </div>
-            </div>
+
+                        // دالة إظهار حسابات الدفع
+                        function showPaymentAccounts(type) {
+                            const bankDiv = document.getElementById('bank-accounts');
+                            const walletDiv = document.getElementById('electronic-wallets');
+                            
+                            if (bankDiv && walletDiv) {
+                                // إخفاء جميع الأقسام أولاً
+                                bankDiv.classList.add('hidden');
+                                walletDiv.classList.add('hidden');
+                                
+                                // إظهار القسم المطلوب
+                                if (type === 'bank') {
+                                    bankDiv.classList.remove('hidden');
+                                } else if (type === 'wallet') {
+                                    walletDiv.classList.remove('hidden');
+                                }
+                                
+                                // مسح التحديدات السابقة
+                                document.querySelectorAll('input[name="payment_account_id"]').forEach(radio => {
+                                    radio.checked = false;
+                                });
+                            }
+                        }
+
+                        // دالة تفعيل/إلغاء تفعيل الفاتورة عند النقر عليها
+                        function toggleInvoice(invoiceId) {
+                            const checkbox = document.getElementById('invoice-' + invoiceId);
+                            if (checkbox) {
+                                checkbox.checked = !checkbox.checked;
+                                // تشغيل event manually
+                                checkbox.dispatchEvent(new Event('change'));
+                                console.log('تم تغيير حالة الفاتورة:', invoiceId, 'الحالة الجديدة:', checkbox.checked);
+                            }
+                        }
+            </script>
         </div>
     </div>
 </section>

@@ -291,6 +291,24 @@
                     <span class="font-bold text-slate-700 group-hover:text-slate-900">إدارة المدفوعات</span>
                 </a>
 
+                <!-- Bank Accounts -->
+                <a href="{{ route('admin.bank_accounts.index') }}"
+                   class="flex items-center space-x-4 space-x-reverse p-4 rounded-2xl hover:bg-white/30 transition-all group {{ request()->routeIs('admin.bank_accounts.*') ? 'bg-white/40 shadow-lg' : '' }}">
+                    <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-university text-white"></i>
+                    </div>
+                    <span class="font-bold text-slate-700 group-hover:text-slate-900">الحسابات البنكية</span>
+                </a>
+
+                <!-- Electronic Wallets -->
+                <a href="{{ route('admin.electronic_wallets.index') }}"
+                   class="flex items-center space-x-4 space-x-reverse p-4 rounded-2xl hover:bg-white/30 transition-all group {{ request()->routeIs('admin.electronic_wallets.*') ? 'bg-white/40 shadow-lg' : '' }}">
+                    <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-mobile-alt text-white"></i>
+                    </div>
+                    <span class="font-bold text-slate-700 group-hover:text-slate-900">المحافظ الإلكترونية</span>
+                </a>
+
                 <!-- Contact Requests -->
                 <a href="{{ route('admin.contact_requests.index') }}"
                    class="flex items-center space-x-4 space-x-reverse p-4 rounded-2xl hover:bg-white/30 transition-all group {{ request()->routeIs('admin.contact_requests.*') ? 'bg-white/40 shadow-lg' : '' }}">

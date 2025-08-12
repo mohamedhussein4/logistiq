@@ -295,6 +295,117 @@
                     </div>
                 </div>
 
+                <!-- User Orders Section -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-gray-800">
+                            <i class="fas fa-shopping-cart text-blue-600 ml-2"></i>
+                            طلبات المنتجات الحديثة
+                        </h3>
+                        <a href="{{ route('user.purchase.my_orders') }}" class="text-blue-600 hover:text-blue-700 text-sm">
+                            عرض الكل
+                            <i class="fas fa-arrow-left mr-1"></i>
+                        </a>
+                    </div>
+
+                    @if($productOrders && $productOrders->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($productOrders->take(5) as $order)
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3 space-x-reverse">
+                                            <h4 class="font-medium text-gray-800">{{ $order->product->name ?? 'منتج محذوف' }}</h4>
+                                            <span class="px-2 py-1 text-xs rounded-full
+                                                @if($order->status === 'pending') bg-yellow-100 text-yellow-800
+                                                @elseif($order->status === 'confirmed') bg-green-100 text-green-800
+                                                @elseif($order->status === 'cancelled') bg-red-100 text-red-800
+                                                @else bg-gray-100 text-gray-800 @endif">
+                                                {{ $order->status === 'pending' ? 'في الانتظار' :
+                                                   ($order->status === 'confirmed' ? 'مؤكد' :
+                                                   ($order->status === 'cancelled' ? 'ملغي' : $order->status)) }}
+                                            </span>
+                                        </div>
+                                        <div class="text-sm text-gray-600 mt-1">
+                                            الكمية: {{ $order->quantity }} |
+                                            السعر: {{ number_format($order->unit_price) }} ر.س |
+                                            الإجمالي: {{ number_format($order->total_amount) }} ر.س
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1">
+                                            {{ $order->created_at->diffForHumans() }}
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <a href="{{ route('user.purchase.order_details', $order->id) }}"
+                                           class="text-blue-600 hover:text-blue-700 text-sm">
+                                            <i class="fas fa-eye"></i>
+                                            عرض
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-shopping-cart text-4xl mb-3"></i>
+                            <p>لا توجد طلبات منتجات حتى الآن</p>
+                            <a href="{{ route('store') }}" class="text-blue-600 hover:text-blue-700 text-sm">
+                                تصفح المنتجات
+                            </a>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Payment Requests Section -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-gray-800">
+                            <i class="fas fa-credit-card text-green-600 ml-2"></i>
+                            طلبات الدفع الحديثة
+                        </h3>
+                    </div>
+
+                    @if($paymentRequests && $paymentRequests->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($paymentRequests->take(5) as $payment)
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3 space-x-reverse">
+                                            <h4 class="font-medium text-gray-800">{{ $payment->request_number }}</h4>
+                                            <span class="px-2 py-1 text-xs rounded-full
+                                                @if($payment->status === 'pending') bg-yellow-100 text-yellow-800
+                                                @elseif($payment->status === 'approved') bg-green-100 text-green-800
+                                                @elseif($payment->status === 'rejected') bg-red-100 text-red-800
+                                                @else bg-gray-100 text-gray-800 @endif">
+                                                {{ $payment->status === 'pending' ? 'في الانتظار' :
+                                                   ($payment->status === 'approved' ? 'موافق عليه' :
+                                                   ($payment->status === 'rejected' ? 'مرفوض' : $payment->status)) }}
+                                            </span>
+                                        </div>
+                                        <div class="text-sm text-gray-600 mt-1">
+                                            النوع: {{ $payment->payment_type === 'product_order' ? 'طلب منتج' :
+                                                     ($payment->payment_type === 'invoice' ? 'فاتورة' : $payment->payment_type) }} |
+                                            المبلغ: {{ number_format($payment->amount) }} ر.س |
+                                            الطريقة: {{ $payment->payment_method === 'bank_transfer' ? 'تحويل بنكي' : 'محفظة إلكترونية' }}
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1">
+                                            {{ $payment->created_at->diffForHumans() }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-credit-card text-4xl mb-3"></i>
+                            <p>لا توجد طلبات دفع حتى الآن</p>
+                        </div>
+                    @endif
+                </div>
+
                 <!-- Danger Zone -->
                 <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-red-500">
                     <div class="flex items-center justify-between mb-4">

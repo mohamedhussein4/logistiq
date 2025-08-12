@@ -411,6 +411,133 @@
                     </div>
                 </div>
 
+                <!-- Payment Requests -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-gray-800">
+                            <i class="fas fa-clock text-blue-600 ml-2"></i>
+                            طلبات الدفع الحديثة
+                        </h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        @forelse($paymentRequests->take(5) as $request)
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-medium text-gray-800">{{ $request->request_number }}</h4>
+                                            <span class="px-3 py-1 rounded-full text-xs font-medium
+                                                {{ $request->status === 'approved' ? 'bg-green-100 text-green-800' :
+                                                   ($request->status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                   ($request->status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')) }}">
+                                                {{ $request->status === 'approved' ? 'مؤكد' :
+                                                   ($request->status === 'pending' ? 'في الانتظار' :
+                                                   ($request->status === 'rejected' ? 'مرفوض' : $request->status)) }}
+                                            </span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                            <div>
+                                                <span class="font-medium">نوع الدفع:</span>
+                                                {{ $request->payment_type === 'invoice' ? 'فاتورة' : 'طلب آخر' }}
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">المبلغ:</span>
+                                                {{ number_format($request->amount) }} ر.س
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">طريقة الدفع:</span>
+                                                {{ $request->payment_method === 'bank_transfer' ? 'تحويل بنكي' : 'محفظة إلكترونية' }}
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">تاريخ الطلب:</span>
+                                                {{ $request->created_at->format('Y-m-d') }}
+                                            </div>
+                                        </div>
+                                        <div class="mt-2 text-sm text-gray-600">
+                                            <span class="font-medium">الحساب:</span>
+                                            @if($request->payment_method === 'bank_transfer' && $request->bankAccount)
+                                                {{ $request->bankAccount->bank_name }} - {{ $request->bankAccount->account_number }}
+                                            @elseif($request->payment_method === 'electronic_wallet' && $request->electronicWallet)
+                                                {{ $request->electronicWallet->wallet_name }} - {{ $request->electronicWallet->wallet_number }}
+                                            @else
+                                                غير محدد
+                                            @endif
+                                        </div>
+                                        @if($request->payment_notes)
+                                            <div class="mt-2 p-2 bg-gray-50 rounded text-sm text-gray-600">
+                                                <span class="font-medium">ملاحظات:</span> {{ $request->payment_notes }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center py-8">
+                                <i class="fas fa-clock text-gray-400 text-3xl mb-3"></i>
+                                <p class="text-gray-500">لا توجد طلبات دفع حتى الآن</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Product Orders -->
+                @if($productOrders && $productOrders->count() > 0)
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-gray-800">
+                            <i class="fas fa-shopping-cart text-orange-600 ml-2"></i>
+                            طلبات المنتجات الحديثة
+                        </h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        @foreach($productOrders->take(5) as $order)
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-medium text-gray-800">{{ $order->product->name ?? 'منتج محذوف' }}</h4>
+                                            <span class="px-3 py-1 rounded-full text-xs font-medium
+                                                {{ $order->status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                   ($order->status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                                                   ($order->status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')) }}">
+                                                {{ $order->status === 'pending' ? 'في الانتظار' :
+                                                   ($order->status === 'confirmed' ? 'مؤكد' :
+                                                   ($order->status === 'cancelled' ? 'ملغي' : $order->status)) }}
+                                            </span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                            <div>
+                                                <span class="font-medium">الكمية:</span>
+                                                {{ $order->quantity }}
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">السعر:</span>
+                                                {{ number_format($order->unit_price) }} ر.س
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">الإجمالي:</span>
+                                                {{ number_format($order->total_amount) }} ر.س
+                                            </div>
+                                            <div>
+                                                <span class="font-medium">تاريخ الطلب:</span>
+                                                {{ $order->created_at->format('Y-m-d') }}
+                                            </div>
+                                        </div>
+                                        @if($order->notes)
+                                            <div class="mt-2 p-2 bg-gray-50 rounded text-sm text-gray-600">
+                                                <span class="font-medium">ملاحظات:</span> {{ $order->notes }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <!-- Logistics Companies -->
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <div class="flex items-center justify-between mb-6">

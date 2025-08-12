@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             CompaniesSeeder::class,     // إنشاء بيانات الشركات وطلبات التمويل
             ProductsSeeder::class,      // إنشاء المنتجات والطلبات
             InvoicesSeeder::class,      // إنشاء الفواتير والمدفوعات
+            PaymentAccountsSeeder::class, // إضافة Seeder الحسابات البنكية والمحافظ
         ]);
 
         $this->command->info('✅ تم إنشاء جميع البيانات التجريبية بنجاح!');

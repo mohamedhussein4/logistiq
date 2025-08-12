@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ClientDebtController;
+use App\Http\Controllers\Admin\PaymentManagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +76,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/update-overdue', [InvoiceController::class, 'updateOverdueInvoices'])->name('update_overdue');
     });
 
+
     // Products Management
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
@@ -108,16 +110,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/export/csv', [OrderController::class, 'export'])->name('export');
     });
 
-    // Payments Management
-    Route::prefix('payments')->name('payments.')->group(function () {
-        Route::get('/', [PaymentController::class, 'index'])->name('index');
-        Route::get('/{payment}', [PaymentController::class, 'show'])->name('show');
-        Route::patch('/{payment}/status', [PaymentController::class, 'updateStatus'])->name('update_status');
-        Route::patch('/{payment}/confirm', [PaymentController::class, 'confirm'])->name('confirm');
-        Route::patch('/{payment}/reject', [PaymentController::class, 'reject'])->name('reject');
-        Route::get('/analytics/data', [PaymentController::class, 'analytics'])->name('analytics');
-        Route::get('/export/csv', [PaymentController::class, 'export'])->name('export');
-    });
 
     // Contact Requests Management
     Route::prefix('contact-requests')->name('contact_requests.')->group(function () {
@@ -172,4 +164,32 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::post('/cache/clear', [SettingController::class, 'clearCache'])->name('cache.clear');
         Route::post('/test-email', [SettingController::class, 'testEmail'])->name('test_email');
     });
+
+    // Payment Management (للمعاملات فقط)
+    Route::prefix('payments')->name('payments.')->group(function () {
+        Route::get('/', [PaymentManagementController::class, 'index'])->name('index');
+        Route::get('/{paymentRequest}', [PaymentManagementController::class, 'show'])->name('show');
+        Route::patch('/{paymentRequest}/status', [PaymentManagementController::class, 'updateStatus'])->name('update_status');
+        Route::post('/proofs/{proof}/review', [PaymentManagementController::class, 'reviewProof'])->name('review_proof');
+    });
+
+    // Bank Accounts Management (منفصل تماماً)
+    Route::prefix('bank-accounts')->name('bank_accounts.')->group(function () {
+        Route::get('/', [PaymentManagementController::class, 'bankAccounts'])->name('index');
+        Route::post('/', [PaymentManagementController::class, 'storeBankAccount'])->name('store');
+        Route::get('/{bankAccount}/edit', [PaymentManagementController::class, 'getBankAccount'])->name('edit');
+        Route::put('/{bankAccount}', [PaymentManagementController::class, 'updateBankAccount'])->name('update');
+        Route::delete('/{bankAccount}', [PaymentManagementController::class, 'destroyBankAccount'])->name('destroy');
+    });
+
+    // Electronic Wallets Management (منفصل تماماً)
+    Route::prefix('electronic-wallets')->name('electronic_wallets.')->group(function () {
+        Route::get('/', [PaymentManagementController::class, 'electronicWallets'])->name('index');
+        Route::post('/', [PaymentManagementController::class, 'storeElectronicWallet'])->name('store');
+        Route::get('/{electronicWallet}/edit', [PaymentManagementController::class, 'getElectronicWallet'])->name('edit');
+        Route::put('/{electronicWallet}', [PaymentManagementController::class, 'updateElectronicWallet'])->name('update');
+        Route::delete('/{electronicWallet}', [PaymentManagementController::class, 'destroyElectronicWallet'])->name('destroy');
+    });
+
+
 });

@@ -46,6 +46,11 @@ class ProductOrder extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function paymentRequests()
+    {
+        return $this->morphMany(PaymentRequest::class, 'related');
+    }
+
     // Static methods
     public static function getStatuses()
     {

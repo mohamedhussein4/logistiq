@@ -9,6 +9,9 @@ use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\ProductOrder;
 use App\Models\Payment;
+use App\Models\PaymentRequest;
+use App\Models\BankAccount;
+use App\Models\ElectronicWallet;
 use App\Models\ServiceCompany;
 use App\Models\LogisticsCompany;
 use App\Models\ClientDebt;
@@ -105,12 +108,18 @@ class LogisticsController extends Controller
         // الإحصائيات الشهرية
         $monthlyStats = $this->getMonthlyStats($user->id);
 
+        // الحصول على البنوك والمحافظ الإلكترونية النشطة لنظام الدفع
+        $bankAccounts = BankAccount::active()->ordered()->get();
+        $electronicWallets = ElectronicWallet::active()->ordered()->get();
+
         return view('logistics.dashboard', compact(
             'logisticsCompany',
             'stats',
             'recentFundingRequests',
             'recentInvoices',
-            'monthlyStats'
+            'monthlyStats',
+            'bankAccounts',
+            'electronicWallets'
         ));
     }
 
@@ -311,7 +320,9 @@ class LogisticsController extends Controller
     {
         $request->validate([
             'payment_amount' => 'required|numeric|min:1',
-            'payment_method' => 'required|string|in:bank_transfer,check,cash,other',
+            'payment_method' => 'required|in:bank_transfer,electronic_wallet',
+            'payment_account_id' => 'required|integer',
+            'payment_notes' => 'nullable|string|max:1000',
         ]);
 
         // التحقق من وجود فواتير محددة
@@ -398,21 +409,25 @@ class LogisticsController extends Controller
                 $invoiceRemaining = $invoice->remaining_amount;
                 $paymentAmount = min($remainingPaymentAmount, $invoiceRemaining);
 
-                // إنشاء سجل السداد للفاتورة
-                $payment = \App\Models\Payment::create([
-                    'invoice_id' => $invoice->id,
+                // إنشاء طلب دفع للفاتورة
+                $paymentRequest = PaymentRequest::create([
+                    'user_id' => $user->id,
+                    'request_number' => 'INV-PAY-' . date('Ymd') . '-' . str_pad(PaymentRequest::count() + 1, 6, '0', STR_PAD_LEFT),
+                    'payment_type' => 'invoice',
+                    'related_id' => $invoice->id,
+                    'related_type' => Invoice::class,
                     'amount' => $paymentAmount,
                     'payment_method' => $request->payment_method,
-                    'payment_date' => now(),
-                    'status' => 'pending', // يحتاج موافقة الأدمن
-                    'notes' => 'سداد الائتمان المتجاوز - ' . $request->payment_method,
-                    'reference_number' => 'CREDIT-' . date('Ymd') . '-' . str_pad(\App\Models\Payment::count() + 1, 4, '0', STR_PAD_LEFT),
+                    'payment_account_id' => $request->payment_account_id,
+                    'payment_account_type' => $request->payment_method === 'bank_transfer' ? BankAccount::class : ElectronicWallet::class,
+                    'payment_notes' => 'سداد الائتمان المتجاوز - ' . ($request->payment_notes ?: 'بدون ملاحظات'),
+                    'status' => 'pending',
                 ]);
 
                 $processedInvoices[] = [
                     'invoice_number' => $invoice->invoice_number,
                     'amount' => $paymentAmount,
-                    'payment_reference' => $payment->reference_number
+                    'payment_reference' => $paymentRequest->request_number
                 ];
 
                 $remainingPaymentAmount -= $paymentAmount;

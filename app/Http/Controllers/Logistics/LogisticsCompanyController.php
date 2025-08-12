@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\ProductOrder;
 use App\Models\Payment;
+use App\Models\PaymentRequest;
 use App\Models\ServiceCompany;
 use App\Models\LogisticsCompany;
 use Illuminate\Support\Facades\Auth;
@@ -172,12 +173,27 @@ class LogisticsCompanyController extends Controller
                 return $client;
             });
 
+        // طلبات المنتجات للمستخدم الحالي
+        $productOrders = ProductOrder::where('user_id', $user->id)
+            ->with(['product', 'paymentRequests'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // طلبات الدفع للمستخدم الحالي
+        $paymentRequests = PaymentRequest::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
         return view('logistics.profile', compact(
             'logisticsCompany',
             'stats',
             'fundingRequests',
             'invoices',
-            'serviceCompanies'
+            'serviceCompanies',
+            'productOrders',
+            'paymentRequests'
         ));
     }
 
