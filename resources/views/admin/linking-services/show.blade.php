@@ -19,12 +19,16 @@
                         'active' => 'bg-green-100 text-green-800',
                         'inactive' => 'bg-gray-100 text-gray-800',
                         'pending' => 'bg-yellow-100 text-yellow-800',
+                        'completed' => 'bg-blue-100 text-blue-800',
+                        'cancelled' => 'bg-red-100 text-red-800',
                         'suspended' => 'bg-red-100 text-red-800'
                     ];
                     $statusNames = [
                         'active' => 'نشط',
                         'inactive' => 'غير نشط',
                         'pending' => 'معلق',
+                        'completed' => 'مكتمل',
+                        'cancelled' => 'ملغي',
                         'suspended' => 'موقوف'
                     ];
                     $currentStatus = $linkingService->status ?? 'active';
@@ -260,10 +264,10 @@
                     </form>
                     @endif
 
-                    <a href="{{ route('admin.linking_services.edit', $linkingService->id ?? 1) }}" class="block w-full px-4 py-2 bg-blue-500 text-white rounded-xl font-semibold text-center hover:bg-blue-600 transition-colors">
+                    {{-- <a href="{{ route('admin.linking_services.edit', $linkingService->id ?? 1) }}" class="block w-full px-4 py-2 bg-blue-500 text-white rounded-xl font-semibold text-center hover:bg-blue-600 transition-colors">
                         <i class="fas fa-edit mr-2"></i>
                         تعديل الخدمة
-                    </a>
+                    </a> --}}
 
                     <button onclick="updateCommission()" class="w-full px-4 py-2 bg-purple-500 text-white rounded-xl font-semibold hover:bg-purple-600 transition-colors">
                         <i class="fas fa-percentage mr-2"></i>

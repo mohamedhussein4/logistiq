@@ -251,10 +251,39 @@
                                         <i class="fas fa-edit text-xs"></i>
                                     </button>
 
-                                    <button onclick="toggleStatus({{ $service->id }}, '{{ $service->status }}')"
-                                            class="w-8 h-8 {{ $service->status === 'active' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600' }} text-white rounded-lg flex items-center justify-center transition-all hover-lift">
-                                        <i class="fas {{ $service->status === 'active' ? 'fa-pause' : 'fa-play' }} text-xs"></i>
-                                    </button>
+                                    <div class="flex space-x-1 space-x-reverse">
+                                        @if($service->status !== 'active')
+                                        <button onclick="updateStatus({{ $service->id }}, 'active')"
+                                                class="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded text-xs flex items-center justify-center transition-all hover-lift"
+                                                title="تفعيل">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        @endif
+
+                                        @if($service->status !== 'completed')
+                                        <button onclick="updateStatus({{ $service->id }}, 'completed')"
+                                                class="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs flex items-center justify-center transition-all hover-lift"
+                                                title="إكمال">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        @endif
+
+                                        @if($service->status !== 'pending')
+                                        <button onclick="updateStatus({{ $service->id }}, 'pending')"
+                                                class="w-6 h-6 bg-yellow-500 hover:bg-yellow-600 text-white rounded text-xs flex items-center justify-center transition-all hover-lift"
+                                                title="تعليق">
+                                            <i class="fas fa-pause"></i>
+                                        </button>
+                                        @endif
+
+                                        @if($service->status !== 'cancelled')
+                                        <button onclick="updateStatus({{ $service->id }}, 'cancelled')"
+                                                class="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded text-xs flex items-center justify-center transition-all hover-lift"
+                                                title="إلغاء">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        @endif
+                                    </div>
 
                                     <button onclick="deleteService({{ $service->id }})"
                                             class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center transition-all hover-lift">
@@ -456,10 +485,10 @@
         const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = `/admin/linking-services/${serviceId}`;
+        form.action = `/admin/linking-services/${serviceId}/status`;
         form.innerHTML = `
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="_method" value="PUT">
+            <input type="hidden" name="_method" value="PATCH">
             <input type="hidden" name="status" value="${newStatus}">
         `;
         document.body.appendChild(form);
