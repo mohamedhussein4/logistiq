@@ -291,6 +291,11 @@
                                         <i class="fas fa-eye text-xs"></i>
                                     </a>
 
+                                    <a href="{{ route('admin.funding_requests.print', $request) }}" target="_blank"
+                                       class="w-8 h-8 bg-purple-500 hover:bg-purple-600 text-white rounded-lg flex items-center justify-center transition-all hover-lift">
+                                        <i class="fas fa-print text-xs"></i>
+                                    </a>
+
                                     @if($request->status === 'pending')
                                     <button onclick="approveRequest({{ $request->id }})"
                                             class="w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center justify-center transition-all hover-lift">

@@ -290,6 +290,11 @@
                                         <i class="fas fa-eye text-xs"></i>
                                     </a>
 
+                                    <a href="{{ route('admin.orders.print', $order) }}" target="_blank"
+                                       class="w-8 h-8 bg-gray-500 hover:bg-gray-600 text-white rounded-lg flex items-center justify-center transition-all hover-lift">
+                                        <i class="fas fa-print text-xs"></i>
+                                    </a>
+
                                     @if($order->status === 'pending')
                                     <button onclick="updateStatus({{ $order->id }}, 'processing')"
                                             class="w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center justify-center transition-all hover-lift">

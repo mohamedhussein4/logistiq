@@ -402,4 +402,14 @@ class FundingRequestController extends Controller
             return redirect()->back()->with('error', 'حدث خطأ أثناء حذف الطلبات: ' . $e->getMessage());
         }
     }
+
+    /**
+     * طباعة تفاصيل طلب التمويل
+     */
+    public function print(FundingRequest $fundingRequest)
+    {
+        $fundingRequest->load(['logisticsCompany.user']);
+        
+        return view('admin.funding-requests.print', compact('fundingRequest'));
+    }
 }

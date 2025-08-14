@@ -51,6 +51,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::prefix('funding-requests')->name('funding_requests.')->group(function () {
         Route::get('/', [FundingRequestController::class, 'index'])->name('index');
         Route::get('/{fundingRequest}', [FundingRequestController::class, 'show'])->name('show');
+        Route::get('/{fundingRequest}/print', [FundingRequestController::class, 'print'])->name('print');
         Route::patch('/{fundingRequest}/status', [FundingRequestController::class, 'updateStatus'])->name('update_status');
         Route::patch('/{fundingRequest}/approve', [FundingRequestController::class, 'approve'])->name('approve');
         Route::patch('/{fundingRequest}/reject', [FundingRequestController::class, 'reject'])->name('reject');
@@ -108,6 +109,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::delete('/bulk-delete', [OrderController::class, 'bulkDelete'])->name('bulk-delete');
         Route::get('/', [OrderController::class, 'index'])->name('index');
         Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+        Route::get('/{order}/print', [OrderController::class, 'print'])->name('print');
         Route::patch('/{order}/status', [OrderController::class, 'updateStatus'])->name('update_status');
         Route::patch('/{order}/ship', [OrderController::class, 'ship'])->name('ship');
         Route::patch('/{order}/deliver', [OrderController::class, 'deliver'])->name('deliver');

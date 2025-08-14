@@ -392,4 +392,14 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'حدث خطأ أثناء حذف الطلبات: ' . $e->getMessage());
         }
     }
+
+    /**
+     * طباعة تفاصيل الطلب
+     */
+    public function print(ProductOrder $order)
+    {
+        $order->load(['user', 'product']);
+        
+        return view('admin.orders.print', compact('order'));
+    }
 }

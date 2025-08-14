@@ -361,7 +361,7 @@
                         طلبات الشركة
                     </a>
 
-                    <button onclick="window.print()"
+                    <button onclick="printFundingRequest()"
                             class="w-full px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors">
                         <i class="fas fa-print mr-2"></i>
                         طباعة التفاصيل
@@ -574,5 +574,11 @@
         }
     }
 </style>
+
+<script>
+    function printFundingRequest() {
+        window.open('/admin/funding-requests/{{ $fundingRequest->id }}/print', '_blank');
+    }
+</script>
 @endpush
 @endsection
