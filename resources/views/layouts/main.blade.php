@@ -15,7 +15,7 @@
     <meta property="og:description" content="{{ \App\Models\Setting::get('seo_description', 'منصة متطورة لربط الشركات اللوجستية بالعملاء') }}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url('/') }}">
-    @if(\App\Models\Setting::get('site_logo'))
+    @if(\App\Models\Setting::get('site_favicon'))
     <meta property="og:image" content="{{ asset('images/' . \App\Models\Setting::get('site_favicon')) }}">
     @endif
 
