@@ -214,9 +214,9 @@
         <div class="p-6 border-b border-white/20">
             <!-- Logo -->
             <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="flex items-center space-x-2 space-x-reverse">
                         @if(\App\Models\Setting::get('site_favicon'))
-                            <img src="{{ asset('storage/' . \App\Models\Setting::get('site_favicon')) }}" alt="Logo" class="w-10 h-10 rounded-lg">
+                            <img src="{{ asset('images/' . \App\Models\Setting::get('site_favicon')) }}" alt="Logo" class="w-20 h-20 rounded-lg">
                         @else
                             <img src="/favicon.ico" alt="Logo" class="w-10 h-10 rounded-lg">
                         @endif
