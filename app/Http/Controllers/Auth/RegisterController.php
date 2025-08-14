@@ -48,21 +48,33 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
+        // تعيين القيمة الافتراضية لنوع المستخدم
+        if (empty($data['user_type'])) {
+            $data['user_type'] = 'regular';
+        }
+
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['required', 'string', 'max:20'],
             'user_type' => ['required', 'string', 'in:logistics,regular'],
-            'company_name' => ['nullable:user_type,logistics', 'string', 'max:255'],
-            'company_license' => ['nullable:user_type,logistics', 'string', 'max:255'],
-            'company_address' => ['nullable:user_type,logistics', 'string', 'max:500'],
-            'contact_person' => ['nullable:user_type,logistics', 'string', 'max:255'],
-        ], [
-            'company_name.required_if' => 'اسم الشركة مطلوب للشركات اللوجستية',
-            'company_license.required_if' => 'رقم الترخيص مطلوب للشركات اللوجستية',
-            'company_address.required_if' => 'عنوان الشركة مطلوب للشركات اللوجستية',
-            'contact_person.required_if' => 'الشخص المسؤول مطلوب للشركات اللوجستية',
+        ];
+
+        // إضافة قواعد الشركة فقط إذا كان النوع logistics
+        if (isset($data['user_type']) && $data['user_type'] === 'logistics') {
+            $rules['company_name'] = ['required', 'string', 'max:255'];
+            $rules['company_license'] = ['required', 'string', 'max:255'];
+            $rules['company_address'] = ['required', 'string', 'max:500'];
+            $rules['contact_person'] = ['required', 'string', 'max:255'];
+            $rules['company_type'] = ['nullable', 'string', 'in:transport,warehouse,freight,mixed'];
+        }
+
+        return Validator::make($data, $rules, [
+            'company_name.required' => 'اسم الشركة مطلوب للشركات اللوجستية',
+            'company_license.required' => 'رقم الترخيص مطلوب للشركات اللوجستية',
+            'company_address.required' => 'عنوان الشركة مطلوب للشركات اللوجستية',
+            'contact_person.required' => 'الشخص المسؤول مطلوب للشركات اللوجستية',
         ]);
     }
 
@@ -74,23 +86,44 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $user = User::create([
+        // تعيين القيمة الافتراضية لنوع المستخدم
+        $userType = $data['user_type'] ?? 'regular';
+
+        // إنشاء المستخدم مع البيانات الأساسية فقط
+        $userData = [
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'phone' => $data['phone'],
-            'user_type' => $data['user_type'],
-        ]);
+            'user_type' => $userType,
+        ];
 
-        // إذا كان المستخدم شركة لوجستية، إنشاء سجل في جدول logistics_companies
-        if ($data['user_type'] === 'logistics') {
+        // إضافة بيانات الشركة فقط إذا كان المستخدم شركة لوجيستية
+        if ($userType === 'logistics') {
+            $userData['company_name'] = $data['company_name'] ?? null;
+            $userData['company_registration'] = $data['company_license'] ?? null;
+            $userData['address'] = $data['company_address'] ?? null;
+            $userData['contact_person'] = $data['contact_person'] ?? null;
+        }
+
+        $user = User::create($userData);
+
+        // إذا كان المستخدم شركة لوجيستية، إنشاء سجل في جدول logistics_companies
+        if ($userType === 'logistics') {
             \App\Models\LogisticsCompany::create([
                 'user_id' => $user->id,
                 'company_name' => $data['company_name'],
-                'license_number' => $data['company_license'],
-                'address' => $data['company_address'],
                 'contact_person' => $data['contact_person'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'address' => $data['company_address'],
+                'commercial_register' => $data['company_license'],
+                'company_type' => $data['company_type'] ?? 'mixed',
                 'credit_limit' => 100000, // الحد الائتماني الافتراضي
+                'available_balance' => 0,
+                'total_funded' => 0,
+                'total_requests' => 0,
+                'status' => 'pending', // في انتظار الموافقة
             ]);
         }
 

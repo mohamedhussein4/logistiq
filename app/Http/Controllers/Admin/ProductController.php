@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
@@ -392,5 +393,55 @@ class ProductController extends Controller
         $category->delete();
 
         return redirect()->back()->with('success', 'تم حذف التصنيف بنجاح');
+    }
+
+    /**
+     * حذف المنتجات المحددة
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|json'
+        ]);
+
+        $ids = json_decode($request->ids, true);
+
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'لم يتم تحديد أي منتجات للحذف');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // التأكد من وجود المنتجات
+            $products = Product::whereIn('id', $ids)->get();
+
+            if ($products->count() !== count($ids)) {
+                throw new \Exception('بعض المنتجات المحددة غير موجودة');
+            }
+
+            // حذف صور المنتجات
+            foreach ($products as $product) {
+                if ($product->images) {
+                    $images = json_decode($product->images, true);
+                    foreach ($images as $image) {
+                        if (Storage::exists($image)) {
+                            Storage::delete($image);
+                        }
+                    }
+                }
+            }
+
+            // حذف المنتجات
+            Product::whereIn('id', $ids)->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', "تم حذف {$products->count()} منتج بنجاح");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف المنتجات: ' . $e->getMessage());
+        }
     }
 }

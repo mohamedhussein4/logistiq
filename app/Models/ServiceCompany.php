@@ -11,10 +11,19 @@ class ServiceCompany extends Model
 
     protected $fillable = [
         'user_id',
+        'company_name',
+        'contact_person',
+        'email',
+        'phone',
+        'address',
+        'commercial_register',
+        'tax_number',
+        'bank_account',
         'total_outstanding',
         'total_paid',
-        'payment_status',
         'credit_limit',
+        'payment_status',
+        'status',
     ];
 
     protected $casts = [

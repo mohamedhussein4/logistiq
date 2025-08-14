@@ -119,10 +119,31 @@
         </div>
 
         @if($paymentRequests->count() > 0)
+        <!-- Bulk Actions -->
+        <div id="bulk-actions" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <span class="text-blue-800 font-medium">تم تحديد <span id="selected-count">0</span> عنصر</span>
+                    <button type="button" onclick="clearSelection()" class="text-blue-600 hover:text-blue-800 font-medium">
+                        إلغاء التحديد
+                    </button>
+                </div>
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <button type="button" onclick="bulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        <i class="fas fa-trash mr-2"></i>
+                        حذف المحدد
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-sm lg:text-base">
                 <thead>
                     <tr class="border-b border-gray-200">
+                        <th class="text-right py-3 lg:py-4 font-semibold text-slate-700">
+                            <input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </th>
                         <th class="text-right py-3 lg:py-4 font-semibold text-slate-700">رقم الطلب</th>
                         <th class="text-right py-3 lg:py-4 font-semibold text-slate-700">المستخدم</th>
                         <th class="text-right py-3 lg:py-4 font-semibold text-slate-700">نوع الدفع</th>
@@ -136,6 +157,10 @@
                 <tbody class="divide-y divide-gray-200">
                     @foreach($paymentRequests as $paymentRequest)
                         <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="py-3 lg:py-4">
+                            <input type="checkbox" class="payment-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                   value="{{ $paymentRequest->id }}" onchange="updateSelectionCount()">
+                        </td>
                         <td class="py-3 lg:py-4">
                             <div class="font-mono text-sm">{{ $paymentRequest->request_number }}</div>
                             </td>
@@ -167,8 +192,6 @@
                             <div class="flex items-center space-x-2 space-x-reverse">
                                 @if($paymentRequest->payment_method === 'bank_transfer')
                                     <i class="fas fa-university text-blue-600"></i>
-                                @elseif($paymentRequest->payment_method === 'electronic_wallet')
-                                    <i class="fas fa-mobile-alt text-green-600"></i>
                                 @else
                                     <i class="fas fa-credit-card text-gray-600"></i>
                                 @endif
@@ -292,6 +315,98 @@ function showStatusModal(paymentId) {
 function hideStatusModal() {
     const modal = document.getElementById('status-modal');
     modal.classList.add('hidden');
+}
+
+// Bulk delete functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckbox = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.payment-checkbox');
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateSelectionCount();
+        });
+    }
+});
+
+function updateSelectionCount() {
+    const checkboxes = document.querySelectorAll('.payment-checkbox');
+    const checkedBoxes = document.querySelectorAll('.payment-checkbox:checked');
+    const count = checkedBoxes.length;
+
+    const selectedCountElement = document.getElementById('selected-count');
+    if (selectedCountElement) selectedCountElement.textContent = count;
+
+    const bulkActionsBar = document.getElementById('bulk-actions');
+
+    if (count > 0) {
+        if (bulkActionsBar) bulkActionsBar.classList.remove('hidden');
+    } else {
+        if (bulkActionsBar) bulkActionsBar.classList.add('hidden');
+    }
+
+    const selectAllCheckbox = document.getElementById('select-all');
+    if (selectAllCheckbox) {
+        if (count === 0) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = false;
+        } else if (count === checkboxes.length) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = true;
+        } else {
+            selectAllCheckbox.indeterminate = true;
+            selectAllCheckbox.checked = false;
+        }
+    }
+}
+
+function clearSelection() {
+    const checkboxes = document.querySelectorAll('.payment-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updateSelectionCount();
+}
+
+function bulkDelete() {
+    const checkedBoxes = document.querySelectorAll('.payment-checkbox:checked');
+
+    if (checkedBoxes.length === 0) {
+        alert('يرجى تحديد طلبات الدفع المراد حذفها');
+        return;
+    }
+
+    if (confirm(`هل أنت متأكد من حذف ${checkedBoxes.length} طلب دفع؟ هذا الإجراء لا يمكن التراجع عنه.`)) {
+        const ids = Array.from(checkedBoxes).map(cb => cb.value);
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ route("admin.payments.bulk-delete") }}';
+
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        form.appendChild(csrfToken);
+
+        const methodField = document.createElement('input');
+        methodField.type = 'hidden';
+        methodField.name = '_method';
+        methodField.value = 'DELETE';
+        form.appendChild(methodField);
+
+        const idsField = document.createElement('input');
+        idsField.type = 'hidden';
+        idsField.name = 'ids';
+        idsField.value = JSON.stringify(ids);
+        form.appendChild(idsField);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
 }
 </script>
 @endpush

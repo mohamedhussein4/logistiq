@@ -6,9 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\PaymentRequest;
 use App\Models\PaymentProof;
 use App\Models\BankAccount;
-use App\Models\ElectronicWallet;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PaymentManagementController extends Controller
 {
@@ -73,7 +74,6 @@ class PaymentManagementController extends Controller
             'user',
             'paymentProofs',
             'bankAccount',
-            'electronicWallet'
         ])->findOrFail($id);
 
         return view('admin.payments.show', compact('paymentRequest'));
@@ -163,16 +163,6 @@ class PaymentManagementController extends Controller
     }
 
     /**
-     * إدارة المحافظ الإلكترونية
-     */
-    public function electronicWallets()
-    {
-        $electronicWallets = ElectronicWallet::ordered()->get();
-
-        return view('admin.payments.electronic-wallets', compact('electronicWallets'));
-    }
-
-    /**
      * حفظ الحساب البنكي
      */
     public function storeBankAccount(Request $request)
@@ -197,26 +187,6 @@ class PaymentManagementController extends Controller
 
     /**
      * حفظ المحفظة الإلكترونية
-     */
-    public function storeElectronicWallet(Request $request)
-    {
-        $request->validate([
-            'wallet_name' => 'required|string|max:255',
-            'wallet_type' => 'required|string|max:255',
-            'account_number' => 'required|string|max:255',
-            'account_name' => 'required|string|max:255',
-            'phone_number' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'notes' => 'nullable|string|max:1000',
-            'status' => 'required|in:active,inactive',
-            'sort_order' => 'nullable|integer|min:0',
-        ]);
-
-        ElectronicWallet::create($request->all());
-
-        return back()->with('success', 'تم إضافة المحفظة الإلكترونية بنجاح.');
-    }
-
     /**
      * تحديث الحساب البنكي
      */
@@ -239,29 +209,6 @@ class PaymentManagementController extends Controller
         $bankAccount->update($request->all());
 
         return back()->with('success', 'تم تحديث الحساب البنكي بنجاح.');
-    }
-
-    /**
-     * تحديث المحفظة الإلكترونية
-     */
-    public function updateElectronicWallet(Request $request, $id)
-    {
-        $request->validate([
-            'wallet_name' => 'required|string|max:255',
-            'wallet_type' => 'required|string|max:255',
-            'account_number' => 'required|string|max:255',
-            'account_name' => 'required|string|max:255',
-            'phone_number' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'notes' => 'nullable|string|max:1000',
-            'status' => 'required|in:active,inactive',
-            'sort_order' => 'nullable|integer|min:0',
-        ]);
-
-        $electronicWallet = ElectronicWallet::findOrFail($id);
-        $electronicWallet->update($request->all());
-
-        return back()->with('success', 'تم تحديث المحفظة الإلكترونية بنجاح.');
     }
 
     /**
@@ -292,36 +239,6 @@ class PaymentManagementController extends Controller
         $bankAccount->delete();
 
         return back()->with('success', 'تم حذف الحساب البنكي بنجاح.');
-    }
-
-    /**
-     * جلب بيانات محفظة إلكترونية للتعديل
-     */
-    public function getElectronicWallet($id)
-    {
-        try {
-            $electronicWallet = ElectronicWallet::findOrFail($id);
-            return response()->json($electronicWallet);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'المحفظة غير موجودة'], 404);
-        }
-    }
-
-    /**
-     * حذف المحفظة الإلكترونية
-     */
-    public function destroyElectronicWallet($id)
-    {
-        $electronicWallet = ElectronicWallet::findOrFail($id);
-
-        // التحقق من عدم وجود طلبات دفع مرتبطة
-        if ($electronicWallet->paymentRequests()->exists()) {
-            return back()->with('error', 'لا يمكن حذف المحفظة الإلكترونية لوجود طلبات دفع مرتبطة بها.');
-        }
-
-        $electronicWallet->delete();
-
-        return back()->with('success', 'تم حذف المحفظة الإلكترونية بنجاح.');
     }
 
     /**
@@ -357,6 +274,57 @@ class PaymentManagementController extends Controller
                     $fundingRequest->update(['status' => 'disbursed']);
                 }
                 break;
+        }
+    }
+
+    /**
+     * حذف طلبات الدفع المحددة
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|json'
+        ]);
+
+        $ids = json_decode($request->ids, true);
+
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'لم يتم تحديد أي طلبات للحذف');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // التأكد من وجود طلبات الدفع
+            $paymentRequests = PaymentRequest::whereIn('id', $ids)->get();
+
+            if ($paymentRequests->count() !== count($ids)) {
+                throw new \Exception('بعض طلبات الدفع المحددة غير موجودة');
+            }
+
+            // حذف إثباتات الدفع المرتبطة
+            foreach ($paymentRequests as $request) {
+                if ($request->paymentProofs) {
+                    foreach ($request->paymentProofs as $proof) {
+                        // حذف الملف من التخزين إذا كان موجود
+                        if ($proof->file_path && Storage::exists($proof->file_path)) {
+                            Storage::delete($proof->file_path);
+                        }
+                        $proof->delete();
+                    }
+                }
+            }
+
+            // حذف طلبات الدفع
+            PaymentRequest::whereIn('id', $ids)->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', "تم حذف {$paymentRequests->count()} طلب دفع بنجاح");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف طلبات الدفع: ' . $e->getMessage());
         }
     }
 }

@@ -67,10 +67,6 @@ class PaymentRequest extends Model
         return $this->belongsTo(BankAccount::class, 'payment_account_id');
     }
 
-    public function electronicWallet()
-    {
-        return $this->belongsTo(ElectronicWallet::class, 'payment_account_id');
-    }
 
     public function paymentAccount()
     {
@@ -78,12 +74,10 @@ class PaymentRequest extends Model
     }
 
     // Helper method للحصول على نوع الحساب
-    public function getPaymentAccountTypeAttribute()
+    public function getPaymentAccountTypeTextAttribute()
     {
-        if ($this->payment_account_type === BankAccount::class) {
+        if ($this->attributes['payment_account_type'] === BankAccount::class) {
             return 'bank_account';
-        } elseif ($this->payment_account_type === ElectronicWallet::class) {
-            return 'electronic_wallet';
         }
         return 'unknown';
     }
@@ -91,10 +85,8 @@ class PaymentRequest extends Model
     // Accessor للحصول على اسم الحساب
     public function getPaymentAccountNameAttribute()
     {
-        if ($this->payment_method === 'bank_transfer' && $this->bankAccount) {
-            return $this->bankAccount->bank_name . ' - ' . $this->bankAccount->account_number;
-        } elseif ($this->payment_method === 'electronic_wallet' && $this->electronicWallet) {
-            return $this->electronicWallet->wallet_name . ' - ' . $this->electronicWallet->wallet_number;
+        if ($this->payment_method === 'bank_transfer' && $this->paymentAccount) {
+            return $this->paymentAccount->bank_name . ' - ' . $this->paymentAccount->account_number;
         }
         return 'غير محدد';
     }

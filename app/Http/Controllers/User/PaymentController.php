@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\PaymentRequest;
 use App\Models\PaymentProof;
 use App\Models\BankAccount;
-use App\Models\ElectronicWallet;
 use App\Models\ProductOrder;
 use App\Models\Invoice;
 use App\Models\FundingRequest;
@@ -34,9 +35,8 @@ class PaymentController extends Controller
         }
 
         $bankAccounts = BankAccount::active()->ordered()->get();
-        $electronicWallets = ElectronicWallet::active()->ordered()->get();
 
-        return view('payments.product-payment', compact('order', 'bankAccounts', 'electronicWallets'));
+        return view('payments.product-payment', compact('order', 'bankAccounts'));
     }
 
     /**
@@ -61,9 +61,8 @@ class PaymentController extends Controller
         }
 
         $bankAccounts = BankAccount::active()->ordered()->get();
-        $electronicWallets = ElectronicWallet::active()->ordered()->get();
 
-        return view('payments.invoice-payment', compact('invoice', 'bankAccounts', 'electronicWallets'));
+        return view('payments.invoice-payment', compact('invoice', 'bankAccounts'));
     }
 
     /**
@@ -115,7 +114,7 @@ class PaymentController extends Controller
      */
     public function show($id)
     {
-        $paymentRequest = PaymentRequest::with(['user', 'paymentProofs', 'bankAccount', 'electronicWallet'])
+        $paymentRequest = PaymentRequest::with(['user', 'paymentProofs', 'bankAccount'])
                                        ->findOrFail($id);
 
         // التحقق من الصلاحيات
@@ -231,11 +230,9 @@ class PaymentController extends Controller
     public function getPaymentAccounts()
     {
         $bankAccounts = BankAccount::active()->ordered()->get();
-        $electronicWallets = ElectronicWallet::active()->ordered()->get();
 
         return response()->json([
             'bank_accounts' => $bankAccounts,
-            'electronic_wallets' => $electronicWallets,
         ]);
     }
 

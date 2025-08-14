@@ -9,7 +9,6 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PaymentRequest;
 use App\Models\BankAccount;
-use App\Models\ElectronicWallet;
 use App\Models\ServiceCompany;
 use App\Models\InstallmentPlan;
 use App\Models\ProductOrder;
@@ -114,9 +113,8 @@ class ServiceCompanyController extends Controller
 
         // الحصول على البنوك والمحافظ الإلكترونية النشطة لنظام الدفع
         $bankAccounts = BankAccount::active()->ordered()->get();
-        $electronicWallets = ElectronicWallet::active()->ordered()->get();
 
-        return view('service-company.dashboard', compact('serviceCompany', 'stats', 'recentInvoices', 'recentPayments', 'bankAccounts', 'electronicWallets'));
+        return view('service-company.dashboard', compact('serviceCompany', 'stats', 'recentInvoices', 'recentPayments', 'bankAccounts'));
     }
 
     /**
@@ -137,6 +135,7 @@ class ServiceCompanyController extends Controller
             'payment_method' => 'required|in:bank_transfer,electronic_wallet',
             'payment_account_id' => 'required|integer',
             'payment_notes' => 'nullable|string|max:1000',
+            'payment_proof' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf,doc,docx|max:5120', // 5MB max
         ]);
 
         // البحث عن الفاتورة
@@ -169,14 +168,38 @@ class ServiceCompanyController extends Controller
                 'amount' => $request->amount,
                 'payment_method' => $request->payment_method,
                 'payment_account_id' => $request->payment_account_id,
-                'payment_account_type' => $request->payment_method === 'bank_transfer' ? BankAccount::class : ElectronicWallet::class,
+                'payment_account_type' => $request->payment_method === 'bank_transfer' ? BankAccount::class : null,
                 'payment_notes' => $request->payment_notes ?: 'دفع سريع من لوحة تحكم الشركة الطالبة',
                 'status' => 'pending',
             ]);
 
+            // رفع إثبات التحويل إذا كان موجوداً
+            if ($request->hasFile('payment_proof')) {
+                $file = $request->file('payment_proof');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('payment-proofs', $fileName, 'public');
+
+                // إنشاء سجل إثبات التحويل
+                $paymentRequest->paymentProofs()->create([
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $filePath,
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                    'description' => 'إثبات تحويل للفاتورة رقم: ' . $invoice->invoice_number,
+                    'status' => 'pending',
+                ]);
+            }
+
             DB::commit();
 
-            return redirect()->back()->with('success', 'تم إرسال طلب الدفع بنجاح. رقم الطلب: ' . $paymentRequest->request_number . '. يرجى رفع إثبات التحويل لإتمام العملية.');
+            $message = 'تم إرسال طلب الدفع بنجاح. رقم الطلب: ' . $paymentRequest->request_number;
+            if ($request->hasFile('payment_proof')) {
+                $message .= ' وتم رفع إثبات التحويل للمراجعة.';
+            } else {
+                $message .= '. يرجى رفع إثبات التحويل لإتمام العملية بسرعة.';
+            }
+
+            return redirect()->back()->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -322,7 +345,7 @@ class ServiceCompanyController extends Controller
 
         // طلبات الدفع للمستخدم الحالي
         $paymentRequests = PaymentRequest::where('user_id', $user->id)
-            ->with(['related', 'bankAccount', 'electronicWallet'])
+            ->with(['related', 'bankAccount', 'paymentProofs'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
@@ -407,5 +430,57 @@ class ServiceCompanyController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'تم تحديث كلمة المرور بنجاح');
+    }
+
+    /**
+     * جلب تفاصيل الفاتورة لعرضها في مربع حوار
+     */
+    public function getInvoiceDetails($id)
+    {
+        $user = Auth::user();
+
+        if ($user->user_type !== 'service_company') {
+            return response()->json(['error' => 'غير مصرح لك بالوصول لهذا المورد'], 403);
+        }
+
+        // البحث عن الفاتورة
+        $invoice = Invoice::with(['logisticsCompany'])
+            ->where('id', $id)
+            ->whereHas('serviceCompany', function($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->first();
+
+        if (!$invoice) {
+            return response()->json(['error' => 'الفاتورة غير موجودة'], 404);
+        }
+
+        // إعداد البيانات للإرجاع
+        $invoiceData = [
+            'id' => $invoice->id,
+            'invoice_number' => $invoice->invoice_number,
+            'original_amount' => $invoice->original_amount,
+            'paid_amount' => $invoice->paid_amount,
+            'remaining_amount' => $invoice->remaining_amount,
+            'payment_status' => $invoice->payment_status,
+            'payment_status_label' => $invoice->payment_status_label,
+            'created_at' => $invoice->created_at->format('Y-m-d'),
+            'due_date' => $invoice->due_date ? \Carbon\Carbon::parse($invoice->due_date)->format('Y-m-d') : '-',
+            'description' => $invoice->description,
+            'logistics_company' => null
+        ];
+
+        // إضافة بيانات الشركة إذا كانت موجودة
+        if ($invoice->logisticsCompany) {
+            $invoiceData['logistics_company'] = [
+                'name' => $invoice->logisticsCompany->name,
+                'contact_person' => $invoice->logisticsCompany->contact_person,
+                'phone' => $invoice->logisticsCompany->phone,
+                'email' => $invoice->logisticsCompany->email,
+                'address' => $invoice->logisticsCompany->address,
+            ];
+        }
+
+        return response()->json($invoiceData);
     }
 }

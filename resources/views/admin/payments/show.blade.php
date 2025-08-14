@@ -63,7 +63,6 @@
                             @php
                                 $methods = [
                                     'bank_transfer' => 'تحويل بنكي',
-                                    'electronic_wallet' => 'محفظة إلكترونية',
                                     'cash' => 'نقدي',
                                     'check' => 'شيك'
                                 ];
@@ -168,44 +167,13 @@
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-2">اسم صاحب الحساب</label>
                                 <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-slate-900">
-                                    {{ $paymentRequest->bankAccount->account_holder_name }}
+                                    {{ $paymentRequest->bankAccount->account_name }}
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-2">رمز البنك</label>
                                 <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-slate-900">
                                     {{ $paymentRequest->bankAccount->swift_code ?? 'غير محدد' }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @elseif($paymentRequest->payment_method === 'electronic_wallet' && $paymentRequest->electronicWallet)
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-2">اسم المحفظة</label>
-                                <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-slate-900">
-                                    {{ $paymentRequest->electronicWallet->wallet_name }}
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-2">رقم المحفظة</label>
-                                <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-slate-900 font-mono">
-                                    {{ $paymentRequest->electronicWallet->wallet_number }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-2">اسم صاحب المحفظة</label>
-                                <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-slate-900">
-                                    {{ $paymentRequest->electronicWallet->wallet_holder_name }}
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-2">نوع المحفظة</label>
-                                <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-slate-900">
-                                    {{ $paymentRequest->electronicWallet->wallet_type }}
                                 </div>
                             </div>
                         </div>
@@ -221,46 +189,129 @@
             <!-- Payment Proofs -->
             @if($paymentRequest->paymentProofs && $paymentRequest->paymentProofs->count() > 0)
             <div class="glass-effect rounded-2xl lg:rounded-3xl p-4 lg:p-8 border border-white/20">
-                <h3 class="text-xl font-bold gradient-text mb-6">إثباتات الدفع</h3>
+                <h3 class="text-xl font-bold gradient-text mb-6">
+                    <i class="fas fa-file-invoice mr-2"></i>
+                    مستندات تأكيد الدفع
+                </h3>
 
-                <div class="space-y-4">
-                    @foreach($paymentRequest->paymentProofs as $proof)
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex items-center space-x-3 space-x-reverse">
-                                <span class="px-3 py-1 rounded-full text-xs font-medium
-                                    {{ $proof->status === 'approved' ? 'bg-green-100 text-green-800' :
-                                       ($proof->status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                       ($proof->status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')) }}">
-                                    {{ $proof->status === 'approved' ? 'موافق عليه' :
-                                       ($proof->status === 'pending' ? 'في الانتظار' :
-                                       ($proof->status === 'rejected' ? 'مرفوض' : $proof->status)) }}
-                                </span>
-                                <span class="text-sm text-gray-600">{{ $proof->created_at->format('Y-m-d H:i') }}</span>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    @foreach($paymentRequest->paymentProofs as $index => $proof)
+                    @php
+                        $extension = $proof->file_path ? pathinfo($proof->file_path, PATHINFO_EXTENSION) : 'unknown';
+                        $filename = $proof->file_path ? pathinfo($proof->file_path, PATHINFO_FILENAME) : 'ملف غير معروف';
+
+                        // تحديد نوع الملف والأيقونة
+                        $fileTypeInfo = [
+                            'pdf' => ['icon' => 'fas fa-file-pdf', 'color' => 'text-red-600', 'bg' => 'bg-red-50', 'border' => 'border-red-200'],
+                            'jpg' => ['icon' => 'fas fa-file-image', 'color' => 'text-green-600', 'bg' => 'bg-green-50', 'border' => 'border-green-200'],
+                            'jpeg' => ['icon' => 'fas fa-file-image', 'color' => 'text-green-600', 'bg' => 'bg-green-50', 'border' => 'border-green-200'],
+                            'png' => ['icon' => 'fas fa-file-image', 'color' => 'text-green-600', 'bg' => 'bg-green-50', 'border' => 'border-green-200'],
+                            'doc' => ['icon' => 'fas fa-file-word', 'color' => 'text-blue-600', 'bg' => 'bg-blue-50', 'border' => 'border-blue-200'],
+                            'docx' => ['icon' => 'fas fa-file-word', 'color' => 'text-blue-600', 'bg' => 'bg-blue-50', 'border' => 'border-blue-200'],
+                            'default' => ['icon' => 'fas fa-file', 'color' => 'text-gray-600', 'bg' => 'bg-gray-50', 'border' => 'border-gray-200']
+                        ];
+
+                        $fileInfo = $fileTypeInfo[$extension] ?? $fileTypeInfo['default'];
+                    @endphp
+
+                    <div class="{{ $fileInfo['bg'] }} {{ $fileInfo['border'] }} rounded-2xl p-6 border-2 hover:shadow-lg transition-all">
+                        <!-- Header مع الحالة والتاريخ -->
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 {{ $fileInfo['bg'] }} rounded-xl flex items-center justify-center ml-3 border-2 border-white shadow-sm">
+                                    <i class="{{ $fileInfo['icon'] }} {{ $fileInfo['color'] }} text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900">مستند التأكيد #{{ $index + 1 }}</h4>
+                                    <p class="text-xs text-slate-600">{{ $proof->created_at->format('Y-m-d H:i') }}</p>
+                                </div>
                             </div>
+
+                            <!-- حالة المستند -->
+                            <span class="px-3 py-1 rounded-full text-xs font-bold
+                                {{ $proof->status === 'approved' ? 'bg-green-100 text-green-800 border border-green-300' :
+                                   ($proof->status === 'pending' ? 'bg-yellow-100 text-yellow-800 border border-yellow-300' :
+                                   ($proof->status === 'rejected' ? 'bg-red-100 text-red-800 border border-red-300' : 'bg-gray-100 text-gray-800 border border-gray-300')) }}">
+                                {{ $proof->status === 'approved' ? '✅ موافق عليه' :
+                                   ($proof->status === 'pending' ? '⏳ في الانتظار' :
+                                   ($proof->status === 'rejected' ? '❌ مرفوض' : $proof->status)) }}
+                            </span>
                         </div>
 
+                        <!-- معلومات الملف -->
                         @if($proof->file_path)
-                        <div class="flex items-center space-x-3 space-x-reverse">
-                            <i class="fas fa-file-alt text-blue-600"></i>
-                            <a href="{{ asset('storage/' . $proof->file_path) }}" target="_blank"
-                               class="text-blue-600 hover:text-blue-800 font-medium">
-                                عرض الملف
-                            </a>
-                            <a href="{{ asset('storage/' . $proof->file_path) }}" download
-                               class="text-green-600 hover:text-green-800">
-                                <i class="fas fa-download"></i>
-                            </a>
+                        <div class="mb-4">
+                            <div class="bg-white rounded-xl p-3 border border-white/50">
+                                <div class="text-xs text-slate-600 mb-1">اسم الملف:</div>
+                                <div class="text-sm font-medium text-slate-900 truncate">{{ $filename . '.' . $extension }}</div>
+                                <div class="text-xs text-slate-500 mt-1">نوع الملف: {{ strtoupper($extension) }}</div>
+                            </div>
                         </div>
                         @endif
 
+                        <!-- الملاحظات -->
                         @if($proof->notes)
-                        <div class="mt-2 text-sm text-gray-600">
-                            <span class="font-medium">ملاحظات:</span> {{ $proof->notes }}
+                        <div class="mb-4">
+                            <div class="bg-white rounded-xl p-3 border border-white/50">
+                                <div class="text-xs text-slate-600 mb-1">ملاحظات:</div>
+                                <div class="text-sm text-slate-800">{{ $proof->notes }}</div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- أزرار العمليات -->
+                        @if($proof->file_path)
+                        <div class="flex space-x-2 space-x-reverse">
+                            <a href="{{ asset('/' . $proof->file_path) }}" target="_blank"
+                               class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-white text-slate-700 border-2 border-slate-300 rounded-xl text-sm font-bold hover:bg-slate-50 hover:border-slate-400 transition-all">
+                                <i class="fas fa-eye mr-2"></i>
+                                عرض المستند
+                            </a>
+
+                            <a href="{{ asset('/' . $proof->file_path) }}" download
+                               class="flex-1 inline-flex items-center justify-center px-4 py-2 {{ $fileInfo['color'] }} border-2 border-current rounded-xl text-sm font-bold hover:bg-white transition-all">
+                                <i class="fas fa-download mr-2"></i>
+                                تحميل
+                            </a>
+                        </div>
+                        @else
+                        <div class="text-center py-4 text-gray-400">
+                            <i class="fas fa-file-slash text-2xl mb-2"></i>
+                            <p class="text-sm">لا يوجد ملف مرفق</p>
                         </div>
                         @endif
                     </div>
                     @endforeach
+                </div>
+
+                <!-- إحصائيات المستندات -->
+                <div class="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-lg font-bold text-slate-900">{{ $paymentRequest->paymentProofs->count() }}</div>
+                            <div class="text-xs text-slate-600">إجمالي المستندات</div>
+                        </div>
+                        <div>
+                            <div class="text-lg font-bold text-green-600">{{ $paymentRequest->paymentProofs->where('status', 'approved')->count() }}</div>
+                            <div class="text-xs text-slate-600">موافق عليها</div>
+                        </div>
+                        <div>
+                            <div class="text-lg font-bold text-yellow-600">{{ $paymentRequest->paymentProofs->where('status', 'pending')->count() }}</div>
+                            <div class="text-xs text-slate-600">في الانتظار</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @else
+            <div class="glass-effect rounded-2xl lg:rounded-3xl p-4 lg:p-8 border border-white/20">
+                <h3 class="text-xl font-bold gradient-text mb-6">
+                    <i class="fas fa-file-invoice mr-2"></i>
+                    مستندات تأكيد الدفع
+                </h3>
+                <div class="text-center py-12 text-gray-500">
+                    <i class="fas fa-file-upload text-4xl mb-4"></i>
+                    <h4 class="text-lg font-semibold mb-2">لم يتم رفع أي مستندات</h4>
+                    <p class="text-sm">لا توجد مستندات تأكيد دفع مرفقة لهذا الطلب</p>
                 </div>
             </div>
             @endif

@@ -22,20 +22,17 @@
 </section>
 
 <!-- Dashboard Stats -->
-@php
-    $isOverLimit = ($stats['used_credit'] ?? 0) > ($stats['credit_limit'] ?? 100000);
-    $excessAmount = $isOverLimit ? ($stats['used_credit'] ?? 0) - ($stats['credit_limit'] ?? 100000) : 0;
-@endphp
 <section class="py-8 bg-gray-50">
     <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
-            <!-- Current Balance -->
+        <!-- Balance Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <!-- Available Balance -->
             <div class="bg-white rounded-lg shadow-sm p-6">
-        <div class="flex items-center justify-between">
-            <div>
+                <div class="flex items-center justify-between">
+                    <div>
                         <p class="text-sm text-gray-600 mb-1">الرصيد المتاح</p>
-                        <p class="text-2xl font-bold text-green-600">{{ number_format($stats['available_balance'] ?? 0) }} ر.س</p>
-                        <p class="text-xs text-gray-500 mt-1">(من الفواتير المدفوعة)</p>
+                        <p class="text-2xl font-bold text-green-600">{{ number_format(auth()->user()->available_balance ?? 0) }} ر.س</p>
+                        <p class="text-xs text-gray-500 mt-1">الرصيد القابل للاستخدام</p>
                     </div>
                     <div class="bg-green-100 p-3 rounded-full">
                         <i class="fas fa-wallet text-green-600 text-xl"></i>
@@ -43,28 +40,66 @@
                 </div>
             </div>
 
-            <!-- Credit Limit -->
+            <!-- Used Balance -->
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-gray-600 mb-1">الحد الائتماني</p>
-                        <p class="text-2xl font-bold text-blue-600">{{ number_format($stats['credit_limit'] ?? 0) }} ر.س</p>
-                        @if($isOverLimit)
-                            <p class="text-xs text-red-600 mt-1">(يحتاج زيادة)</p>
-                        @endif
+                        <p class="text-sm text-gray-600 mb-1">الرصيد المستخدم</p>
+                        <p class="text-2xl font-bold text-red-600">{{ number_format(auth()->user()->used_balance ?? 0) }} ر.س</p>
+                        <p class="text-xs text-gray-500 mt-1">المبلغ المستخدم</p>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <i class="fas fa-minus-circle text-red-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remaining Balance -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">الرصيد المتبقي</p>
+                        @php
+                            $remainingBalance = (auth()->user()->available_balance ?? 0) - (auth()->user()->used_balance ?? 0);
+                        @endphp
+                        <p class="text-2xl font-bold {{ $remainingBalance < 0 ? 'text-red-600' : 'text-blue-600' }}">
+                            {{ number_format($remainingBalance) }} ر.س
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">المتبقي للاستخدام</p>
                     </div>
                     <div class="bg-blue-100 p-3 rounded-full">
-                        <i class="fas fa-chart-line text-blue-600 text-xl"></i>
+                        <i class="fas fa-coins text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Balance -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">إجمالي الرصيد</p>
+                        <p class="text-2xl font-bold text-indigo-600">{{ number_format(auth()->user()->total_balance ?? 0) }} ر.س</p>
+                        <p class="text-xs text-gray-500 mt-1">إجمالي الرصيد الممنوح</p>
+                    </div>
+                    <div class="bg-indigo-100 p-3 rounded-full">
+                        <i class="fas fa-chart-line text-indigo-600 text-xl"></i>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Total Requests -->
+        <!-- Orders Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Total Requests -->
             <div class="bg-white rounded-lg shadow-sm p-6">
-        <div class="flex items-center justify-between">
-            <div>
+                <div class="flex items-center justify-between">
+                    <div>
                         <p class="text-sm text-gray-600 mb-1">إجمالي الطلبات</p>
                         <p class="text-2xl font-bold text-purple-600">{{ $stats['total_requests'] ?? 0 }}</p>
+                        <p class="text-xs text-gray-500 mt-1">العدد الكلي للطلبات</p>
+                        @if(config('app.debug') && isset($stats['total_requests']))
+                            <p class="text-xs text-blue-500 mt-1">🔧 Debug: {{ $stats['total_requests'] }} طلب مسجل</p>
+                        @endif
                     </div>
                     <div class="bg-purple-100 p-3 rounded-full">
                         <i class="fas fa-file-alt text-purple-600 text-xl"></i>
@@ -78,420 +113,19 @@
                     <div>
                         <p class="text-sm text-gray-600 mb-1">الطلبات المعلقة</p>
                         <p class="text-2xl font-bold text-orange-600">{{ $stats['pending_requests'] ?? 0 }}</p>
+                        <p class="text-xs text-gray-500 mt-1">في انتظار المراجعة</p>
+                        @if(config('app.debug') && isset($stats['pending_requests']))
+                            <p class="text-xs text-orange-500 mt-1">🔧 Debug: {{ $stats['pending_requests'] }} طلب معلق</p>
+                        @endif
                     </div>
                     <div class="bg-orange-100 p-3 rounded-full">
                         <i class="fas fa-clock text-orange-600 text-xl"></i>
-            </div>
-        </div>
-    </div>
-
-            <!-- Remaining Credit -->
-            <div class="bg-white rounded-lg shadow-sm p-6">
-        <div class="flex items-center justify-between">
-            <div>
-                        <p class="text-sm text-gray-600 mb-1">الائتمان المتبقي</p>
-                        @php
-                            $remainingCredit = max(0, $stats['credit_limit'] - $stats['used_credit']);
-                        @endphp
-                        <p class="text-2xl font-bold {{ $isOverLimit ? 'text-red-600' : 'text-indigo-600' }}">
-                            {{ $isOverLimit ? '-' . number_format($excessAmount) : number_format($remainingCredit) }} ر.س
-                        </p>
-                        <p class="text-xs text-gray-500 mt-1">
-                            {{ $isOverLimit ? '(متجاوز الحد الائتماني)' : '(لطلب تمويل جديد)' }}
-                        </p>
                     </div>
-                    <div class="bg-indigo-100 p-3 rounded-full">
-                        <i class="fas fa-credit-card text-indigo-600 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Additional Financial Details -->
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white rounded-lg shadow-sm p-4">
-                <div class="text-center">
-                    <p class="text-sm text-gray-600 mb-1">الفواتير المدفوعة</p>
-                    <p class="text-lg font-bold text-green-600">
-                        @php
-                            $totalPaidInvoices = \App\Models\Invoice::where('logistics_company_id', auth()->id())
-                                ->where('payment_status', 'paid')
-                                ->sum('paid_amount');
-                        @endphp
-                        {{ number_format($totalPaidInvoices) }} ر.س
-                    </p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-sm p-4">
-                <div class="text-center">
-                    <p class="text-sm text-gray-600 mb-1">الفواتير المستحقة</p>
-                    <p class="text-lg font-bold text-red-600">
-                        @php
-                            $totalOutstandingInvoices = \App\Models\Invoice::where('logistics_company_id', auth()->id())
-                                ->whereIn('payment_status', ['unpaid', 'partial'])
-                                ->sum('remaining_amount');
-                        @endphp
-                        {{ number_format($totalOutstandingInvoices) }} ر.س
-                    </p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-sm p-4">
-                <div class="text-center">
-                    <p class="text-sm text-gray-600 mb-1">الائتمان المستخدم</p>
-                    <p class="text-lg font-bold text-orange-600">
-                        @php
-                            $usedCredit = \App\Models\FundingRequest::where('logistics_company_id', auth()->id())
-                                ->whereIn('status', ['approved', 'disbursed'])
-                                ->sum('amount');
-                        @endphp
-                        {{ number_format($usedCredit) }} ر.س
-                        @if($isOverLimit)
-                            <br><span class="text-xs text-red-600">(متجاوز بـ {{ number_format($excessAmount) }} ر.س)</span>
-                        @endif
-                    </p>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<!-- Credit Management Section -->
-@php
-    $isOverLimit = $stats['used_credit'] > $stats['credit_limit'];
-    $excessAmount = $isOverLimit ? $stats['used_credit'] - $stats['credit_limit'] : 0;
-@endphp
-
-@if($isOverLimit)
-<section class="py-6 bg-red-50">
-    <div class="container mx-auto px-4">
-        <!-- Header Alert -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6 border-l-4 border-red-500">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <i class="fas fa-exclamation-triangle text-red-600 text-xl mr-3"></i>
-                    <div>
-                        <h3 class="text-lg font-semibold text-red-800">تجاوز الحد الائتماني</h3>
-                        <p class="text-red-700">تم تجاوز الحد بمبلغ {{ number_format($excessAmount) }} ر.س - يرجى سداد بعض الفواتير</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <div class="text-sm text-red-600">المبلغ المتجاوز</div>
-                    <div class="text-xl font-bold text-red-800">{{ number_format($excessAmount) }} ر.س</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Payment Form -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-
-                                                        <!-- Outstanding Invoices Selection -->
-                @php
-                    $outstandingInvoices = \App\Models\Invoice::where('logistics_company_id', auth()->id())
-                        ->whereIn('payment_status', ['unpaid', 'partial'])
-                        ->orderBy('due_date', 'asc')
-                        ->get();
-                @endphp
-
-            <form action="{{ route('logistics.credit.pay') }}" method="POST" class="space-y-6">
-                @csrf
-
-                @if($outstandingInvoices->count() > 0)
-                <!-- Invoice Selection -->
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-lg font-semibold text-gray-800">
-                            <i class="fas fa-file-invoice text-blue-600 mr-2"></i>
-                            الفواتير المستحقة
-                        </h4>
-                        <div class="space-x-2 space-x-reverse">
-                            <button type="button" id="select-all-invoices" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
-                                تحديد الكل
-                            </button>
-                            <button type="button" id="deselect-all-invoices" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
-                                إلغاء
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-4">
-                        @foreach($outstandingInvoices as $invoice)
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer" onclick="toggleInvoice({{ $invoice->id }})">
-                            <div class="flex items-center space-x-3 space-x-reverse">
-                                <input type="checkbox"
-                                       name="selected_invoices[]"
-                                       value="{{ $invoice->id }}"
-                                       data-amount="{{ $invoice->remaining_amount }}"
-                                       id="invoice-{{ $invoice->id }}"
-                                       class="invoice-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <div>
-                                    <div class="font-medium text-gray-800">{{ $invoice->invoice_number }}</div>
-                                    <div class="text-sm text-gray-600">
-                                        استحقاق: {{ $invoice->due_date ? $invoice->due_date->format('Y-m-d') : 'غير محدد' }} |
-                                        {{ $invoice->serviceCompany->name ?? 'عميل غير محدد' }}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="font-bold text-red-600">{{ number_format($invoice->remaining_amount) }} ر.س</div>
-                                <div class="text-xs text-gray-500">
-                                    {{ $invoice->payment_status === 'unpaid' ? 'غير مدفوع' : 'مدفوع جزئياً' }}
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-
-                    <div class="mt-3 p-3 bg-blue-50 rounded-lg">
-                        <div class="flex justify-between items-center">
-                            <span class="text-blue-800 font-medium">إجمالي المحدد:</span>
-                            <span id="selected-total" class="font-bold text-blue-900 text-lg">0 ر.س</span>
-                        </div>
-                    </div>
-                </div>
-                @endif
-                <!-- Hidden Payment Amount (Auto-calculated) -->
-                <input type="hidden" name="payment_amount" id="payment-amount" value="0">
-
-                <!-- Payment Amount Display -->
-                <div class="mb-4">
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center">
-                                <i class="fas fa-calculator text-green-600 mr-3"></i>
-                                <span class="text-green-800 font-semibold">مبلغ السداد التلقائي:</span>
-                            </div>
-                            <div class="text-right">
-                                <span id="payment-amount-display" class="text-2xl font-bold text-green-900">0 ر.س</span>
-                                <div class="text-sm text-green-700">سيتم حسابه تلقائياً حسب الفواتير المحددة</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                                                                                            <!-- Payment Method -->
-                <div>
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4">
-                        <i class="fas fa-credit-card text-blue-600 mr-2"></i>
-                        طريقة السداد
-                    </h4>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50">
-                            <input type="radio" name="payment_method" value="bank_transfer" class="text-blue-600 focus:ring-blue-500" onchange="showPaymentAccounts('bank')">
-                            <i class="fas fa-university text-blue-600 mx-3"></i>
-                            <span class="font-medium">تحويل بنكي</span>
-                        </label>
-                        <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-green-50">
-                            <input type="radio" name="payment_method" value="electronic_wallet" class="text-green-600 focus:ring-green-500" onchange="showPaymentAccounts('wallet')">
-                            <i class="fas fa-mobile-alt text-green-600 mx-3"></i>
-                            <span class="font-medium">محفظة إلكترونية</span>
-                        </label>
-                    </div>
-
-                    <!-- Bank Accounts -->
-                    <div id="bank-accounts" class="hidden mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">اختر الحساب البنكي</label>
-                        <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3">
-                            @foreach($bankAccounts ?? [] as $bank)
-                            <label class="flex items-center p-2 bg-blue-50 rounded hover:bg-blue-100 cursor-pointer">
-                                <input type="radio" name="payment_account_id" value="{{ $bank->id }}" class="text-blue-600 focus:ring-blue-500">
-                                <div class="mr-3 flex-1">
-                                    <div class="font-medium">{{ $bank->bank_name }}</div>
-                                    <div class="text-sm text-gray-600">{{ $bank->account_number }} - {{ $bank->account_holder_name }}</div>
-                                </div>
-                            </label>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- Electronic Wallets -->
-                    <div id="electronic-wallets" class="hidden mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">اختر المحفظة الإلكترونية</label>
-                        <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3">
-                            @foreach($electronicWallets ?? [] as $wallet)
-                            <label class="flex items-center p-2 bg-green-50 rounded hover:bg-green-100 cursor-pointer">
-                                <input type="radio" name="payment_account_id" value="{{ $wallet->id }}" class="text-green-600 focus:ring-green-500">
-                                <div class="mr-3 flex-1">
-                                    <div class="font-medium">{{ $wallet->wallet_name }}</div>
-                                    <div class="text-sm text-gray-600">{{ $wallet->wallet_number }} - {{ $wallet->wallet_holder_name }}</div>
-                                </div>
-                            </label>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Notes -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">ملاحظات إضافية</label>
-                    <textarea name="payment_notes" rows="3"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              placeholder="أضف أي ملاحظات حول عملية الدفع..."></textarea>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="pt-4">
-                    <button type="submit" id="submit-payment" class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition-colors font-medium">
-                        <i class="fas fa-paper-plane mr-2"></i>
-                        إرسال طلب السداد
-                    </button>
-                </div>
-            </form>
-
-            <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const checkboxes = document.querySelectorAll('.invoice-checkbox');
-                            const selectAllBtn = document.getElementById('select-all-invoices');
-                            const deselectAllBtn = document.getElementById('deselect-all-invoices');
-                            const selectedTotal = document.getElementById('selected-total');
-                            const paymentAmount = document.getElementById('payment-amount');
-                            const submitBtn = document.getElementById('submit-payment');
-
-                            // دالة تحديث إجمالي المحدد ومبلغ السداد التلقائي
-                            function updateSelectedTotal() {
-                                let total = 0;
-                                checkboxes.forEach(checkbox => {
-                                    if (checkbox.checked) {
-                                        total += parseFloat(checkbox.dataset.amount) || 0;
-                                    }
-                                });
-
-                                // تحديث عرض الإجمالي
-                                if (selectedTotal) {
-                                    selectedTotal.textContent = total.toLocaleString() + ' ر.س';
-                                }
-
-                                // تحديث مبلغ السداد التلقائي
-                                if (paymentAmount) {
-                                    paymentAmount.value = total;
-                                }
-
-                                // تحديث عرض مبلغ السداد
-                                const paymentAmountDisplay = document.getElementById('payment-amount-display');
-                                if (paymentAmountDisplay) {
-                                    paymentAmountDisplay.textContent = total.toLocaleString() + ' ر.س';
-                                }
-
-                                console.log('إجمالي المحدد ومبلغ السداد:', total);
-                                return total;
-                            }
-
-                            // تحديث عند تغيير التحديد
-                            checkboxes.forEach(checkbox => {
-                                checkbox.addEventListener('change', function() {
-                                    console.log('تم تغيير الفاتورة:', this.value, 'المبلغ:', this.dataset.amount, 'محدد:', this.checked);
-                                    updateSelectedTotal();
-                                });
-                            });
-
-                            // تحديد الكل
-                            if (selectAllBtn) {
-                                selectAllBtn.addEventListener('click', function() {
-                                    console.log('تحديد الكل');
-                                    checkboxes.forEach(checkbox => {
-                                        checkbox.checked = true;
-                                    });
-                                    updateSelectedTotal();
-                                });
-                            }
-
-                            // إلغاء التحديد
-                            if (deselectAllBtn) {
-                                deselectAllBtn.addEventListener('click', function() {
-                                    console.log('إلغاء التحديد');
-                                    checkboxes.forEach(checkbox => {
-                                        checkbox.checked = false;
-                                    });
-                                    updateSelectedTotal();
-                                });
-                            }
-
-                            // لا حاجة لأزرار سداد لأن المبلغ يتم حسابه تلقائياً
-
-                            // التحقق من التحديد قبل الإرسال
-                            const form = document.querySelector('form');
-                            if (form) {
-                                form.addEventListener('submit', function(e) {
-                                    const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
-                                    if (checkedBoxes.length === 0) {
-                                        e.preventDefault();
-                                        alert('يرجى تحديد فاتورة واحدة على الأقل');
-                                        return false;
-                                    }
-
-                                    // التحقق من أن مبلغ السداد أكبر من صفر
-                                    const paymentAmountValue = parseFloat(paymentAmount.value) || 0;
-                                    if (paymentAmountValue <= 0) {
-                                        e.preventDefault();
-                                        alert('مبلغ السداد يجب أن يكون أكبر من صفر');
-                                        return false;
-                                    }
-
-                                    // التحقق من اختيار طريقة الدفع
-                                    const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
-                                    if (!paymentMethod) {
-                                        e.preventDefault();
-                                        alert('يرجى اختيار طريقة الدفع');
-                                        return false;
-                                    }
-
-                                    // التحقق من اختيار الحساب
-                                    const paymentAccount = document.querySelector('input[name="payment_account_id"]:checked');
-                                    if (!paymentAccount) {
-                                        e.preventDefault();
-                                        alert('يرجى اختيار الحساب للدفع');
-                                        return false;
-                                    }
-
-                                    console.log('تم إرسال النموذج بمبلغ:', paymentAmountValue);
-                                });
-                            }
-
-                            // تهيئة أولية
-                            updateSelectedTotal();
-                            console.log('تم تحميل JavaScript للدفع');
-                        });
-
-                        // دالة إظهار حسابات الدفع
-                        function showPaymentAccounts(type) {
-                            const bankDiv = document.getElementById('bank-accounts');
-                            const walletDiv = document.getElementById('electronic-wallets');
-
-                            if (bankDiv && walletDiv) {
-                                // إخفاء جميع الأقسام أولاً
-                                bankDiv.classList.add('hidden');
-                                walletDiv.classList.add('hidden');
-
-                                // إظهار القسم المطلوب
-                                if (type === 'bank') {
-                                    bankDiv.classList.remove('hidden');
-                                } else if (type === 'wallet') {
-                                    walletDiv.classList.remove('hidden');
-                                }
-
-                                // مسح التحديدات السابقة
-                                document.querySelectorAll('input[name="payment_account_id"]').forEach(radio => {
-                                    radio.checked = false;
-                                });
-                            }
-                        }
-
-                        // دالة تفعيل/إلغاء تفعيل الفاتورة عند النقر عليها
-                        function toggleInvoice(invoiceId) {
-                            const checkbox = document.getElementById('invoice-' + invoiceId);
-                            if (checkbox) {
-                                checkbox.checked = !checkbox.checked;
-                                // تشغيل event manually
-                                checkbox.dispatchEvent(new Event('change'));
-                                console.log('تم تغيير حالة الفاتورة:', invoiceId, 'الحالة الجديدة:', checkbox.checked);
-                            }
-                        }
-            </script>
-        </div>
-    </div>
-</section>
-@endif
 
 <!-- Main Content -->
 <section class="py-8">
@@ -543,76 +177,77 @@
                                       placeholder="اكتب تفاصيل إضافية حول الطلب..."></textarea>
                         </div>
 
-                        <!-- قسم العملاء المدينين -->
+                        <!-- قسم الشركة الطالبة للخدمة -->
                         <div class="border-t pt-4">
                             <h4 class="text-md font-semibold text-gray-800 mb-4">
                                 <i class="fas fa-building text-purple-600 ml-2"></i>
-                                العملاء المدينون (مصدر التمويل)
+                                الشركة الطالبة للخدمة
                             </h4>
 
-                            <div id="clients-container">
-                                <div class="client-item border border-gray-200 rounded-lg p-4 mb-4" data-client="1">
-                                    <div class="flex items-center justify-between mb-3">
-                                        <h5 class="font-medium text-gray-700">العميل الأول</h5>
-                                        <button type="button" class="text-red-500 hover:text-red-700 remove-client" style="display: none;">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                            <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                                <div class="grid md:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600 mb-2">اسم الشركة</label>
+                                        <input type="text" name="clients[1][company_name]"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                               placeholder="مثال: شركة التجارة المتقدمة" required>
                                     </div>
-
-                                    <div class="grid md:grid-cols-2 gap-3">
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-600 mb-1">اسم الشركة</label>
-                                            <input type="text" name="clients[1][company_name]"
-                                                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                   placeholder="مثال: شركة النقل السريع" required>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-600 mb-1">اسم المسؤول</label>
-                                            <input type="text" name="clients[1][contact_person]"
-                                                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                   placeholder="مثال: أحمد محمد" required>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-600 mb-1">البريد الإلكتروني</label>
-                                            <input type="email" name="clients[1][email]"
-                                                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                   placeholder="ahmed@company.com" required>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-600 mb-1">رقم الهاتف</label>
-                                            <input type="tel" name="clients[1][phone]"
-                                                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                   placeholder="0501234567" required>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-600 mb-1">المبلغ المستحق (ر.س)</label>
-                                            <input type="number" name="clients[1][amount]"
-                                                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 client-amount"
-                                                   placeholder="30000" min="1000" required>
-                                        </div>
-                                        <div>
-                                            <label class="block text-xs font-medium text-gray-600 mb-1">تاريخ الاستحقاق</label>
-                                            <input type="date" name="clients[1][due_date]"
-                                                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" required>
-                                        </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600 mb-2">اسم المسؤول</label>
+                                        <input type="text" name="clients[1][contact_person]"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                               placeholder="مثال: أحمد محمد السعد" required>
                                     </div>
-
-                                    <div class="mt-3">
-                                        <label class="block text-xs font-medium text-gray-600 mb-1">إرفاق الفاتورة الأصلية</label>
-                                        <input type="file" name="clients[1][invoice_document]"
-                                               class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                               accept=".pdf,.jpg,.jpeg,.png">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600 mb-2">البريد الإلكتروني</label>
+                                        <input type="email" name="clients[1][email]"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                               placeholder="ahmed@company.com" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600 mb-2">رقم الهاتف</label>
+                                        <input type="tel" name="clients[1][phone]"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                               placeholder="0501234567" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600 mb-2">قيمة الخدمة المطلوبة (ر.س)</label>
+                                        <input type="number" name="clients[1][amount]" id="service-amount"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                               placeholder="50000" min="1000" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600 mb-2">تاريخ تنفيذ الخدمة</label>
+                                        <input type="date" name="clients[1][due_date]"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="flex items-center justify-between mt-4">
-                                <button type="button" id="add-client" class="px-3 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm">
-                                    <i class="fas fa-plus ml-1"></i>
-                                    إضافة عميل آخر
-                                </button>
-                                <div class="text-sm text-gray-600">
-                                    إجمالي المبلغ: <span id="total-amount" class="font-semibold text-purple-600">0 ر.س</span>
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-600 mb-2">نوع الخدمة المطلوبة</label>
+                                    <select name="clients[1][service_type]" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="">اختر نوع الخدمة</option>
+                                        <option value="transportation">خدمات النقل والشحن</option>
+                                        <option value="logistics">الخدمات اللوجستية</option>
+                                        <option value="warehousing">خدمات التخزين</option>
+                                        <option value="distribution">خدمات التوزيع</option>
+                                        <option value="consulting">استشارات لوجستية</option>
+                                        <option value="other">خدمات أخرى</option>
+                                    </select>
+                                </div>
+
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-600 mb-2">تفاصيل الخدمة</label>
+                                    <textarea rows="3" name="clients[1][service_details]"
+                                              class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                              placeholder="اكتب تفاصيل الخدمة المطلوبة..."></textarea>
+                                </div>
+
+                                <div class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-600 mb-2">إرفاق عقد أو اتفاقية الخدمة</label>
+                                    <input type="file" name="clients[1][invoice_document]"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
                                 </div>
                             </div>
                         </div>
@@ -665,110 +300,119 @@
                             آخر طلبات التمويل
                         </h4>
                         <div class="space-y-3">
-                            @forelse($recentFundingRequests ?? [] as $request)
-                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                                        <p class="text-gray-800 font-medium">طلب تمويل #{{ $request->id }}</p>
-                                        <p class="text-blue-600 text-sm font-semibold">{{ number_format($request->amount ?? 0) }} ر.س</p>
-                                        <p class="text-gray-500 text-xs">{{ $request->created_at ? $request->created_at->diffForHumans() : 'غير محدد' }}</p>
-                    </div>
-                    <div class="text-left">
-                                        @if(($request->status ?? 'pending') == 'pending')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                معلق
-                            </span>
-                                        @elseif(($request->status ?? 'pending') == 'approved')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                موافق عليه
-                            </span>
-                                        @elseif(($request->status ?? 'pending') == 'disbursed')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                تم الصرف
-                            </span>
-                        @else
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                مرفوض
-                            </span>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            @empty
-                            <div class="text-center py-8 text-gray-500">
-                                <i class="fas fa-inbox text-4xl mb-3"></i>
-                                <p>لا توجد طلبات تمويل حتى الآن</p>
-                                <p class="text-sm">أرسل أول طلب تمويل باستخدام النموذج</p>
-            </div>
-            @endforelse
-        </div>
-    </div>
+                            @if(isset($recentFundingRequests) && $recentFundingRequests->count() > 0)
+                                @foreach($recentFundingRequests as $request)
+                                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <p class="text-gray-800 font-medium">طلب تمويل #{{ $request->id }}</p>
+                                            <p class="text-blue-600 text-sm font-semibold">{{ number_format($request->amount ?? 0) }} ر.س</p>
+                                            <p class="text-gray-500 text-xs">{{ $request->created_at ? $request->created_at->diffForHumans() : 'غير محدد' }}</p>
+                                        </div>
+                                        <div class="text-left flex flex-col items-end space-y-2">
+                                            <!-- Status Badge -->
+                                            @if(($request->status ?? 'pending') == 'pending')
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                    معلق
+                                                </span>
+                                            @elseif(($request->status ?? 'pending') == 'approved')
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    موافق عليه
+                                                </span>
+                                            @elseif(($request->status ?? 'pending') == 'disbursed')
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    تم الصرف
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    مرفوض
+                                                </span>
+                                            @endif
 
-    <!-- Recent Invoices -->
-                    <div>
-                        <h4 class="text-lg font-medium text-gray-800 mb-4">
-                            <i class="fas fa-file-invoice text-purple-600 ml-2"></i>
-                            آخر الفواتير
-                        </h4>
-                        <div class="space-y-3">
-                            @forelse($recentInvoices ?? [] as $invoice)
-                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                                        <p class="text-gray-800 font-medium">{{ $invoice->invoice_number ?? '#INV-' . $invoice->id ?? 'غير محدد' }}</p>
-                                        <p class="text-blue-600 text-sm">{{ $invoice->serviceCompany->name ?? 'عميل غير محدد' }}</p>
-                                        <p class="text-gray-500 text-xs">{{ $invoice->due_date ? $invoice->due_date->format('Y-m-d') : 'غير محدد' }}</p>
+                                            <!-- View Details Button -->
+                                            @if(isset($request->id))
+                                                <button onclick="showFundingRequestDetails({{ $request->id }})"
+                                                   class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors">
+                                                    <i class="fas fa-eye text-xs ml-1"></i>
+                                                    عرض التفاصيل
+                                                </button>
+                                            @else
+                                                <span class="inline-flex items-center px-3 py-1 bg-gray-400 text-white text-xs font-medium rounded-md">
+                                                    <i class="fas fa-info-circle text-xs ml-1"></i>
+                                                    طلب #{{ $request->id ?? 'N/A' }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            @else
+                                <div class="text-center py-8 text-gray-500">
+                                    <i class="fas fa-inbox text-4xl mb-3"></i>
+                                    <p class="font-medium mb-2">لا توجد طلبات تمويل حتى الآن</p>
+                                    <p class="text-sm mb-3">أرسل أول طلب تمويل باستخدام النموذج</p>
+                                    @if(config('app.debug'))
+                                        <div class="text-xs bg-gray-100 p-2 rounded mt-4">
+                                            <p><strong>معلومات التشخيص:</strong></p>
+                                            <p>المستخدم الحالي: {{ auth()->user()->name }} (ID: {{ auth()->user()->id }})</p>
+                                            <p>نوع المستخدم: {{ auth()->user()->user_type }}</p>
+                                            @if(auth()->user()->logisticsCompany)
+                                                <p>ID الشركة اللوجستية: {{ auth()->user()->logisticsCompany->id }}</p>
+                                                <p>اسم الشركة: {{ auth()->user()->logisticsCompany->company_name ?? 'غير محدد' }}</p>
+                                            @else
+                                                <p class="text-red-600">⚠️ الشركة اللوجستية غير موجودة</p>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
                     </div>
-                    <div class="text-left">
-                                        <p class="text-gray-800 font-bold">{{ number_format($invoice->original_amount ?? 0) }} ر.س</p>
-                                        @if(($invoice->payment_status ?? 'unpaid') == 'paid')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                مدفوع
-                            </span>
-                                        @elseif(($invoice->payment_status ?? 'unpaid') == 'partial')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                مدفوع جزئياً
-                            </span>
-                                        @else
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                غير مدفوع
-                            </span>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            @empty
-                            <div class="text-center py-8 text-gray-500">
-                                <i class="fas fa-file-invoice text-4xl mb-3"></i>
-                                <p>لا توجد فواتير حتى الآن</p>
-                                <p class="text-sm">ستظهر الفواتير هنا عند إنشائها</p>
-            </div>
-            @endforelse
-        </div>
-    </div>
 </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- Modal لعرض تفاصيل طلب التمويل -->
+<div id="fundingRequestModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-3 border-b">
+            <h3 class="text-lg font-semibold text-gray-900">تفاصيل طلب التمويل</h3>
+            <button type="button" class="text-gray-400 hover:text-gray-600" onclick="closeFundingModal()">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Modal Content -->
+        <div id="modalContent" class="py-4 max-h-96 overflow-y-auto">
+            <div class="text-center py-8">
+                <i class="fas fa-spinner fa-spin text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600">جارٍ تحميل البيانات...</p>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex justify-end pt-3 border-t">
+            <button type="button"
+                    onclick="closeFundingModal()"
+                    class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200">
+                إغلاق
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- Quick Actions -->
 <section class="py-8 bg-gray-50">
     <div class="container mx-auto px-4">
         <h3 class="text-xl font-semibold text-gray-800 mb-6">إجراءات سريعة</h3>
-        <div class="grid md:grid-cols-4 gap-4">
+        <div class="grid md:grid-cols-2 gap-4">
             <a href="{{ route('logistics.profile') }}" class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow text-center block">
                 <i class="fas fa-user-circle text-blue-600 text-2xl mb-2"></i>
                 <p class="text-sm font-medium">الملف الشخصي</p>
             </a>
-            <button class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow text-center">
-                <i class="fas fa-download text-green-600 text-2xl mb-2"></i>
-                <p class="text-sm font-medium">تحميل كشف حساب</p>
-            </button>
-            <button class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow text-center">
-                <i class="fas fa-calculator text-purple-600 text-2xl mb-2"></i>
-                <p class="text-sm font-medium">حاسبة التمويل</p>
-            </button>
             <button class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow text-center">
                 <i class="fas fa-headset text-orange-600 text-2xl mb-2"></i>
                 <p class="text-sm font-medium">الدعم الفني</p>
@@ -779,166 +423,233 @@
 
 @push('scripts')
 <script>
-    let clientCounter = 1;
-
-    // File upload handling
+    // File upload handling for main documents
     document.getElementById('documents').addEventListener('change', function(e) {
         const files = e.target.files;
         if (files.length > 0) {
-            const fileList = Array.from(files).map(file => file.name).join(', ');
-            alert('تم اختيار الملفات: ' + fileList);
+            const fileNames = Array.from(files).map(file => file.name).slice(0, 3);
+            const displayText = fileNames.join(', ') + (files.length > 3 ? ` و ${files.length - 3} ملف آخر` : '');
+
+            // Update upload area text
+            const uploadArea = e.target.closest('.border-dashed');
+            const textElement = uploadArea.querySelector('p');
+            if (textElement) {
+                textElement.textContent = `تم اختيار ${files.length} ملف: ${displayText}`;
+            }
         }
     });
 
-    // Drag and drop file upload
+    // Drag and drop functionality
     const dropZone = document.querySelector('.border-dashed');
-
-    dropZone.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        dropZone.classList.add('border-blue-400');
-    });
-
-    dropZone.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        dropZone.classList.remove('border-blue-400');
-    });
-
-    dropZone.addEventListener('drop', function(e) {
-        e.preventDefault();
-        dropZone.classList.remove('border-blue-400');
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            document.getElementById('documents').files = files;
-            const fileList = Array.from(files).map(file => file.name).join(', ');
-            alert('تم إسقاط الملفات: ' + fileList);
-        }
-    });
-
-    // Add new client functionality
-    document.getElementById('add-client').addEventListener('click', function() {
-        clientCounter++;
-        const container = document.getElementById('clients-container');
-        const newClient = document.createElement('div');
-        newClient.className = 'client-item border border-gray-200 rounded-lg p-4 mb-4';
-        newClient.setAttribute('data-client', clientCounter);
-
-        newClient.innerHTML = `
-            <div class="flex items-center justify-between mb-3">
-                <h5 class="font-medium text-gray-700">العميل ${getArabicNumber(clientCounter)}</h5>
-                <button type="button" class="text-red-500 hover:text-red-700 remove-client">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">اسم الشركة</label>
-                    <input type="text" name="clients[${clientCounter}][company_name]"
-                           class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                           placeholder="مثال: شركة النقل السريع" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">اسم المسؤول</label>
-                    <input type="text" name="clients[${clientCounter}][contact_person]"
-                           class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                           placeholder="مثال: أحمد محمد" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">البريد الإلكتروني</label>
-                    <input type="email" name="clients[${clientCounter}][email]"
-                           class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                           placeholder="ahmed@company.com" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">رقم الهاتف</label>
-                    <input type="tel" name="clients[${clientCounter}][phone]"
-                           class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                           placeholder="0501234567" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">المبلغ المستحق (ر.س)</label>
-                    <input type="number" name="clients[${clientCounter}][amount]"
-                           class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 client-amount"
-                           placeholder="20000" min="1000" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">تاريخ الاستحقاق</label>
-                    <input type="date" name="clients[${clientCounter}][due_date]"
-                           class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" required>
-                </div>
-            </div>
-
-            <div class="mt-3">
-                <label class="block text-xs font-medium text-gray-600 mb-1">إرفاق الفاتورة الأصلية</label>
-                <input type="file" name="clients[${clientCounter}][invoice_document]"
-                       class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                       accept=".pdf,.jpg,.jpeg,.png">
-            </div>
-        `;
-
-        container.appendChild(newClient);
-        updateRemoveButtons();
-        calculateTotal();
-    });
-
-    // Remove client functionality
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-client') || e.target.closest('.remove-client')) {
-            const clientItem = e.target.closest('.client-item');
-            clientItem.remove();
-            updateRemoveButtons();
-            calculateTotal();
-        }
-    });
-
-    // Calculate total amount
-    document.addEventListener('input', function(e) {
-        if (e.target.classList.contains('client-amount')) {
-            calculateTotal();
-            updateMainAmount();
-        }
-    });
-
-    function calculateTotal() {
-        const amounts = document.querySelectorAll('.client-amount');
-        let total = 0;
-        amounts.forEach(input => {
-            const value = parseFloat(input.value) || 0;
-            total += value;
+    if (dropZone) {
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('border-blue-400', 'bg-blue-50');
         });
-        document.getElementById('total-amount').textContent = total.toLocaleString() + ' ر.س';
-        return total;
-    }
 
-    function updateMainAmount() {
-        const total = calculateTotal();
-        const mainAmountInput = document.querySelector('input[name="amount"]');
-        if (mainAmountInput) {
-            mainAmountInput.value = total;
-        }
-    }
+        dropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('border-blue-400', 'bg-blue-50');
+        });
 
-    function updateRemoveButtons() {
-        const items = document.querySelectorAll('.client-item');
-        items.forEach((item, index) => {
-            const removeBtn = item.querySelector('.remove-client');
-            if (items.length > 1) {
-                removeBtn.style.display = 'block';
-                } else {
-                removeBtn.style.display = 'none';
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('border-blue-400', 'bg-blue-50');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('documents').files = files;
+                document.getElementById('documents').dispatchEvent(new Event('change'));
             }
         });
     }
 
-    function getArabicNumber(num) {
-        const arabicNumbers = ['', 'الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر'];
-        return arabicNumbers[num] || `رقم ${num}`;
+    // Sync service amount with main funding amount
+    document.getElementById('service-amount').addEventListener('input', function(e) {
+        const serviceAmount = parseFloat(e.target.value) || 0;
+        const mainAmountInput = document.querySelector('input[name="amount"]');
+        if (mainAmountInput) {
+            mainAmountInput.value = serviceAmount;
+        }
+    });
+
+    // Sync main amount with service amount
+    document.querySelector('input[name="amount"]').addEventListener('input', function(e) {
+        const mainAmount = parseFloat(e.target.value) || 0;
+        const serviceAmountInput = document.getElementById('service-amount');
+        if (serviceAmountInput) {
+            serviceAmountInput.value = mainAmount;
+        }
+    });
+
+    // Form validation before submit
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const amount = parseFloat(document.querySelector('input[name="amount"]').value) || 0;
+        const serviceAmount = parseFloat(document.getElementById('service-amount').value) || 0;
+
+        if (amount !== serviceAmount && amount > 0 && serviceAmount > 0) {
+            e.preventDefault();
+            alert('يجب أن يكون مبلغ التمويل مطابق لقيمة الخدمة المطلوبة');
+            return false;
+        }
+
+        if (amount < 1000) {
+            e.preventDefault();
+            alert('الحد الأدنى لمبلغ التمويل هو 1000 ريال سعودي');
+            return false;
+        }
+    });
+
+    // Set minimum date to today for service date
+    document.addEventListener('DOMContentLoaded', function() {
+        const serviceDateInput = document.querySelector('input[name="clients[1][due_date]"]');
+        if (serviceDateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            serviceDateInput.setAttribute('min', today);
+        }
+    });
+
+    // Modal Functions
+    function showFundingRequestDetails(requestId) {
+        const modal = document.getElementById('fundingRequestModal');
+        const modalContent = document.getElementById('modalContent');
+
+        // Show modal
+        modal.classList.remove('hidden');
+
+        // Show loading
+        modalContent.innerHTML = `
+            <div class="text-center py-8">
+                <i class="fas fa-spinner fa-spin text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-600">جارٍ تحميل البيانات...</p>
+            </div>
+        `;
+
+        // Fetch data
+        fetch(`/logistics/funding/${requestId}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                modalContent.innerHTML = buildModalContent(data.data);
+            } else {
+                modalContent.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                        <p class="text-red-600">حدث خطأ في تحميل البيانات</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            modalContent.innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+                    <p class="text-red-600">حدث خطأ في الاتصال بالخادم</p>
+                </div>
+            `;
+        });
     }
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        updateRemoveButtons();
-        calculateTotal();
+    function buildModalContent(data) {
+        let clientsHtml = '';
+        if (data.client_debts && data.client_debts.length > 0) {
+            clientsHtml = data.client_debts.map(client => `
+                <div class="border border-gray-200 rounded-lg p-3 mb-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                        <div><strong>الشركة:</strong> ${client.company_name}</div>
+                        <div><strong>المبلغ:</strong> <span class="text-green-600 font-bold">${client.formatted_amount}</span></div>
+                        <div><strong>المسؤول:</strong> ${client.contact_person}</div>
+                        <div><strong>الاستحقاق:</strong> ${client.due_date}</div>
+                        <div class="md:col-span-2"><strong>البريد:</strong> ${client.email}</div>
+                        <div class="md:col-span-2"><strong>الهاتف:</strong> ${client.phone}</div>
+                        ${client.invoice_document ? `<div class="md:col-span-2"><a href="${client.invoice_document}" target="_blank" class="text-blue-600 hover:underline"><i class="fas fa-file-pdf mr-1"></i>عرض الفاتورة</a></div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        let documentsHtml = '';
+        if (data.documents && data.documents.length > 0) {
+            documentsHtml = `
+                <div class="mt-4">
+                    <h4 class="font-semibold text-gray-900 mb-2">المستندات المرفقة:</h4>
+                    <div class="space-y-2">
+                        ${data.documents.map((doc, index) => `
+                            <a href="${doc}" target="_blank" class="block p-2 bg-gray-50 rounded hover:bg-gray-100 text-sm">
+                                <i class="fas fa-file mr-2"></i>مستند ${index + 1}
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="space-y-4">
+                <!-- معلومات أساسية -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <strong class="text-gray-700">رقم الطلب:</strong>
+                        <span class="block text-gray-900">#${data.id}</span>
+                    </div>
+                    <div>
+                        <strong class="text-gray-700">المبلغ:</strong>
+                        <span class="block text-green-600 font-bold text-lg">${data.formatted_amount}</span>
+                    </div>
+                    <div>
+                        <strong class="text-gray-700">السبب:</strong>
+                        <span class="block text-gray-900">${data.reason_text}</span>
+                    </div>
+                    <div>
+                        <strong class="text-gray-700">الحالة:</strong>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                            ${data.status_color === 'yellow' ? 'bg-yellow-100 text-yellow-800' : ''}
+                            ${data.status_color === 'green' ? 'bg-green-100 text-green-800' : ''}
+                            ${data.status_color === 'red' ? 'bg-red-100 text-red-800' : ''}
+                            ${data.status_color === 'blue' ? 'bg-blue-100 text-blue-800' : ''}
+                            ${data.status_color === 'gray' ? 'bg-gray-100 text-gray-800' : ''}">
+                            ${data.status_text}
+                        </span>
+                    </div>
+                    <div class="md:col-span-2">
+                        <strong class="text-gray-700">تاريخ الإنشاء:</strong>
+                        <span class="block text-gray-900">${data.created_at} (${data.created_at_human})</span>
+                    </div>
+                    ${data.description ? `
+                        <div class="md:col-span-2">
+                            <strong class="text-gray-700">الوصف:</strong>
+                            <p class="mt-1 text-gray-900 bg-white p-2 rounded border">${data.description}</p>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- الشركات الطالبة للخدمة -->
+                ${clientsHtml ? `
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-3">الشركات الطالبة للخدمة (${data.client_debts.length}):</h4>
+                        ${clientsHtml}
+                    </div>
+                ` : ''}
+
+                ${documentsHtml}
+            </div>
+        `;
+    }
+
+    function closeFundingModal() {
+        document.getElementById('fundingRequestModal').classList.add('hidden');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('fundingRequestModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeFundingModal();
+        }
     });
 </script>
 @endpush

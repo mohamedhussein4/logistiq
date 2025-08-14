@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'لوحة التحكم') - Link2u Admin</title>
+    <meta name="description" content="{{ \App\Models\Setting::get('seo_description', 'لوحة التحكم الإدارية') }}">
+    <title>@yield('title', 'لوحة التحكم') - {{ \App\Models\Setting::get('site_name', 'Logistiq') }} Admin</title>
+        @if(\App\Models\Setting::get('site_favicon'))
+    <link rel="icon" type="image/x-icon" href="{{ asset('images/' . \App\Models\Setting::get('site_favicon')) }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/' . \App\Models\Setting::get('site_favicon')) }}">
+    @endif
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -208,17 +214,17 @@
         <div class="p-6 border-b border-white/20">
             <!-- Logo -->
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4 space-x-reverse">
-                    <div class="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
-                        <i class="fas fa-truck text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-black gradient-text">Link2u</h1>
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        @if(\App\Models\Setting::get('site_favicon'))
+                            <img src="{{ asset('storage/' . \App\Models\Setting::get('site_favicon')) }}" alt="Logo" class="w-10 h-10 rounded-lg">
+                        @else
+                            <img src="/favicon.ico" alt="Logo" class="w-10 h-10 rounded-lg">
+                        @endif
+                        <div>
+                        <h1 class="text-xl font-black gradient-text">{{ \App\Models\Setting::get('site_name', 'Logistiq') }}</h1>
                         <p class="text-sm text-slate-600">لوحة التحكم</p>
-                    </div>
-                </div>
-
-                <!-- Close button for mobile -->
+                        </div>
+                    </div>                <!-- Close button for mobile -->
                 <button id="close-sidebar" class="lg:hidden w-8 h-8 flex items-center justify-center text-slate-600 hover:text-slate-800">
                     <i class="fas fa-times"></i>
                 </button>
@@ -300,14 +306,6 @@
                     <span class="font-bold text-slate-700 group-hover:text-slate-900">الحسابات البنكية</span>
                 </a>
 
-                <!-- Electronic Wallets -->
-                <a href="{{ route('admin.electronic_wallets.index') }}"
-                   class="flex items-center space-x-4 space-x-reverse p-4 rounded-2xl hover:bg-white/30 transition-all group {{ request()->routeIs('admin.electronic_wallets.*') ? 'bg-white/40 shadow-lg' : '' }}">
-                    <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas fa-mobile-alt text-white"></i>
-                    </div>
-                    <span class="font-bold text-slate-700 group-hover:text-slate-900">المحافظ الإلكترونية</span>
-                </a>
 
                 <!-- Contact Requests -->
                 <a href="{{ route('admin.contact_requests.index') }}"
@@ -355,7 +353,7 @@
                 </div>
                 <div class="flex-1">
                     <div class="font-bold text-slate-800">مدير النظام</div>
-                    <div class="text-sm text-slate-600">admin@Link2u.com</div>
+                    <div class="text-sm text-slate-600">{{ \App\Models\Setting::get('site_email', 'admin@logistiq.com') }}</div>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

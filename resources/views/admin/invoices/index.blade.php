@@ -96,13 +96,35 @@
 
         <!-- Mobile Cards View -->
         <div class="lg:hidden space-y-4">
+            <!-- Mobile Bulk Actions -->
+            <div id="mobile-bulk-actions" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        <span class="text-blue-800 font-medium">تم تحديد <span id="mobile-selected-count">0</span> عنصر</span>
+                        <button type="button" onclick="clearSelection()" class="text-blue-600 hover:text-blue-800 font-medium">
+                            إلغاء التحديد
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <button type="button" onclick="bulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>
+                            حذف
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             @forelse($invoices as $invoice)
             <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                 <div class="flex items-start justify-between mb-3">
-                    <div>
-                        <div class="text-sm font-bold text-slate-900">{{ $invoice->invoice_number }}</div>
-                        <div class="text-lg font-black text-slate-900">{{ number_format($invoice->original_amount) }} ريال</div>
-                        <div class="text-sm text-slate-600">المدفوع: {{ number_format($invoice->paid_amount) }}</div>
+                    <div class="flex items-start space-x-3 space-x-reverse">
+                        <input type="checkbox" class="invoice-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-1"
+                               value="{{ $invoice->id }}" onchange="updateSelectionCount()">
+                        <div>
+                            <div class="text-sm font-bold text-slate-900">{{ $invoice->invoice_number }}</div>
+                            <div class="text-lg font-black text-slate-900">{{ number_format($invoice->original_amount) }} ريال</div>
+                            <div class="text-sm text-slate-600">المدفوع: {{ number_format($invoice->paid_amount) }}</div>
+                        </div>
                     </div>
                     @php
                         $paymentStatusClasses = [
@@ -153,11 +175,32 @@
 
         <!-- Desktop Table View -->
         <div class="hidden lg:block overflow-hidden rounded-2xl border border-gray-200">
+            <!-- Bulk Actions -->
+            <div id="bulk-actions" class="hidden bg-blue-50 border-b border-blue-200 p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        <span class="text-blue-800 font-medium">تم تحديد <span id="selected-count">0</span> عنصر</span>
+                        <button type="button" onclick="clearSelection()" class="text-blue-600 hover:text-blue-800 font-medium">
+                            إلغاء التحديد
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <button type="button" onclick="bulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>
+                            حذف المحدد
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table class="w-full">
                     <!-- Table Header -->
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="px-6 py-4 text-right text-sm font-bold text-slate-700 border-b border-gray-200">
+                                <input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </th>
                             <th class="px-6 py-4 text-right text-sm font-bold text-slate-700 border-b border-gray-200">
                                 رقم الفاتورة
                             </th>
@@ -189,6 +232,10 @@
                     <tbody class="bg-white divide-y divide-gray-100">
                         @forelse($invoices as $invoice)
                         <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" class="invoice-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                       value="{{ $invoice->id }}" onchange="updateSelectionCount()">
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center ml-3">
@@ -422,6 +469,113 @@
             closePaymentModal();
         }
     });
+
+    // Bulk delete functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.getElementById('select-all');
+        const checkboxes = document.querySelectorAll('.invoice-checkbox');
+        const bulkActionsBar = document.getElementById('bulk-actions');
+        const mobileBulkActionsBar = document.getElementById('mobile-bulk-actions');
+
+        // Select all functionality
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateSelectionCount();
+            });
+        }
+    });
+
+    function updateSelectionCount() {
+        const checkboxes = document.querySelectorAll('.invoice-checkbox');
+        const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
+        const count = checkedBoxes.length;
+
+        // Update count displays
+        const selectedCountElements = document.querySelectorAll('#selected-count, #mobile-selected-count');
+        selectedCountElements.forEach(element => {
+            if (element) element.textContent = count;
+        });
+
+        // Show/hide bulk actions bars
+        const bulkActionsBar = document.getElementById('bulk-actions');
+        const mobileBulkActionsBar = document.getElementById('mobile-bulk-actions');
+
+        if (count > 0) {
+            if (bulkActionsBar) bulkActionsBar.classList.remove('hidden');
+            if (mobileBulkActionsBar) mobileBulkActionsBar.classList.remove('hidden');
+        } else {
+            if (bulkActionsBar) bulkActionsBar.classList.add('hidden');
+            if (mobileBulkActionsBar) mobileBulkActionsBar.classList.add('hidden');
+        }
+
+        // Update select all checkbox state
+        const selectAllCheckbox = document.getElementById('select-all');
+        if (selectAllCheckbox) {
+            if (count === 0) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = false;
+            } else if (count === checkboxes.length) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.indeterminate = true;
+                selectAllCheckbox.checked = false;
+            }
+        }
+    }
+
+    function clearSelection() {
+        const checkboxes = document.querySelectorAll('.invoice-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        updateSelectionCount();
+    }
+
+    function bulkDelete() {
+        const checkedBoxes = document.querySelectorAll('.invoice-checkbox:checked');
+
+        if (checkedBoxes.length === 0) {
+            alert('يرجى تحديد الفواتير المراد حذفها');
+            return;
+        }
+
+        if (confirm(`هل أنت متأكد من حذف ${checkedBoxes.length} فاتورة؟ هذا الإجراء لا يمكن التراجع عنه.`)) {
+            const ids = Array.from(checkedBoxes).map(cb => cb.value);
+
+            // Create form and submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("admin.invoices.bulk-delete") }}';
+
+            // Add CSRF token
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            form.appendChild(csrfToken);
+
+            // Add method override
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
+            form.appendChild(methodField);
+
+            // Add selected IDs
+            const idsField = document.createElement('input');
+            idsField.type = 'hidden';
+            idsField.name = 'ids';
+            idsField.value = JSON.stringify(ids);
+            form.appendChild(idsField);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
 </script>
 @endpush
 @endsection

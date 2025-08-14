@@ -26,6 +26,12 @@ class User extends Authenticatable
         'company_name',
         'company_registration',
         'status',
+        'available_balance',
+        'used_balance',
+        'total_balance',
+        'admin_notes',
+        'address',
+        'contact_person',
     ];
 
     /**
@@ -48,6 +54,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'available_balance' => 'decimal:2',
+            'used_balance' => 'decimal:2',
+            'total_balance' => 'decimal:2',
         ];
     }
 
@@ -186,5 +195,118 @@ class User extends Authenticatable
     public function scopeRegularUsers($query)
     {
         return $query->where('user_type', self::TYPE_REGULAR);
+    }
+
+    // Balance Management Methods (للشركات اللوجستية فقط)
+
+    /**
+     * الحصول على الرصيد المتبقي
+     */
+    public function getRemainingBalanceAttribute()
+    {
+        return $this->available_balance - $this->used_balance;
+    }
+
+    /**
+     * إضافة رصيد للمستخدم
+     */
+    public function addBalance($amount, $description = null)
+    {
+        if (!$this->isLogisticsCompany()) {
+            throw new \Exception('إدارة الرصيد متاحة للشركات اللوجستية فقط');
+        }
+
+        $this->increment('available_balance', $amount);
+        $this->increment('total_balance', $amount);
+
+        // تسجيل العملية في سجل الرصيد
+        $this->balanceTransactions()->create([
+            'type' => 'credit',
+            'amount' => $amount,
+            'description' => $description ?: 'إضافة رصيد',
+            'balance_before' => $this->available_balance - $amount,
+            'balance_after' => $this->available_balance,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * استخدام رصيد من المستخدم
+     */
+    public function useBalance($amount, $description = null)
+    {
+        if (!$this->isLogisticsCompany()) {
+            throw new \Exception('إدارة الرصيد متاحة للشركات اللوجستية فقط');
+        }
+
+        if ($this->remaining_balance < $amount) {
+            throw new \Exception('الرصيد المتبقي غير كافي');
+        }
+
+        $this->increment('used_balance', $amount);
+
+        // تسجيل العملية في سجل الرصيد
+        $this->balanceTransactions()->create([
+            'type' => 'debit',
+            'amount' => $amount,
+            'description' => $description ?: 'استخدام رصيد',
+            'balance_before' => $this->remaining_balance + $amount,
+            'balance_after' => $this->remaining_balance,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * تعيين الرصيد الافتراضي للشركات اللوجستية الجديدة
+     */
+    public function setDefaultBalance()
+    {
+        if (!$this->isLogisticsCompany()) {
+            return $this;
+        }
+
+        $defaultBalance = \App\Models\Setting::get('default_logistics_balance', 200000);
+
+        $this->update([
+            'available_balance' => $defaultBalance,
+            'total_balance' => $defaultBalance,
+            'used_balance' => 0,
+        ]);
+
+        // تسجيل العملية
+        $this->balanceTransactions()->create([
+            'type' => 'initial',
+            'amount' => $defaultBalance,
+            'description' => 'رصيد افتراضي للشركة الجديدة',
+            'balance_before' => 0,
+            'balance_after' => $defaultBalance,
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * علاقة مع معاملات الرصيد
+     */
+    public function balanceTransactions()
+    {
+        return $this->hasMany(\App\Models\BalanceTransaction::class);
+    }
+
+    /**
+     * Boot method لتطبيق الأحداث على Model
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // منح الرصيد الافتراضي للشركات اللوجستية الجديدة
+        static::created(function ($user) {
+            if ($user->isLogisticsCompany()) {
+                $user->setDefaultBalance();
+            }
+        });
     }
 }

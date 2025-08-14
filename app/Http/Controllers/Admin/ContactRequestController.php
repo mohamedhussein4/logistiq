@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ContactRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ContactRequestController extends Controller
 {
@@ -269,5 +270,43 @@ class ContactRequestController extends Controller
                 ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, created_at, responded_at)) as avg_hours')
                 ->first()->avg_hours ?? 0,
         ]);
+    }
+
+    /**
+     * حذف طلبات الاتصال المحددة
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|json'
+        ]);
+
+        $ids = json_decode($request->ids, true);
+
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'لم يتم تحديد أي طلبات للحذف');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // التأكد من وجود طلبات الاتصال
+            $requests = ContactRequest::whereIn('id', $ids)->get();
+
+            if ($requests->count() !== count($ids)) {
+                throw new \Exception('بعض طلبات الاتصال المحددة غير موجودة');
+            }
+
+            // حذف طلبات الاتصال
+            ContactRequest::whereIn('id', $ids)->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', "تم حذف {$requests->count()} طلب اتصال بنجاح");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف طلبات الاتصال: ' . $e->getMessage());
+        }
     }
 }

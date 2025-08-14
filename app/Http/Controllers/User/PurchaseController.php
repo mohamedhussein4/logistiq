@@ -8,7 +8,6 @@ use App\Models\ProductOrder;
 use App\Models\PaymentRequest;
 use App\Models\PaymentProof;
 use App\Models\BankAccount;
-use App\Models\ElectronicWallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -27,9 +26,8 @@ class PurchaseController extends Controller
     {
         $product = Product::findOrFail($productId);
         $bankAccounts = BankAccount::active()->ordered()->get();
-        $electronicWallets = ElectronicWallet::active()->ordered()->get();
 
-        return view('user.purchase.direct-payment', compact('product', 'bankAccounts', 'electronicWallets'));
+        return view('user.purchase.direct-payment', compact('product', 'bankAccounts'));
     }
 
     /**
@@ -46,9 +44,19 @@ class PurchaseController extends Controller
 
         $request->validate([
             'quantity' => 'required|integer|min:1',
+            'delivery_address' => 'required|string|max:500|min:10',
             'payment_method' => 'required|in:bank_transfer,electronic_wallet',
             'payment_account_id' => 'required|integer',
             'payment_notes' => 'nullable|string|max:1000',
+            'payment_proof' => 'required|file|mimes:jpeg,jpg,png,pdf|max:5120',
+        ], [
+            'delivery_address.required' => 'عنوان التوصيل مطلوب',
+            'delivery_address.min' => 'عنوان التوصيل يجب أن يكون مفصلاً أكثر (10 أحرف على الأقل)',
+            'delivery_address.max' => 'عنوان التوصيل طويل جداً (500 حرف كحد أقصى)',
+            'payment_proof.required' => 'إثبات التحويل مطلوب',
+            'payment_proof.file' => 'يجب أن يكون إثبات التحويل ملف صالح',
+            'payment_proof.mimes' => 'إثبات التحويل يجب أن يكون صورة (jpeg, jpg, png) أو ملف PDF',
+            'payment_proof.max' => 'حجم ملف إثبات التحويل يجب ألا يتجاوز 5 ميجابايت',
         ]);
 
 
@@ -72,7 +80,7 @@ class PurchaseController extends Controller
                 'quantity' => $quantity,
                 'unit_price' => $product->price,
                 'total_amount' => $totalAmount,
-                'delivery_address' => 'سيتم التواصل لتحديد عنوان التسليم',
+                'delivery_address' => $request->delivery_address,
                 'status' => 'pending',
                 'notes' => $request->payment_notes ?: 'طلب شراء مباشر',
             ]);
@@ -87,10 +95,27 @@ class PurchaseController extends Controller
                 'amount' => $totalAmount,
                 'payment_method' => $request->payment_method,
                 'payment_account_id' => $request->payment_account_id,
-                'payment_account_type' => $request->payment_method === 'bank_transfer' ? 'bank_account' : 'electronic_wallet',
+                'payment_account_type' => $request->payment_method === 'bank_transfer' ? BankAccount::class : null,
                 'payment_notes' => $request->payment_notes,
                 'status' => 'pending',
             ]);
+
+            // حفظ ملف إثبات التحويل
+            if ($request->hasFile('payment_proof')) {
+                $file = $request->file('payment_proof');
+                $fileName = 'payment_proof_' . $paymentRequest->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $filePath = $file->storeAs('payment-proofs', $fileName, 'public');
+
+                // إنشاء سجل PaymentProof
+                PaymentProof::create([
+                    'payment_request_id' => $paymentRequest->id,
+                    'file_name' => $fileName,
+                    'file_path' => $filePath,
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                    'status' => 'pending',
+                ]);
+            }
 
             DB::commit();
 
@@ -124,10 +149,8 @@ class PurchaseController extends Controller
 
         // جلب بيانات وسيلة الدفع
         $paymentAccount = null;
-        if ($paymentRequest->payment_account_type === 'bank_account') {
+        if ($paymentRequest && $paymentRequest->payment_account_type === BankAccount::class) {
             $paymentAccount = BankAccount::find($paymentRequest->payment_account_id);
-        } else {
-            $paymentAccount = ElectronicWallet::find($paymentRequest->payment_account_id);
         }
 
         return view('user.purchase.success', compact('order', 'paymentRequest', 'paymentAccount'));

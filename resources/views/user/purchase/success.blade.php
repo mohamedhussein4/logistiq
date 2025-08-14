@@ -31,7 +31,7 @@
                     <i class="fas fa-receipt text-primary-600 ml-2"></i>
                     تفاصيل الطلب
                 </h2>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between p-3 bg-primary-50 rounded-lg border border-primary-100">
@@ -90,9 +90,10 @@
                     <i class="fas fa-university text-primary-600 ml-2"></i>
                     بيانات التحويل
                 </h2>
-                
+
                 @if($paymentRequest->payment_method === 'bank_transfer')
                     <div class="bg-blue-50 rounded-xl p-6 border border-blue-100">
+                        @if($paymentAccount)
                         <div class="flex items-center mb-6">
                             <div class="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center ml-4 shadow-soft">
                                 <i class="fas fa-university text-white text-2xl"></i>
@@ -102,7 +103,19 @@
                                 <p class="text-blue-600">تحويل بنكي</p>
                             </div>
                         </div>
-                        
+                        @else
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-gray-500 rounded-xl flex items-center justify-center ml-4 shadow-soft">
+                                <i class="fas fa-credit-card text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">طريقة الدفع</h3>
+                                <p class="text-gray-600">{{ $paymentRequest->payment_method === 'bank_transfer' ? 'تحويل بنكي' : 'غير محدد' }}</p>
+                            </div>
+                        </div>
+                        @endif
+
+                        @if($paymentAccount)
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-2">
                                 <label class="block text-sm font-medium text-blue-700">اسم الحساب</label>
@@ -119,35 +132,11 @@
                             </div>
                             @endif
                         </div>
-                    </div>
-                @else
-                    <div class="bg-green-50 rounded-xl p-6 border border-green-100">
-                        <div class="flex items-center mb-6">
-                            <div class="w-16 h-16 bg-green-500 rounded-xl flex items-center justify-center ml-4 shadow-soft">
-                                <i class="fas fa-mobile-alt text-white text-2xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold text-green-800">{{ $paymentAccount->wallet_name }}</h3>
-                                <p class="text-green-600">محفظة إلكترونية</p>
-                            </div>
+                        @else
+                        <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <p class="text-gray-600 text-center">لا توجد تفاصيل حساب متاحة</p>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-green-700">اسم الحساب</label>
-                                <div class="p-3 bg-white rounded-lg border border-green-200 font-semibold text-secondary-800">{{ $paymentAccount->account_name }}</div>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-green-700">رقم الحساب</label>
-                                <div class="p-3 bg-white rounded-lg border border-green-200 font-mono text-secondary-800">{{ $paymentAccount->account_number }}</div>
-                            </div>
-                            @if($paymentAccount->phone_number)
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-green-700">رقم الهاتف</label>
-                                <div class="p-3 bg-white rounded-lg border border-green-200 text-secondary-800">{{ $paymentAccount->phone_number }}</div>
-                            </div>
-                            @endif
-                        </div>
+                        @endif
                     </div>
                 @endif
             </div>
@@ -158,7 +147,7 @@
                     <i class="fas fa-upload text-primary-600 ml-2"></i>
                     رفع إثبات التحويل
                 </h2>
-                
+
                 <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
                     <div class="flex items-center">
                         <i class="fas fa-info-circle text-yellow-600 ml-2"></i>
@@ -232,7 +221,7 @@
                                 <div>
                                     <div class="font-medium text-secondary-800">{{ $proof->file_name }}</div>
                                     <div class="text-sm text-secondary-600">
-                                        {{ $proof->created_at->format('Y-m-d H:i') }} 
+                                        {{ $proof->created_at->format('Y-m-d H:i') }}
                                         • {{ number_format($proof->file_size / 1024, 1) }} KB
                                     </div>
                                     @if($proof->description)
@@ -240,7 +229,7 @@
                                     @endif
                                 </div>
                             </div>
-                            
+
                             <div class="flex items-center space-x-3 space-x-reverse">
                                 <span class="px-3 py-1 rounded-full text-xs font-medium
                                     @if($proof->status === 'pending') bg-yellow-100 text-yellow-800
@@ -252,7 +241,7 @@
                                     @else مرفوض
                                     @endif
                                 </span>
-                                <a href="{{ asset('storage/' . $proof->file_path) }}" target="_blank"
+                                <a href="{{ asset('/' . $proof->file_path) }}" target="_blank"
                                    class="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded-lg text-sm transition-colors hover-lift flex items-center">
                                     <i class="fas fa-eye ml-1"></i>
                                     عرض
@@ -267,12 +256,12 @@
 
             <!-- إجراءات إضافية -->
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
-                <a href="{{ route('store') }}" 
+                <a href="{{ route('store') }}"
                    class="flex-1 bg-secondary-200 hover:bg-secondary-300 text-secondary-700 px-6 py-3 rounded-xl font-semibold text-center transition-all hover-lift flex items-center justify-center">
                     <i class="fas fa-shopping-cart ml-2"></i>
                     الرجوع للمتجر
                 </a>
-                <a href="{{ route('user.purchase.my_orders') }}" 
+                <a href="{{ route('user.purchase.my_orders') }}"
                    class="flex-1 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-6 py-3 rounded-xl font-semibold text-center transition-all hover-lift shadow-glow flex items-center justify-center">
                     <i class="fas fa-list ml-2"></i>
                     طلباتي
@@ -288,7 +277,7 @@ function handleFileSelect(input) {
     const fileInfo = document.getElementById('file-info');
     const fileName = document.getElementById('file-name');
     const fileSize = document.getElementById('file-size');
-    
+
     if (input.files.length > 0) {
         const file = input.files[0];
         fileName.textContent = file.name;
@@ -302,14 +291,14 @@ function handleFileSelect(input) {
 
 document.getElementById('proof-upload-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     const form = this;
     const uploadBtn = document.getElementById('upload-btn');
     const formData = new FormData(form);
-    
+
     uploadBtn.disabled = true;
     uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i>جاري الرفع...';
-    
+
     fetch('{{ route('user.purchase.upload_proof') }}', {
         method: 'POST',
         body: formData,

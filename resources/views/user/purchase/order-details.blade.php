@@ -12,7 +12,7 @@
                     <h1 class="text-3xl md:text-4xl font-bold text-secondary-800 mb-2">تفاصيل الطلب #{{ $order->id }}</h1>
                     <p class="text-secondary-600">{{ $order->created_at->format('Y-m-d H:i') }}</p>
                 </div>
-                <a href="{{ route('user.purchase.my_orders') }}" 
+                <a href="{{ route('user.purchase.my_orders') }}"
                    class="bg-secondary-200 hover:bg-secondary-300 text-secondary-700 px-6 py-3 rounded-xl font-medium transition-all hover-lift flex items-center">
                     <i class="fas fa-arrow-left ml-2"></i>
                     العودة للطلبات
@@ -32,13 +32,13 @@
                     <i class="fas fa-shopping-bag text-primary-600 ml-2"></i>
                     معلومات الطلب
                 </h2>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- معلومات المنتج -->
                     <div class="space-y-4">
                         <div class="flex items-center bg-primary-50 p-4 rounded-xl border border-primary-100">
                             @if($order->product->image)
-                                <img src="{{ asset('storage/' . $order->product->image) }}" alt="{{ $order->product->name }}" 
+                                <img src="{{ asset('/' . $order->product->image) }}" alt="{{ $order->product->name }}"
                                      class="w-20 h-20 object-cover rounded-lg ml-4 shadow-soft">
                             @else
                                 <div class="w-20 h-20 bg-secondary-200 rounded-lg flex items-center justify-center ml-4">
@@ -55,7 +55,7 @@
                                 @endif
                             </div>
                         </div>
-                        
+
                         @if($order->product->description)
                             <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
                                 <span class="text-sm font-medium text-secondary-700 flex items-center mb-2">
@@ -85,7 +85,7 @@
                                 <div class="text-lg font-semibold text-secondary-800">{{ number_format($order->price, 2) }} ريال</div>
                             </div>
                         </div>
-                        
+
                         <div class="border-t border-secondary-200 pt-4">
                             <div class="flex justify-between items-center p-4 bg-green-50 rounded-xl border border-green-100">
                                 <span class="text-lg font-bold text-secondary-800 flex items-center">
@@ -104,7 +104,7 @@
                                 </span>
                                 <div class="font-semibold text-secondary-800">{{ $order->created_at->format('Y-m-d H:i') }}</div>
                             </div>
-                            
+
                             <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100">
                                 <span class="text-sm font-medium text-yellow-700 flex items-center">
                                     <i class="fas fa-info-circle text-primary-600 ml-1"></i>
@@ -155,7 +155,7 @@
                         <i class="fas fa-credit-card text-primary-600 ml-2"></i>
                         معلومات الدفع
                     </h2>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-4">
                             <div class="bg-primary-50 p-4 rounded-xl border border-primary-100">
@@ -165,7 +165,7 @@
                                 </span>
                                 <div class="font-semibold text-primary-600">{{ $paymentRequest->request_number }}</div>
                             </div>
-                            
+
                             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
                                 <span class="text-sm font-medium text-blue-700 flex items-center">
                                     <i class="fas fa-credit-card text-primary-600 ml-1"></i>
@@ -268,7 +268,7 @@
                         <i class="fas fa-folder-open text-primary-600 ml-2"></i>
                         إثباتات الدفع المرفوعة
                     </h2>
-                    
+
                     <div class="space-y-4">
                         @foreach($paymentRequest->paymentProofs as $proof)
                         <div class="border border-secondary-200 rounded-xl p-4 hover-lift transition-all">
@@ -286,7 +286,7 @@
                                     <div>
                                         <div class="font-semibold text-secondary-800">{{ $proof->file_name }}</div>
                                         <div class="text-sm text-secondary-600">
-                                            {{ $proof->created_at->format('Y-m-d H:i') }} 
+                                            {{ $proof->created_at->format('Y-m-d H:i') }}
                                             • {{ number_format($proof->file_size / 1024, 1) }} KB
                                         </div>
                                         @if($proof->description)
@@ -294,7 +294,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                
+
                                 <div class="flex items-center space-x-3 space-x-reverse">
                                     <span class="px-3 py-1 rounded-full text-xs font-medium
                                         @if($proof->status === 'pending') bg-yellow-100 text-yellow-800
@@ -306,14 +306,14 @@
                                         @else مرفوض
                                         @endif
                                     </span>
-                                    <a href="{{ asset('storage/' . $proof->file_path) }}" target="_blank"
+                                    <a href="{{ asset('/' . $proof->file_path) }}" target="_blank"
                                        class="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded-lg text-sm transition-all hover-lift flex items-center">
                                         <i class="fas fa-eye ml-1"></i>
                                         عرض
                                     </a>
                                 </div>
                             </div>
-                            
+
                             @if($proof->status === 'rejected' && $proof->rejection_reason)
                             <div class="mt-3 p-3 bg-red-50 rounded-lg border border-red-100">
                                 <span class="text-sm font-medium text-red-700 flex items-center">
@@ -332,20 +332,20 @@
                 <!-- إجراءات سريعة -->
                 <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
                     @if($paymentRequest->status === 'pending')
-                        <a href="{{ route('user.purchase.success', $order->id) }}" 
+                        <a href="{{ route('user.purchase.success', $order->id) }}"
                            class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover-lift shadow-glow flex items-center justify-center">
                             <i class="fas fa-upload ml-2"></i>
                             رفع إثبات الدفع
                         </a>
                     @endif
-                    
-                    <a href="{{ route('user.purchase.my_orders') }}" 
+
+                    <a href="{{ route('user.purchase.my_orders') }}"
                        class="flex-1 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-6 py-3 rounded-xl font-semibold transition-all hover-lift shadow-glow flex items-center justify-center">
                         <i class="fas fa-list ml-2"></i>
                         طلباتي
                     </a>
-                    
-                    <a href="{{ route('store') }}" 
+
+                    <a href="{{ route('store') }}"
                        class="flex-1 bg-secondary-200 hover:bg-secondary-300 text-secondary-700 px-6 py-3 rounded-xl font-semibold transition-all hover-lift flex items-center justify-center">
                         <i class="fas fa-shopping-cart ml-2"></i>
                         المتجر

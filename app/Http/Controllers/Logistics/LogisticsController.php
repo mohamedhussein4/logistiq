@@ -11,7 +11,6 @@ use App\Models\ProductOrder;
 use App\Models\Payment;
 use App\Models\PaymentRequest;
 use App\Models\BankAccount;
-use App\Models\ElectronicWallet;
 use App\Models\ServiceCompany;
 use App\Models\LogisticsCompany;
 use App\Models\ClientDebt;
@@ -47,29 +46,39 @@ class LogisticsController extends Controller
         $user = Auth::user();
         $logisticsCompany = $user->logisticsCompany;
 
-
         // إذا لم تكن بيانات الشركة موجودة، أنشئ بيانات افتراضية
         if (!$logisticsCompany) {
-            $logisticsCompany = (object) [
-                'id' => $user->id,
-                'available_balance' => 0,
-                'credit_limit' => 100000,
-                'used_credit' => 0
-            ];
+            $logisticsCompany = LogisticsCompany::create([
+                'user_id' => $user->id,
+                'company_name' => $user->name . ' - شركة لوجستية',
+                'company_type' => 'logistics',
+                'contact_person' => $user->name,
+                'email' => $user->email,
+                'phone' => '0501234567',
+                'address' => 'الرياض، المملكة العربية السعودية',
+                'commercial_register' => '1234567890',
+                'credit_limit' => 200000.00,
+                'used_credit' => 0.00,
+                'available_balance' => 0.00,
+                'status' => 'active',
+            ]);
         }
 
+        // الحصول على ID الشركة اللوجستية الصحيحة
+        $logisticsCompanyId = $logisticsCompany->id;
+
         // حساب الإحصائيات الحقيقية من قاعدة البيانات
-        $creditLimit = $logisticsCompany->credit_limit ?? 100000;
-        $usedCredit = FundingRequest::where('logistics_company_id', $user->id)
+        $creditLimit = $logisticsCompany->credit_limit ?? 200000;
+        $usedCredit = FundingRequest::where('logistics_company_id', $logisticsCompanyId)
             ->whereIn('status', ['approved', 'disbursed'])
             ->sum('amount');
         $availableCredit = $creditLimit - $usedCredit;
 
         // حساب الرصيد المتاح الفعلي (من الفواتير المدفوعة)
-        $totalPaidInvoices = Invoice::where('logistics_company_id', $user->id)
+        $totalPaidInvoices = Invoice::where('logistics_company_id', $logisticsCompanyId)
             ->where('payment_status', 'paid')
             ->sum('paid_amount');
-        $totalOutstandingInvoices = Invoice::where('logistics_company_id', $user->id)
+        $totalOutstandingInvoices = Invoice::where('logistics_company_id', $logisticsCompanyId)
             ->whereIn('payment_status', ['unpaid', 'partial'])
             ->sum('remaining_amount');
         $availableBalance = max(0, $totalPaidInvoices - $totalOutstandingInvoices); // لا يمكن أن يكون سالباً
@@ -79,38 +88,37 @@ class LogisticsController extends Controller
             'available_balance' => $availableBalance,
             'credit_limit' => $creditLimit,
             'used_credit' => $usedCredit,
-            'total_requests' => FundingRequest::where('logistics_company_id', $user->id)->count(),
-            'pending_requests' => FundingRequest::where('logistics_company_id', $user->id)
+            'total_requests' => FundingRequest::where('logistics_company_id', $logisticsCompanyId)->count(),
+            'pending_requests' => FundingRequest::where('logistics_company_id', $logisticsCompanyId)
                 ->where('status', 'pending')->count(),
-            'approved_requests' => FundingRequest::where('logistics_company_id', $user->id)
+            'approved_requests' => FundingRequest::where('logistics_company_id', $logisticsCompanyId)
                 ->where('status', 'approved')->count(),
-            'total_invoices' => Invoice::where('logistics_company_id', $user->id)->count(),
-            'paid_invoices' => Invoice::where('logistics_company_id', $user->id)
+            'total_invoices' => Invoice::where('logistics_company_id', $logisticsCompanyId)->count(),
+            'paid_invoices' => Invoice::where('logistics_company_id', $logisticsCompanyId)
                 ->where('status', 'paid')->count(),
-            'pending_invoices' => Invoice::where('logistics_company_id', $user->id)
+            'pending_invoices' => Invoice::where('logistics_company_id', $logisticsCompanyId)
                 ->where('status', 'pending')->count(),
         ];
 
         // آخر طلبات التمويل
-        $recentFundingRequests = FundingRequest::where('logistics_company_id', $user->id)
+        $recentFundingRequests = FundingRequest::where('logistics_company_id', $logisticsCompanyId)
             ->with(['logisticsCompany'])
             ->latest()
             ->take(5)
             ->get();
 
         // آخر الفواتير
-        $recentInvoices = Invoice::where('logistics_company_id', $user->id)
+        $recentInvoices = Invoice::where('logistics_company_id', $logisticsCompanyId)
             ->with(['serviceCompany'])
             ->latest()
             ->take(5)
             ->get();
 
         // الإحصائيات الشهرية
-        $monthlyStats = $this->getMonthlyStats($user->id);
+        $monthlyStats = $this->getMonthlyStats($logisticsCompanyId);
 
         // الحصول على البنوك والمحافظ الإلكترونية النشطة لنظام الدفع
         $bankAccounts = BankAccount::active()->ordered()->get();
-        $electronicWallets = ElectronicWallet::active()->ordered()->get();
 
         return view('logistics.dashboard', compact(
             'logisticsCompany',
@@ -119,7 +127,6 @@ class LogisticsController extends Controller
             'recentInvoices',
             'monthlyStats',
             'bankAccounts',
-            'electronicWallets'
         ));
     }
 
@@ -194,7 +201,7 @@ class LogisticsController extends Controller
             'clients.*.invoice_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
-                $user = Auth::user();
+        $user = Auth::user();
 
         // الحصول على بيانات الشركة اللوجستية أو إنشاء بيانات افتراضية
         $logisticsCompany = $user->logisticsCompany;
@@ -255,9 +262,31 @@ class LogisticsController extends Controller
 
         DB::beginTransaction();
         try {
+            // الحصول على ID الشركة اللوجستية الصحيحة
+            $logisticsCompanyId = $logisticsCompany->id ?? null;
+
+            // إذا لم توجد الشركة اللوجستية، قم بإنشائها
+            if (!$logisticsCompanyId) {
+                $newLogisticsCompany = LogisticsCompany::create([
+                    'user_id' => $user->id,
+                    'company_name' => $user->name . ' - شركة لوجستية',
+                    'company_type' => 'logistics',
+                    'contact_person' => $user->name,
+                    'email' => $user->email,
+                    'phone' => '0501234567',
+                    'address' => 'الرياض، المملكة العربية السعودية',
+                    'commercial_register' => '1234567890',
+                    'credit_limit' => 200000.00,
+                    'used_credit' => 0.00,
+                    'available_balance' => 0.00,
+                    'status' => 'active',
+                ]);
+                $logisticsCompanyId = $newLogisticsCompany->id;
+            }
+
             // إنشاء طلب التمويل
             $fundingRequest = FundingRequest::create([
-                'logistics_company_id' => $user->id, // استخدام ID المستخدم مباشرة
+                'logistics_company_id' => $logisticsCompanyId,
                 'service_company_id' => null, // طلب للشركة اللوجستية نفسها
                 'amount' => $request->amount,
                 'reason' => $request->reason,
@@ -304,7 +333,6 @@ class LogisticsController extends Controller
 
             return redirect()->route('logistics.dashboard')
                 ->with('success', 'تم إرسال طلب التمويل بنجاح مع بيانات ' . count($request->clients) . ' عملاء. الطلب قيد المراجعة.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()
@@ -314,8 +342,148 @@ class LogisticsController extends Controller
     }
 
     /**
-     * سداد الائتمان المتجاوز
+     * عرض تفاصيل طلب تمويل محدد
      */
+    public function showFundingRequest($id)
+    {
+        $user = Auth::user();
+        $logisticsCompany = $user->logisticsCompany;
+
+        // البحث عن طلب التمويل
+        $fundingRequest = FundingRequest::where('id', $id)
+            ->where('logistics_company_id', $logisticsCompany->id)
+            ->with(['clientDebts'])
+            ->first();
+
+        if (!$fundingRequest) {
+            abort(404, 'طلب التمويل غير موجود أو ليس لديك صلاحية لعرضه');
+        }
+
+        // إذا كان الطلب مطلوب في modal (AJAX)
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $fundingRequest->id,
+                    'amount' => $fundingRequest->amount,
+                    'formatted_amount' => number_format((float)$fundingRequest->amount) . ' ر.س',
+                    'reason' => $fundingRequest->reason,
+                    'reason_text' => $this->getFundingReasonText($fundingRequest->reason),
+                    'description' => $fundingRequest->description,
+                    'status' => $fundingRequest->status,
+                    'status_text' => $this->getFundingStatusText($fundingRequest->status),
+                    'status_color' => $this->getFundingStatusColor($fundingRequest->status),
+                    'created_at' => $fundingRequest->created_at->format('Y-m-d H:i'),
+                    'created_at_human' => $fundingRequest->created_at->diffForHumans(),
+                    'client_debts' => $fundingRequest->clientDebts->map(function ($debt) {
+                        return [
+                            'company_name' => $debt->company_name,
+                            'contact_person' => $debt->contact_person,
+                            'email' => $debt->email,
+                            'phone' => $debt->phone,
+                            'amount' => $debt->amount,
+                            'formatted_amount' => number_format((float)$debt->amount) . ' ر.س',
+                            'due_date' => $debt->due_date,
+                            'status' => $debt->status,
+                            'status_text' => $this->getClientDebtStatusText($debt->status),
+                            'invoice_document' => $debt->invoice_document ? asset('storage/' . $debt->invoice_document) : null,
+                        ];
+                    }),
+                    'documents' => $fundingRequest->documents ? collect($fundingRequest->documents)->map(function ($doc) {
+                        return asset('storage/' . $doc);
+                    }) : [],
+                ]
+            ]);
+        }
+
+        // عرض الصفحة العادية
+        return view('logistics.funding.show', compact('fundingRequest'));
+    }
+
+    /**
+     * إلغاء طلب تمويل
+     */
+    public function cancelFundingRequest($id)
+    {
+        $user = Auth::user();
+        $logisticsCompany = $user->logisticsCompany;
+
+        $fundingRequest = FundingRequest::where('id', $id)
+            ->where('logistics_company_id', $logisticsCompany->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if (!$fundingRequest) {
+            return redirect()->back()->with('error', 'طلب التمويل غير موجود أو لا يمكن إلغاؤه');
+        }
+
+        $fundingRequest->update(['status' => 'cancelled']);
+
+        return redirect()->back()->with('success', 'تم إلغاء طلب التمويل بنجاح');
+    }
+
+    /**
+     * الحصول على نص سبب التمويل
+     */
+    private function getFundingReasonText($reason)
+    {
+        $reasons = [
+            'operational' => 'تشغيلية',
+            'expansion' => 'توسع',
+            'equipment' => 'معدات',
+            'emergency' => 'طارئة',
+            'other' => 'أخرى'
+        ];
+
+        return $reasons[$reason] ?? $reason;
+    }
+
+    /**
+     * الحصول على نص حالة التمويل
+     */
+    private function getFundingStatusText($status)
+    {
+        $statuses = [
+            'pending' => 'معلق',
+            'approved' => 'معتمد',
+            'rejected' => 'مرفوض',
+            'disbursed' => 'تم الصرف',
+            'cancelled' => 'ملغي'
+        ];
+
+        return $statuses[$status] ?? $status;
+    }
+
+    /**
+     * الحصول على لون حالة التمويل
+     */
+    private function getFundingStatusColor($status)
+    {
+        $colors = [
+            'pending' => 'yellow',
+            'approved' => 'green',
+            'rejected' => 'red',
+            'disbursed' => 'blue',
+            'cancelled' => 'gray'
+        ];
+
+        return $colors[$status] ?? 'gray';
+    }
+
+    /**
+     * الحصول على نص حالة دين العميل
+     */
+    private function getClientDebtStatusText($status)
+    {
+        $statuses = [
+            'pending' => 'معلق',
+            'approved' => 'معتمد',
+            'rejected' => 'مرفوض',
+            'collected' => 'تم التحصيل'
+        ];
+
+        return $statuses[$status] ?? $status;
+    }
     public function payCreditExcess(Request $request)
     {
         $request->validate([
@@ -337,7 +505,7 @@ class LogisticsController extends Controller
         }
 
         // إزالة القيم الفارغة من المصفوفة
-        $selectedInvoices = array_filter($request->selected_invoices, function($value) {
+        $selectedInvoices = array_filter($request->selected_invoices, function ($value) {
             return !empty($value) && $value !== '';
         });
 
@@ -419,7 +587,7 @@ class LogisticsController extends Controller
                     'amount' => $paymentAmount,
                     'payment_method' => $request->payment_method,
                     'payment_account_id' => $request->payment_account_id,
-                    'payment_account_type' => $request->payment_method === 'bank_transfer' ? BankAccount::class : ElectronicWallet::class,
+                    'payment_account_type' => $request->payment_method === 'bank_transfer' ? BankAccount::class : null,
                     'payment_notes' => 'سداد الائتمان المتجاوز - ' . ($request->payment_notes ?: 'بدون ملاحظات'),
                     'status' => 'pending',
                 ]);
@@ -440,7 +608,6 @@ class LogisticsController extends Controller
             $successMessage .= 'أرقام المراجع: ' . implode(', ', array_column($processedInvoices, 'payment_reference'));
 
             return redirect()->back()->with('success', $successMessage);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()

@@ -85,7 +85,12 @@ class OrderController extends Controller
      */
     public function show(ProductOrder $order)
     {
-        $order->load(['user.profile', 'product.category']);
+        $order->load([
+            'user.profile',
+            'product.category',
+            'paymentRequests.paymentProofs',
+            'paymentRequests.bankAccount'
+        ]);
 
         return view('admin.orders.show', compact('order'));
     }
@@ -348,5 +353,43 @@ class OrderController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * حذف الطلبات المحددة
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|json'
+        ]);
+
+        $ids = json_decode($request->ids, true);
+
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'لم يتم تحديد أي طلبات للحذف');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // التأكد من وجود الطلبات
+            $orders = ProductOrder::whereIn('id', $ids)->get();
+
+            if ($orders->count() !== count($ids)) {
+                throw new \Exception('بعض الطلبات المحددة غير موجودة');
+            }
+
+            // حذف الطلبات
+            ProductOrder::whereIn('id', $ids)->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', "تم حذف {$orders->count()} طلب بنجاح");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف الطلبات: ' . $e->getMessage());
+        }
     }
 }

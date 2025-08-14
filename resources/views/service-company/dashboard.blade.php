@@ -130,7 +130,7 @@
                         </div>
                     @endif
 
-                    <form class="space-y-4" action="{{ route('service_company.quick_payment') }}" method="POST">
+                    <form class="space-y-4" action="{{ route('service_company.quick_payment') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -160,47 +160,112 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">طريقة الدفع</label>
                             <div class="space-y-2">
                                 <label class="flex items-center p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-blue-50">
-                                    <input type="radio" name="payment_method" value="bank_transfer" class="text-purple-600 focus:ring-purple-500" onchange="showPaymentAccounts('bank')">
+                                    <input type="radio" name="payment_method" value="bank_transfer" class="text-purple-600 focus:ring-purple-500" onchange="showPaymentAccounts('bank')" checked>
                                     <i class="fas fa-university text-purple-600 mx-2"></i>
                                     <span class="font-medium">تحويل بنكي</span>
-                                </label>
-                                <label class="flex items-center p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-green-50">
-                                    <input type="radio" name="payment_method" value="electronic_wallet" class="text-green-600 focus:ring-green-500" onchange="showPaymentAccounts('wallet')">
-                                    <i class="fas fa-mobile-alt text-green-600 mx-2"></i>
-                                    <span class="font-medium">محفظة إلكترونية</span>
                                 </label>
                             </div>
                         </div>
 
                         <!-- Bank Accounts -->
-                        <div id="bank-accounts" class="hidden">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">اختر الحساب البنكي</label>
-                            <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3">
-                                @foreach($bankAccounts ?? [] as $bank)
-                                <label class="flex items-center p-2 bg-blue-50 rounded hover:bg-blue-100 cursor-pointer">
-                                    <input type="radio" name="payment_account_id" value="{{ $bank->id }}" class="text-purple-600 focus:ring-purple-500">
-                                    <div class="mr-3 flex-1">
-                                        <div class="font-medium">{{ $bank->bank_name }}</div>
-                                        <div class="text-sm text-gray-600">{{ $bank->account_number }} - {{ $bank->account_holder_name }}</div>
-                                    </div>
-                                </label>
-                                @endforeach
-                            </div>
-                        </div>
+                        <div id="bank-accounts" class="">
+                            <label class="block text-sm font-medium text-gray-700 mb-4">
+                                <i class="fas fa-university text-blue-600 ml-2"></i>
+                                اختر الحساب البنكي للدفع
+                            </label>
 
-                        <!-- Electronic Wallets -->
-                        <div id="electronic-wallets" class="hidden">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">اختر المحفظة الإلكترونية</label>
-                            <div class="space-y-2 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-3">
-                                @foreach($electronicWallets ?? [] as $wallet)
-                                <label class="flex items-center p-2 bg-green-50 rounded hover:bg-green-100 cursor-pointer">
-                                    <input type="radio" name="payment_account_id" value="{{ $wallet->id }}" class="text-green-600 focus:ring-green-500">
-                                    <div class="mr-3 flex-1">
-                                        <div class="font-medium">{{ $wallet->wallet_name }}</div>
-                                        <div class="text-sm text-gray-600">{{ $wallet->wallet_number }} - {{ $wallet->wallet_holder_name }}</div>
+                            <div class="space-y-3">
+                                @foreach($bankAccounts ?? [] as $bank)
+                                <label class="block p-4 bg-white border-2 border-gray-200 rounded-lg hover:border-blue-400 hover:shadow-md transition-all duration-200 cursor-pointer bank-option" data-account="{{ $bank->id }}">
+                                    <div class="flex items-start">
+                                        <input type="radio" name="payment_account_id" value="{{ $bank->id }}" class="text-blue-600 focus:ring-blue-500 w-5 h-5 mt-1 ml-4">
+                                        <div class="flex-1">
+                                            <!-- معلومات أساسية - ظاهرة دائماً -->
+                                            <div class="flex items-center justify-between mb-3">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-university text-blue-600 text-xl ml-3"></i>
+                                                    <div>
+                                                        <h3 class="font-bold text-gray-800 text-lg">{{ $bank->bank_name }}</h3>
+                                                        <p class="text-sm text-gray-600">{{ $bank->account_name }}</p>
+                                                    </div>
+                                                </div>
+                                                <button type="button" class="toggle-details text-blue-600 hover:text-blue-800 px-3 py-1 rounded-md hover:bg-blue-50 transition-colors" data-account="{{ $bank->id }}">
+                                                    <i class="fas fa-chevron-down transition-transform duration-200"></i>
+                                                    <span class="text-sm mr-1">التفاصيل</span>
+                                                </button>
+                                            </div>
+
+                                            <!-- رقم الحساب - ظاهر دائماً -->
+                                            <div class="bg-gray-50 p-3 rounded-lg">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center">
+                                                        <i class="fas fa-credit-card text-gray-500 ml-2"></i>
+                                                        <span class="text-sm font-medium text-gray-700">رقم الحساب:</span>
+                                                        <span class="font-mono text-sm font-bold text-gray-900 mr-2">{{ $bank->account_number }}</span>
+                                                    </div>
+                                                    <button type="button" class="copy-btn text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-100" data-copy="{{ $bank->account_number }}">
+                                                        <i class="fas fa-copy ml-1"></i>
+                                                        نسخ
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- التفاصيل الإضافية - مخفية في البداية -->
+                                            <div class="bank-details hidden mt-4 pt-4 border-t border-gray-200" id="details-{{ $bank->id }}">
+                                                <div class="grid md:grid-cols-1 gap-4">
+                                                    @if($bank->iban)
+                                                    <div class="bg-blue-50 p-3 rounded-lg">
+                                                        <label class="text-xs font-semibold text-blue-600 uppercase tracking-wide block mb-1">رقم الآيبان</label>
+                                                        <div class="flex items-center justify-between">
+                                                            <span class="font-mono text-sm font-medium text-blue-900">{{ $bank->iban }}</span>
+                                                            <button type="button" class="copy-btn text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-200" data-copy="{{ $bank->iban }}">
+                                                                <i class="fas fa-copy ml-1"></i>
+                                                                نسخ
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    @endif
+
+                                                    @if($bank->swift_code)
+                                                    <div class="bg-green-50 p-3 rounded-lg">
+                                                        <label class="text-xs font-semibold text-green-600 uppercase tracking-wide block mb-1">رمز السويفت</label>
+                                                        <div class="flex items-center justify-between">
+                                                            <span class="font-mono text-sm font-medium text-green-900">{{ $bank->swift_code }}</span>
+                                                            <button type="button" class="copy-btn text-xs text-green-600 hover:text-green-800 px-2 py-1 rounded hover:bg-green-200" data-copy="{{ $bank->swift_code }}">
+                                                                <i class="fas fa-copy ml-1"></i>
+                                                                نسخ
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    @endif
+
+                                                    @if($bank->branch_name)
+                                                    <div class="bg-yellow-50 p-3 rounded-lg">
+                                                        <label class="text-xs font-semibold text-yellow-600 uppercase tracking-wide block mb-1">اسم الفرع</label>
+                                                        <span class="text-sm font-medium text-yellow-900">{{ $bank->branch_name }}</span>
+                                                    </div>
+                                                    @endif
+
+                                                    @if($bank->notes)
+                                                    <div class="bg-purple-50 p-3 rounded-lg {{ !$bank->branch_name ? 'md:col-span-2' : '' }}">
+                                                        <label class="text-xs font-semibold text-purple-600 uppercase tracking-wide block mb-1">ملاحظات</label>
+                                                        <span class="text-sm text-purple-900">{{ $bank->notes }}</span>
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </label>
                                 @endforeach
+
+                                @if(count($bankAccounts ?? []) === 0)
+                                <div class="text-center py-8 text-gray-500">
+                                    <i class="fas fa-info-circle text-4xl mb-4 text-gray-400"></i>
+                                    <p class="text-lg font-medium">لا توجد حسابات بنكية مُسجلة</p>
+                                    <p class="text-sm">يرجى إضافة حساب بنكي أولاً لتتمكن من الدفع</p>
+                                </div>
+                                @endif
                             </div>
                         </div>
 
@@ -214,6 +279,54 @@
                                       name="payment_notes"
                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                       placeholder="اكتب ملاحظات إضافية حول عملية الدفع..."></textarea>
+                        </div>
+
+                        <!-- Payment Proof Upload -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                <i class="fas fa-file-upload text-blue-600 ml-2"></i>
+                                إثبات التحويل (اختياري)
+                            </label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
+                                <div class="text-center">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
+                                    <div class="mb-4">
+                                        <label for="payment_proof" class="cursor-pointer">
+                                            <span class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors inline-block">
+                                                <i class="fas fa-folder-open ml-2"></i>
+                                                اختر ملف أو صورة
+                                            </span>
+                                            <input type="file"
+                                                   id="payment_proof"
+                                                   name="payment_proof"
+                                                   accept="image/*,.pdf,.doc,.docx"
+                                                   class="hidden"
+                                                   onchange="handleFileUpload(this)">
+                                        </label>
+                                    </div>
+                                    <div id="file-info" class="hidden">
+                                        <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-file-check text-green-600 ml-2"></i>
+                                                    <span id="file-name" class="text-sm font-medium text-green-800"></span>
+                                                </div>
+                                                <button type="button" onclick="removeFile()" class="text-red-600 hover:text-red-800">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                            <div class="text-xs text-green-600 mt-1">
+                                                <span id="file-size"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-500">
+                                        صور مقبولة: JPG, PNG, GIF<br>
+                                        مستندات مقبولة: PDF, DOC, DOCX<br>
+                                        الحد الأقصى: 5 ميجابايت
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-md hover:bg-purple-700 transition-colors font-medium">
@@ -276,11 +389,12 @@
                                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">المبلغ</th>
                                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
                                             <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">تاريخ الاستحقاق</th>
+                                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-gray-200">
                                         @forelse($recentInvoices as $invoice)
-                                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                                        <tr class="hover:bg-gray-50 transition-colors"
                                             data-invoice-number="{{ $invoice->invoice_number }}"
                                             data-remaining-amount="{{ $invoice->remaining_amount }}"
                                             data-status="{{ $invoice->payment_status }}">
@@ -296,10 +410,17 @@
                                                 </span>
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-600">{{ $invoice->due_date->format('Y-m-d') }}</td>
+                                            <td class="px-4 py-3 text-sm">
+                                                <button onclick="showInvoiceDetails({{ $invoice->id }})"
+                                                        class="inline-flex items-center px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 hover:text-blue-800 rounded-md text-xs font-medium transition-colors">
+                                                    <i class="fas fa-eye ml-1"></i>
+                                                    تفاصيل الفاتورة
+                                                </button>
+                                            </td>
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                                            <td colspan="6" class="px-4 py-8 text-center text-gray-500">
                                                 <i class="fas fa-file-invoice text-gray-400 text-3xl mb-3 block"></i>
                                                 لا توجد فواتير حتى الآن
                                             </td>
@@ -312,7 +433,7 @@
                             <!-- Mobile Cards -->
                             <div id="invoices-mobile" class="md:hidden">
                                 @forelse($recentInvoices as $invoice)
-                                <div class="invoice-card border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                                <div class="invoice-card border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors"
                                      data-invoice-number="{{ $invoice->invoice_number }}"
                                      data-remaining-amount="{{ $invoice->remaining_amount }}"
                                      data-status="{{ $invoice->payment_status }}">
@@ -328,9 +449,16 @@
                                             {{ $invoice->payment_status_label }}
                                         </span>
                                     </div>
-                                    <div class="flex items-center justify-between">
+                                    <div class="flex items-center justify-between mb-3">
                                         <span class="text-lg font-semibold text-gray-900">{{ number_format($invoice->original_amount) }} ر.س</span>
                                         <span class="text-xs text-gray-500">{{ $invoice->due_date->format('Y-m-d') }}</span>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button onclick="showInvoiceDetails({{ $invoice->id }})"
+                                                class="inline-flex items-center px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 hover:text-blue-800 rounded-md text-xs font-medium transition-colors">
+                                            <i class="fas fa-eye ml-1"></i>
+                                            تفاصيل الفاتورة
+                                        </button>
                                     </div>
                                 </div>
                                 @empty
@@ -790,28 +918,14 @@
     // دالة إظهار حسابات الدفع للشركات الطالبة
     function showPaymentAccounts(type) {
         const bankDiv = document.getElementById('bank-accounts');
-        const walletDiv = document.getElementById('electronic-wallets');
 
-        if (bankDiv && walletDiv) {
-            // إخفاء جميع الأقسام أولاً
-            bankDiv.classList.add('hidden');
-            walletDiv.classList.add('hidden');
-
-            // إظهار القسم المطلوب
+        if (bankDiv) {
+            // إظهار قسم الحسابات البنكية
             if (type === 'bank') {
                 bankDiv.classList.remove('hidden');
-            } else if (type === 'wallet') {
-                walletDiv.classList.remove('hidden');
             }
-
-            // مسح التحديدات السابقة
-            document.querySelectorAll('input[name="payment_account_id"]').forEach(radio => {
-                radio.checked = false;
-            });
         }
-    }
-
-    // إضافة validation للنموذج
+    }    // إضافة validation للنموذج
     document.addEventListener('DOMContentLoaded', function() {
         const quickPaymentForm = document.querySelector('form[action*="quick_payment"]');
         if (quickPaymentForm) {
@@ -834,6 +948,324 @@
             });
         }
     });
+
+    // دالة معالجة رفع الملف
+    function handleFileUpload(input) {
+        const fileInfo = document.getElementById('file-info');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const maxSize = 5 * 1024 * 1024; // 5MB بالبايت
+
+            // التحقق من حجم الملف
+            if (file.size > maxSize) {
+                alert('حجم الملف كبير جداً! يجب أن يكون أقل من 5 ميجابايت');
+                input.value = '';
+                return;
+            }
+
+            // التحقق من نوع الملف
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('نوع الملف غير مدعوم! يرجى اختيار صورة أو مستند PDF/Word');
+                input.value = '';
+                return;
+            }
+
+            // عرض معلومات الملف
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.remove('hidden');
+        }
+    }
+
+    // دالة حذف الملف
+    function removeFile() {
+        const input = document.getElementById('payment_proof');
+        const fileInfo = document.getElementById('file-info');
+
+        input.value = '';
+        fileInfo.classList.add('hidden');
+    }
+
+    // دالة تنسيق حجم الملف
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // دالة عرض تفاصيل البنك
+    document.addEventListener('DOMContentLoaded', function() {
+        // التعامل مع أزرار التفاصيل
+        const toggleButtons = document.querySelectorAll('.toggle-details');
+        const bankOptions = document.querySelectorAll('.bank-option');
+        const copyButtons = document.querySelectorAll('.copy-btn');
+
+        // عند النقر على زر التفاصيل
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const accountId = this.getAttribute('data-account');
+                const detailsElement = document.getElementById('details-' + accountId);
+                const icon = this.querySelector('i');
+
+                if (detailsElement.classList.contains('hidden')) {
+                    // إظهار التفاصيل
+                    detailsElement.classList.remove('hidden');
+                    icon.style.transform = 'rotate(180deg)';
+                    this.querySelector('span').textContent = 'إخفاء';
+                } else {
+                    // إخفاء التفاصيل
+                    detailsElement.classList.add('hidden');
+                    icon.style.transform = 'rotate(0deg)';
+                    this.querySelector('span').textContent = 'التفاصيل';
+                }
+            });
+        });
+
+        // عند النقر على خيار البنك (للتحديد)
+        bankOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                // التأكد من أن النقرة ليست على زر التفاصيل أو النسخ
+                if (e.target.closest('.toggle-details') || e.target.closest('.copy-btn')) {
+                    return;
+                }
+
+                // إزالة التحديد من جميع الخيارات
+                bankOptions.forEach(opt => {
+                    opt.classList.remove('border-blue-500', 'bg-blue-50');
+                    opt.classList.add('border-gray-200');
+                });
+
+                // تحديد الخيار المختار
+                this.classList.remove('border-gray-200');
+                this.classList.add('border-blue-500', 'bg-blue-50');
+
+                // تحديد الـ radio button
+                const radioButton = this.querySelector('input[type="radio"]');
+                if (radioButton) {
+                    radioButton.checked = true;
+                }
+            });
+        });
+
+        // دالة نسخ النص
+        copyButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const textToCopy = this.getAttribute('data-copy');
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // تغيير النص مؤقتاً
+                    const originalHTML = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check ml-1"></i>تم';
+                    this.classList.add('bg-green-100', 'text-green-800');
+
+                    // إعادة النص الأصلي بعد ثانيتين
+                    setTimeout(() => {
+                        this.innerHTML = originalHTML;
+                        this.classList.remove('bg-green-100', 'text-green-800');
+                    }, 1500);
+                }).catch(() => {
+                    alert('حدث خطأ أثناء نسخ النص');
+                });
+            });
+        });
+    });
+
+    // دالة عرض تفاصيل الفاتورة
+    function showInvoiceDetails(invoiceId) {
+        // إظهار مربع حوار تحميل
+        const loadingModal = document.createElement('div');
+        loadingModal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center';
+        loadingModal.innerHTML = `
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="flex items-center">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 ml-3"></div>
+                    <span>جاري تحميل تفاصيل الفاتورة...</span>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(loadingModal);
+
+        // استدعاء API لجلب تفاصيل الفاتورة
+        fetch(`/service-company/invoice/${invoiceId}/details`)
+            .then(response => response.json())
+            .then(data => {
+                // إزالة مربع حوار التحميل
+                document.body.removeChild(loadingModal);
+
+                // إظهار تفاصيل الفاتورة
+                showInvoiceModal(data);
+            })
+            .catch(error => {
+                // إزالة مربع حوار التحميل
+                document.body.removeChild(loadingModal);
+
+                console.error('Error:', error);
+                alert('حدث خطأ أثناء تحميل تفاصيل الفاتورة');
+            });
+    }
+
+    // دالة إظهار مربع حوار تفاصيل الفاتورة
+    function showInvoiceModal(invoice) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50';
+        modal.innerHTML = `
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <!-- Header -->
+                    <div class="bg-blue-600 text-white p-6 rounded-t-lg">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold">تفاصيل الفاتورة ${invoice.invoice_number}</h3>
+                            <button onclick="closeInvoiceModal()" class="text-white hover:text-gray-200 text-2xl font-bold">&times;</button>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-6 space-y-6">
+                        <!-- معلومات أساسية -->
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-gray-700 mb-3">معلومات الفاتورة</h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">رقم الفاتورة:</span>
+                                        <span class="font-medium">${invoice.invoice_number}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">تاريخ الإنشاء:</span>
+                                        <span class="font-medium">${invoice.created_at}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">تاريخ الاستحقاق:</span>
+                                        <span class="font-medium">${invoice.due_date}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">الحالة:</span>
+                                        <span class="font-medium px-2 py-1 rounded text-xs ${getStatusClass(invoice.payment_status)}">${invoice.payment_status_label}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-gray-700 mb-3">معلومات المبلغ</h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">المبلغ الأصلي:</span>
+                                        <span class="font-medium">${formatNumber(invoice.original_amount)} ر.س</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">المبلغ المدفوع:</span>
+                                        <span class="font-medium text-green-600">${formatNumber(invoice.paid_amount)} ر.س</span>
+                                    </div>
+                                    <div class="flex justify-between border-t pt-2">
+                                        <span class="text-gray-600 font-semibold">المبلغ المتبقي:</span>
+                                        <span class="font-bold text-red-600">${formatNumber(invoice.remaining_amount)} ر.س</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- تفاصيل الشركة -->
+                        ${invoice.logistics_company ? `
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-blue-900 mb-3 flex items-center">
+                                <i class="fas fa-building ml-2"></i>
+                                معلومات الشركة
+                            </h4>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-blue-700">اسم الشركة:</span>
+                                        <span class="font-medium">${invoice.logistics_company.name}</span>
+                                    </div>
+                                    ${invoice.logistics_company.contact_person ? `
+                                    <div class="flex justify-between">
+                                        <span class="text-blue-700">الشخص المسؤول:</span>
+                                        <span class="font-medium">${invoice.logistics_company.contact_person}</span>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                                <div class="space-y-2">
+                                    ${invoice.logistics_company.phone ? `
+                                    <div class="flex justify-between">
+                                        <span class="text-blue-700">الهاتف:</span>
+                                        <span class="font-medium">${invoice.logistics_company.phone}</span>
+                                    </div>
+                                    ` : ''}
+                                    ${invoice.logistics_company.email ? `
+                                    <div class="flex justify-between">
+                                        <span class="text-blue-700">البريد الإلكتروني:</span>
+                                        <span class="font-medium">${invoice.logistics_company.email}</span>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <!-- الوصف أو الملاحظات -->
+                        ${invoice.description ? `
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h4 class="font-semibold text-yellow-900 mb-2 flex items-center">
+                                <i class="fas fa-sticky-note ml-2"></i>
+                                الوصف
+                            </h4>
+                            <p class="text-sm text-yellow-800">${invoice.description}</p>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end">
+                        <button onclick="closeInvoiceModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                            إغلاق
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        modal.setAttribute('id', 'invoice-modal');
+    }
+
+    // دالة إغلاق مربع حوار الفاتورة
+    function closeInvoiceModal() {
+        const modal = document.getElementById('invoice-modal');
+        if (modal) {
+            document.body.removeChild(modal);
+        }
+    }
+
+    // دالة مساعدة لتنسيق الأرقام
+    function formatNumber(num) {
+        return parseInt(num).toLocaleString('ar-SA');
+    }
+
+    // دالة مساعدة لتحديد كلاس الحالة
+    function getStatusClass(status) {
+        switch (status) {
+            case 'paid':
+                return 'bg-green-100 text-green-800';
+            case 'partial':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'overdue':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-red-100 text-red-800';
+        }
+    }
 </script>
 @endpush
 @endsection

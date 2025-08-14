@@ -94,20 +94,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Electronic Wallet -->
-                            <div class="border-2 border-gray-200 rounded-lg p-4 cursor-pointer payment-method" data-method="electronic_wallet">
-                                <div class="flex items-center">
-                                    <input type="radio" name="payment_method" value="electronic_wallet" class="mr-3" required>
-                                    <div>
-                                        <div class="flex items-center">
-                                            <i class="fas fa-mobile-alt text-green-600 text-xl ml-2"></i>
-                                            <span class="font-semibold text-gray-800">محفظة إلكترونية</span>
-                                        </div>
-                                        <p class="text-sm text-gray-600 mt-1">دفع عبر المحافظ الإلكترونية</p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -117,36 +103,58 @@
 
                         <!-- Bank Accounts -->
                         <div id="bank-accounts" class="hidden">
-                            <div class="grid md:grid-cols-2 gap-4">
+                            <div class="grid md:grid-cols-1 gap-4">
                                 @foreach($bankAccounts as $account)
-                                <div class="border border-gray-200 rounded-lg p-4 cursor-pointer account-option" data-id="{{ $account->id }}" data-type="bank_account">
-                                    <div class="flex items-center">
-                                        <input type="radio" name="payment_account_id" value="{{ $account->id }}" class="mr-3">
-                                        <div>
-                                            <div class="font-semibold text-gray-800">{{ $account->bank_name }}</div>
-                                            <div class="text-sm text-gray-600">{{ $account->account_name }}</div>
-                                            <div class="text-sm text-gray-500">{{ $account->account_number }}</div>
-                                            @if($account->iban)
-                                            <div class="text-xs text-gray-400 mt-1">{{ $account->iban }}</div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
+                                <div class="border border-gray-200 rounded-lg p-6 cursor-pointer account-option hover:border-blue-500 transition-colors" data-id="{{ $account->id }}" data-type="bank_account">
+                                    <div class="flex items-start">
+                                        <input type="radio" name="payment_account_id" value="{{ $account->id }}" class="mr-4 mt-1">
+                                        <div class="flex-1">
+                                            <div class="flex items-center mb-3">
+                                                <i class="fas fa-university text-blue-600 text-xl mr-3"></i>
+                                                <h4 class="font-bold text-gray-800 text-lg">{{ $account->bank_name }}</h4>
+                                            </div>
 
-                        <!-- Electronic Wallets -->
-                        <div id="electronic-wallets" class="hidden">
-                            <div class="grid md:grid-cols-2 gap-4">
-                                @foreach($electronicWallets as $wallet)
-                                <div class="border border-gray-200 rounded-lg p-4 cursor-pointer account-option" data-id="{{ $wallet->id }}" data-type="electronic_wallet">
-                                    <div class="flex items-center">
-                                        <input type="radio" name="payment_account_id" value="{{ $wallet->id }}" class="mr-3">
-                                        <div>
-                                            <div class="font-semibold text-gray-800">{{ $wallet->wallet_name }}</div>
-                                            <div class="text-sm text-gray-600">{{ $wallet->account_name }}</div>
-                                            <div class="text-sm text-gray-500">{{ $wallet->account_number }}</div>
+                                            <div class="grid md:grid-cols-2 gap-4 mb-3">
+                                                <div>
+                                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">اسم صاحب الحساب</label>
+                                                    <p class="text-sm font-medium text-gray-800">{{ $account->account_name }}</p>
+                                                </div>
+                                                <div>
+                                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">رقم الحساب</label>
+                                                    <p class="text-sm font-mono font-medium text-gray-800 bg-gray-50 px-2 py-1 rounded">{{ $account->account_number }}</p>
+                                                </div>
+                                            </div>
+
+                                            @if($account->iban || $account->swift_code)
+                                            <div class="grid md:grid-cols-2 gap-4 mb-3">
+                                                @if($account->iban)
+                                                <div>
+                                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">رقم الآيبان</label>
+                                                    <p class="text-sm font-mono font-medium text-gray-800 bg-gray-50 px-2 py-1 rounded">{{ $account->iban }}</p>
+                                                </div>
+                                                @endif
+                                                @if($account->swift_code)
+                                                <div>
+                                                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">رمز السويفت</label>
+                                                    <p class="text-sm font-mono font-medium text-gray-800 bg-gray-50 px-2 py-1 rounded">{{ $account->swift_code }}</p>
+                                                </div>
+                                                @endif
+                                            </div>
+                                            @endif
+
+                                            @if($account->branch_name)
+                                            <div class="mb-3">
+                                                <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">اسم الفرع</label>
+                                                <p class="text-sm font-medium text-gray-800">{{ $account->branch_name }}</p>
+                                            </div>
+                                            @endif
+
+                                            @if($account->notes)
+                                            <div class="mt-3 p-3 bg-blue-50 rounded-lg">
+                                                <label class="text-xs font-semibold text-blue-600 uppercase tracking-wide">ملاحظات</label>
+                                                <p class="text-sm text-blue-800 mt-1">{{ $account->notes }}</p>
+                                            </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -183,7 +191,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const paymentMethods = document.querySelectorAll('.payment-method');
     const paymentAccountSection = document.getElementById('payment-account-section');
     const bankAccounts = document.getElementById('bank-accounts');
-    const electronicWallets = document.getElementById('electronic-wallets');
     const accountOptions = document.querySelectorAll('.account-option');
 
     // إخفاء قسم اختيار الحساب في البداية
@@ -207,10 +214,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const selectedMethod = this.dataset.method;
             if (selectedMethod === 'bank_transfer') {
                 bankAccounts.classList.remove('hidden');
-                electronicWallets.classList.add('hidden');
-            } else if (selectedMethod === 'electronic_wallet') {
-                bankAccounts.classList.add('hidden');
-                electronicWallets.classList.remove('hidden');
             }
         });
     });

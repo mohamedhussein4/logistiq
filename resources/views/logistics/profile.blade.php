@@ -261,7 +261,7 @@
                         <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                             <div>
                                 <h4 class="font-medium text-gray-800">إشعارات البريد الإلكتروني</h4>
-                                <p class="text-sm text-gray-600">تلقي إشعارات حول طلبات التمويل والفواتير</p>
+                                <p class="text-sm text-gray-600">تلقي إشعارات حول طلبات التمويل والأنشطة الحسابية</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" class="sr-only peer" checked>
@@ -357,55 +357,6 @@
                     @endif
                 </div>
 
-                <!-- Payment Requests Section -->
-                <div class="bg-white rounded-lg shadow-sm p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-semibold text-gray-800">
-                            <i class="fas fa-credit-card text-green-600 ml-2"></i>
-                            طلبات الدفع الحديثة
-                        </h3>
-                    </div>
-
-                    @if($paymentRequests && $paymentRequests->count() > 0)
-                        <div class="space-y-3">
-                            @foreach($paymentRequests->take(5) as $payment)
-                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex-1">
-                                        <div class="flex items-center space-x-3 space-x-reverse">
-                                            <h4 class="font-medium text-gray-800">{{ $payment->request_number }}</h4>
-                                            <span class="px-2 py-1 text-xs rounded-full
-                                                @if($payment->status === 'pending') bg-yellow-100 text-yellow-800
-                                                @elseif($payment->status === 'approved') bg-green-100 text-green-800
-                                                @elseif($payment->status === 'rejected') bg-red-100 text-red-800
-                                                @else bg-gray-100 text-gray-800 @endif">
-                                                {{ $payment->status === 'pending' ? 'في الانتظار' :
-                                                   ($payment->status === 'approved' ? 'موافق عليه' :
-                                                   ($payment->status === 'rejected' ? 'مرفوض' : $payment->status)) }}
-                                            </span>
-                                        </div>
-                                        <div class="text-sm text-gray-600 mt-1">
-                                            النوع: {{ $payment->payment_type === 'product_order' ? 'طلب منتج' :
-                                                     ($payment->payment_type === 'invoice' ? 'فاتورة' : $payment->payment_type) }} |
-                                            المبلغ: {{ number_format($payment->amount) }} ر.س |
-                                            الطريقة: {{ $payment->payment_method === 'bank_transfer' ? 'تحويل بنكي' : 'محفظة إلكترونية' }}
-                                        </div>
-                                        <div class="text-xs text-gray-500 mt-1">
-                                            {{ $payment->created_at->diffForHumans() }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-8 text-gray-500">
-                            <i class="fas fa-credit-card text-4xl mb-3"></i>
-                            <p>لا توجد طلبات دفع حتى الآن</p>
-                        </div>
-                    @endif
-                </div>
-
                 <!-- Danger Zone -->
                 <div class="bg-white rounded-lg shadow-sm p-6 border-l-4 border-red-500">
                     <div class="flex items-center justify-between mb-4">
@@ -446,7 +397,7 @@
 <script>
 function confirmDelete() {
     if (confirm('هل أنت متأكد من رغبتك في حذف الحساب نهائياً؟ هذا الإجراء لا يمكن التراجع عنه.')) {
-        if (confirm('تأكيد أخير: سيتم حذف جميع البيانات والطلبات والفواتير المرتبطة بحسابك. هل تريد المتابعة؟')) {
+        if (confirm('تأكيد أخير: سيتم حذف جميع البيانات والطلبات المرتبطة بحسابك. هل تريد المتابعة؟')) {
             // Here you would submit a delete form
             alert('تم إرسال طلب حذف الحساب. سيتم التواصل معك قريباً.');
         }

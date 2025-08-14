@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\BankAccount;
-use App\Models\ElectronicWallet;
 
 class PaymentAccountsSeeder extends Seeder
 {
@@ -64,69 +63,6 @@ class PaymentAccountsSeeder extends Seeder
 
         foreach ($bankAccounts as $account) {
             BankAccount::create($account);
-        }
-
-        // إنشاء المحافظ الإلكترونية
-        $electronicWallets = [
-            [
-                'wallet_name' => 'STC Pay',
-                'wallet_type' => 'stc_pay',
-                'account_number' => '966501234567',
-                'account_name' => 'Link2u للتجارة',
-                'phone_number' => '966501234567',
-                'email' => 'payments@link2u.com',
-                'notes' => 'محفظة STC Pay الرئيسية',
-                'status' => 'active',
-                'sort_order' => 1,
-            ],
-            [
-                'wallet_name' => 'مدى',
-                'wallet_type' => 'mada',
-                'account_number' => '1234567890123456',
-                'account_name' => 'Link2u للتجارة',
-                'phone_number' => '966501234567',
-                'email' => 'payments@link2u.com',
-                'notes' => 'محفظة مدى الرئيسية',
-                'status' => 'active',
-                'sort_order' => 2,
-            ],
-            [
-                'wallet_name' => 'Apple Pay',
-                'wallet_type' => 'apple_pay',
-                'account_number' => 'link2u.applepay',
-                'account_name' => 'Link2u للتجارة',
-                'phone_number' => '966501234567',
-                'email' => 'payments@link2u.com',
-                'notes' => 'محفظة Apple Pay',
-                'status' => 'active',
-                'sort_order' => 3,
-            ],
-            [
-                'wallet_name' => 'Google Pay',
-                'wallet_type' => 'google_pay',
-                'account_number' => 'link2u.googlepay',
-                'account_name' => 'Link2u للتجارة',
-                'phone_number' => '966501234567',
-                'email' => 'payments@link2u.com',
-                'notes' => 'محفظة Google Pay',
-                'status' => 'active',
-                'sort_order' => 4,
-            ],
-            [
-                'wallet_name' => 'PayPal',
-                'wallet_type' => 'paypal',
-                'account_number' => 'payments@link2u.com',
-                'account_name' => 'Link2u للتجارة',
-                'phone_number' => '966501234567',
-                'email' => 'payments@link2u.com',
-                'notes' => 'محفظة PayPal الدولية',
-                'status' => 'active',
-                'sort_order' => 5,
-            ],
-        ];
-
-        foreach ($electronicWallets as $wallet) {
-            ElectronicWallet::create($wallet);
         }
 
         $this->command->info('تم إنشاء الحسابات البنكية والمحافظ الإلكترونية بنجاح!');

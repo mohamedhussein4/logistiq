@@ -458,8 +458,6 @@
                                             <span class="font-medium">الحساب:</span>
                                             @if($request->payment_method === 'bank_transfer' && $request->bankAccount)
                                                 {{ $request->bankAccount->bank_name }} - {{ $request->bankAccount->account_number }}
-                                            @elseif($request->payment_method === 'electronic_wallet' && $request->electronicWallet)
-                                                {{ $request->electronicWallet->wallet_name }} - {{ $request->electronicWallet->wallet_number }}
                                             @else
                                                 غير محدد
                                             @endif
@@ -467,6 +465,50 @@
                                         @if($request->payment_notes)
                                             <div class="mt-2 p-2 bg-gray-50 rounded text-sm text-gray-600">
                                                 <span class="font-medium">ملاحظات:</span> {{ $request->payment_notes }}
+                                            </div>
+                                        @endif
+
+                                        <!-- إثباتات التحويل -->
+                                        @if($request->paymentProofs && $request->paymentProofs->count() > 0)
+                                            <div class="mt-3 p-3 bg-blue-50 rounded-lg">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="text-sm font-medium text-blue-800">
+                                                        <i class="fas fa-file-check ml-1"></i>
+                                                        إثباتات التحويل ({{ $request->paymentProofs->count() }})
+                                                    </span>
+                                                </div>
+                                                <div class="space-y-2">
+                                                    @foreach($request->paymentProofs as $proof)
+                                                        <div class="flex items-center justify-between bg-white rounded p-2 text-xs">
+                                                            <div class="flex items-center">
+                                                                @php
+                                                                    $extension = pathinfo($proof->file_name, PATHINFO_EXTENSION);
+                                                                    $iconClass = in_array($extension, ['jpg', 'jpeg', 'png', 'gif']) ? 'fa-file-image text-green-600' :
+                                                                               ($extension === 'pdf' ? 'fa-file-pdf text-red-600' : 'fa-file text-gray-600');
+                                                                @endphp
+                                                                <i class="fas {{ $iconClass }} ml-2"></i>
+                                                                <span class="text-gray-700">{{ $proof->file_name }}</span>
+                                                            </div>
+                                                            <div class="flex items-center space-x-2 space-x-reverse">
+                                                                <span class="px-2 py-1 rounded-full text-xs
+                                                                    {{ $proof->status === 'approved' ? 'bg-green-100 text-green-700' :
+                                                                       ($proof->status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
+                                                                    {{ $proof->status === 'approved' ? 'موافق عليه' :
+                                                                       ($proof->status === 'pending' ? 'قيد المراجعة' : 'مرفوض') }}
+                                                                </span>
+                                                                <a href="{{ asset('/' . $proof->file_path) }}" target="_blank"
+                                                                   class="text-blue-600 hover:text-blue-800">
+                                                                    <i class="fas fa-external-link-alt"></i>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="mt-3 p-2 bg-orange-50 rounded text-xs text-orange-700">
+                                                <i class="fas fa-exclamation-triangle ml-1"></i>
+                                                لم يتم رفع إثبات تحويل لهذا الطلب
                                             </div>
                                         @endif
                                     </div>

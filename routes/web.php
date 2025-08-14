@@ -7,8 +7,9 @@ use App\Http\Controllers\Logistics\LogisticsCompanyController;
 use App\Http\Controllers\ServiceCompany\ServiceCompanyController;
 use App\Http\Controllers\User\UserDashboardController;
 use App\Http\Controllers\User\ContactController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\User\PaymentController;
 use App\Http\Controllers\User\PurchaseController;
+use App\Http\Controllers\User\ServiceCompanyRegistrationController;
 
 // Authentication routes
 Auth::routes();
@@ -22,6 +23,12 @@ Route::get('/store', [UserDashboardController::class, 'publicStore'])->name('sto
 
 // Contact form route
 Route::post('/contact', [\App\Http\Controllers\User\ContactController::class, 'store'])->name('contact.store');
+
+// Service Company Registration routes
+Route::prefix('service-company')->name('service-company.')->group(function () {
+    Route::get('/register', [ServiceCompanyRegistrationController::class, 'showRegistrationForm'])->name('register.form');
+    Route::post('/register', [ServiceCompanyRegistrationController::class, 'register'])->name('register');
+});
 
 // Direct Purchase routes - مسارات الشراء المباشر (منظمة)
 Route::prefix('user/purchase')->name('user.purchase.')->middleware(['auth'])->group(function () {

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\FundingRequestController;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\ProductController;
@@ -40,6 +41,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::put('/{user}', [UserController::class, 'update'])->name('update');
         Route::patch('/{user}/status', [UserController::class, 'updateStatus'])->name('update_status');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+        Route::delete('/', [UserController::class, 'bulkDelete'])->name('bulk-delete');
+
+        // Balance Management for Logistics Companies
+        Route::post('/{user}/balance', [UserManagementController::class, 'updateBalance'])->name('update_balance');
     });
 
     // Funding Requests Management
@@ -50,6 +55,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::patch('/{fundingRequest}/approve', [FundingRequestController::class, 'approve'])->name('approve');
         Route::patch('/{fundingRequest}/reject', [FundingRequestController::class, 'reject'])->name('reject');
         Route::patch('/{fundingRequest}/disburse', [FundingRequestController::class, 'disburse'])->name('disburse');
+        Route::delete('/bulk-delete', [FundingRequestController::class, 'bulkDelete'])->name('bulk-delete');
         Route::get('/analytics/data', [FundingRequestController::class, 'analytics'])->name('analytics');
         Route::get('/export/csv', [FundingRequestController::class, 'export'])->name('export');
     });
@@ -66,22 +72,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/', [InvoiceController::class, 'index'])->name('index');
         Route::get('/create', [InvoiceController::class, 'create'])->name('create');
         Route::post('/', [InvoiceController::class, 'store'])->name('store');
+        Route::delete('/bulk-delete', [InvoiceController::class, 'bulkDelete'])->name('bulk-delete');
         Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
         Route::get('/{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit');
         Route::patch('/{invoice}', [InvoiceController::class, 'update'])->name('update');
-        Route::delete('/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy');
         Route::patch('/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('update_status');
         Route::post('/{invoice}/payment', [InvoiceController::class, 'recordPayment'])->name('record_payment');
         Route::get('/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('download_pdf');
         Route::post('/update-overdue', [InvoiceController::class, 'updateOverdueInvoices'])->name('update_overdue');
     });
-
-
     // Products Management
     Route::prefix('products')->name('products.')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
         Route::get('/create', [ProductController::class, 'create'])->name('create');
         Route::post('/', [ProductController::class, 'store'])->name('store');
+        Route::delete('/bulk-delete', [ProductController::class, 'bulkDelete'])->name('bulk-delete');
         Route::get('/{product}', [ProductController::class, 'show'])->name('show');
         Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit');
         Route::put('/{product}', [ProductController::class, 'update'])->name('update');
@@ -100,6 +105,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Orders Management
     Route::prefix('orders')->name('orders.')->group(function () {
+        Route::delete('/bulk-delete', [OrderController::class, 'bulkDelete'])->name('bulk-delete');
         Route::get('/', [OrderController::class, 'index'])->name('index');
         Route::get('/{order}', [OrderController::class, 'show'])->name('show');
         Route::patch('/{order}/status', [OrderController::class, 'updateStatus'])->name('update_status');
@@ -117,6 +123,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/{contactRequest}', [ContactRequestController::class, 'show'])->name('show');
         Route::patch('/{contactRequest}/status', [ContactRequestController::class, 'updateStatus'])->name('update_status');
         Route::post('/{contactRequest}/respond', [ContactRequestController::class, 'respond'])->name('respond');
+                Route::delete('/bulk-delete', [ContactRequestController::class, 'bulkDelete'])->name('bulk-delete');
+
         Route::delete('/{contactRequest}', [ContactRequestController::class, 'destroy'])->name('destroy');
         Route::patch('/{contactRequest}/important', [ContactRequestController::class, 'markImportant'])->name('mark_important');
         Route::get('/analytics/data', [ContactRequestController::class, 'analytics'])->name('analytics');
@@ -170,6 +178,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/', [PaymentManagementController::class, 'index'])->name('index');
         Route::get('/{paymentRequest}', [PaymentManagementController::class, 'show'])->name('show');
         Route::patch('/{paymentRequest}/status', [PaymentManagementController::class, 'updateStatus'])->name('update_status');
+        Route::delete('/bulk-delete', [PaymentManagementController::class, 'bulkDelete'])->name('bulk-delete');
         Route::post('/proofs/{proof}/review', [PaymentManagementController::class, 'reviewProof'])->name('review_proof');
     });
 
@@ -181,15 +190,5 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::put('/{bankAccount}', [PaymentManagementController::class, 'updateBankAccount'])->name('update');
         Route::delete('/{bankAccount}', [PaymentManagementController::class, 'destroyBankAccount'])->name('destroy');
     });
-
-    // Electronic Wallets Management (منفصل تماماً)
-    Route::prefix('electronic-wallets')->name('electronic_wallets.')->group(function () {
-        Route::get('/', [PaymentManagementController::class, 'electronicWallets'])->name('index');
-        Route::post('/', [PaymentManagementController::class, 'storeElectronicWallet'])->name('store');
-        Route::get('/{electronicWallet}/edit', [PaymentManagementController::class, 'getElectronicWallet'])->name('edit');
-        Route::put('/{electronicWallet}', [PaymentManagementController::class, 'updateElectronicWallet'])->name('update');
-        Route::delete('/{electronicWallet}', [PaymentManagementController::class, 'destroyElectronicWallet'])->name('destroy');
-    });
-
 
 });

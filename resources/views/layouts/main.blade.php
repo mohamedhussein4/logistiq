@@ -6,7 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Link2u - حلول التمويل اللوجستية')</title>
+    <meta name="description" content="{{ \App\Models\Setting::get('seo_description', 'منصة متطورة لربط الشركات اللوجستية بالعملاء') }}">
+    <meta name="keywords" content="{{ \App\Models\Setting::get('seo_keywords', 'شركات لوجستية، شحن، توصيل، السعودية') }}">
+    <meta name="author" content="{{ \App\Models\Setting::get('site_name', 'Logistiq') }}">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{{ \App\Models\Setting::get('seo_title', 'Logistiq') }}">
+    <meta property="og:description" content="{{ \App\Models\Setting::get('seo_description', 'منصة متطورة لربط الشركات اللوجستية بالعملاء') }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url('/') }}">
+    @if(\App\Models\Setting::get('site_logo'))
+    <meta property="og:image" content="{{ asset('images/' . \App\Models\Setting::get('site_logo')) }}">
+    @endif
+
+    <!-- Favicon -->
+    @if(\App\Models\Setting::get('site_favicon'))
+    <link rel="icon" type="image/x-icon" href="{{ asset('images/' . \App\Models\Setting::get('site_favicon')) }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/' . \App\Models\Setting::get('site_favicon')) }}">
+    @endif
+
+    <title>@yield('title', '{{ \App\Models\Setting::get("site_name", "Logistiq") }}')</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -408,7 +427,7 @@
 
             <!-- Brand Name -->
             <div class="mb-8 animate-slide-up" style="animation-delay: 0.2s;">
-                <h1 class="text-3xl font-bold text-primary-600 mb-2">Link2u</h1>
+                <h1 class="text-3xl font-bold text-primary-600 mb-2">{{ \App\Models\Setting::get('site_name', 'Logistiq') }}</h1>
                 <p class="text-sm text-secondary-500">حلول التمويل اللوجستية</p>
             </div>
 
@@ -430,17 +449,7 @@
                 <!-- Logo -->
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center space-x-3 space-x-reverse group">
-                        <div class="relative">
-                            <div
-                                class="absolute inset-0 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300 animate-pulse-soft">
-                            </div>
-                            <div
-                                class="relative bg-gradient-to-br from-primary-500 to-primary-600 p-2 rounded-xl shadow-glow group-hover:shadow-lg transition-all duration-300">
-                                <i class="fas fa-truck text-white text-xl animate-float"></i>
-                            </div>
-                        </div>
-                        <span
-                            class="text-2xl font-bold gradient-text group-hover:scale-105 transition-transform duration-300">Link2u</span>
+                        <img src="{{ asset('images/' . \App\Models\Setting::get('site_logo')) }}" alt="{{ \App\Models\Setting::get('site_name', 'Logistiq') }}" width="120" class="object-contain">
                     </a>
                 </div>
 
@@ -774,13 +783,17 @@
                                 </div>
                                 <div
                                     class="relative bg-gradient-to-br from-primary-500 to-primary-600 p-3 rounded-xl shadow-glow">
-                                    <i class="fas fa-truck text-white text-2xl"></i>
+                                    @if(\App\Models\Setting::get('site_logo'))
+                                        <img src="{{ asset('images/' . \App\Models\Setting::get('site_logo')) }}" alt="{{ \App\Models\Setting::get('site_name', 'Logistiq') }}" class="w-8 h-8 object-contain">
+                                    @else
+                                        <i class="fas fa-truck text-white text-2xl"></i>
+                                    @endif
                                 </div>
                             </div>
-                            <span class="text-2xl font-bold gradient-text">Link2u</span>
+                            <span class="text-2xl font-bold gradient-text">{{ \App\Models\Setting::get('site_name', 'Logistiq') }}</span>
                         </div>
                         <p class="text-secondary-300 text-base leading-relaxed mb-6 max-w-md">
-                            نقدم حلول التمويل المتقدمة للشركات اللوجستية وخدمات بيع أجهزة التتبع بأحدث التقنيات
+                            {{ \App\Models\Setting::get('footer_description', 'نقدم حلول التمويل المتقدمة للشركات اللوجستية وخدمات بيع أجهزة التتبع بأحدث التقنيات') }}
                         </p>
 
                         <!-- Social Links -->
@@ -856,7 +869,7 @@
                                 </div>
                                 <div>
                                     <p class="text-secondary-300 group-hover:text-primary-400 transition-colors">
-                                        info@Link2u.com</p>
+                                        {{ \App\Models\Setting::get('site_email', 'info@logistiq.sa') }}</p>
                                 </div>
                             </div>
 
@@ -867,8 +880,7 @@
                                         class="fas fa-phone text-primary-400 group-hover:text-white transition-colors"></i>
                                 </div>
                                 <div>
-                                    <p class="text-secondary-300 group-hover:text-primary-400 transition-colors">+966
-                                        11 123 4567</p>
+                                    <p class="text-secondary-300 group-hover:text-primary-400 transition-colors">{{ \App\Models\Setting::get('site_phone', '+966 11 123 4567') }}</p>
                                 </div>
                             </div>
 
@@ -881,9 +893,62 @@
                                 <div>
                                     <p
                                         class="text-secondary-300 group-hover:text-primary-400 transition-colors leading-relaxed">
-                                        الرياض، المملكة العربية السعودية</p>
+                                        {{ \App\Models\Setting::get('site_address', 'الرياض، المملكة العربية السعودية') }}</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Media Section -->
+                    <div class="animate-slide-up" style="animation-delay: 0.3s;">
+                        <h3 class="text-white font-bold mb-6 relative">
+                            تابعونا
+                            <div
+                                class="absolute bottom-0 right-0 w-8 h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full">
+                            </div>
+                        </h3>
+                        <div class="flex flex-wrap gap-3">
+                            @if(\App\Models\Setting::get('social_facebook'))
+                                <a href="{{ \App\Models\Setting::get('social_facebook') }}" target="_blank"
+                                    class="group flex items-center justify-center w-12 h-12 bg-primary-600/20 rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-110">
+                                    <i class="fab fa-facebook-f text-primary-400 group-hover:text-white transition-colors text-lg"></i>
+                                </a>
+                            @endif
+
+                            @if(\App\Models\Setting::get('social_twitter'))
+                                <a href="{{ \App\Models\Setting::get('social_twitter') }}" target="_blank"
+                                    class="group flex items-center justify-center w-12 h-12 bg-primary-600/20 rounded-lg hover:bg-blue-400 transition-all duration-300 transform hover:scale-110">
+                                    <i class="fab fa-twitter text-primary-400 group-hover:text-white transition-colors text-lg"></i>
+                                </a>
+                            @endif
+
+                            @if(\App\Models\Setting::get('social_instagram'))
+                                <a href="{{ \App\Models\Setting::get('social_instagram') }}" target="_blank"
+                                    class="group flex items-center justify-center w-12 h-12 bg-primary-600/20 rounded-lg hover:bg-pink-600 transition-all duration-300 transform hover:scale-110">
+                                    <i class="fab fa-instagram text-primary-400 group-hover:text-white transition-colors text-lg"></i>
+                                </a>
+                            @endif
+
+                            @if(\App\Models\Setting::get('social_linkedin'))
+                                <a href="{{ \App\Models\Setting::get('social_linkedin') }}" target="_blank"
+                                    class="group flex items-center justify-center w-12 h-12 bg-primary-600/20 rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-110">
+                                    <i class="fab fa-linkedin-in text-primary-400 group-hover:text-white transition-colors text-lg"></i>
+                                </a>
+                            @endif
+
+                            @if(\App\Models\Setting::get('social_youtube'))
+                                <a href="{{ \App\Models\Setting::get('social_youtube') }}" target="_blank"
+                                    class="group flex items-center justify-center w-12 h-12 bg-primary-600/20 rounded-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-110">
+                                    <i class="fab fa-youtube text-primary-400 group-hover:text-white transition-colors text-lg"></i>
+                                </a>
+                            @endif
+
+                            @if(\App\Models\Setting::get('social_whatsapp'))
+                                <a href="{{ \App\Models\Setting::get('social_whatsapp') }}" target="_blank"
+                                    class="group flex items-center justify-center w-12 h-12 bg-primary-600/20 rounded-lg hover:bg-green-500 transition-all duration-300 transform hover:scale-110">
+                                    <i class="fab fa-whatsapp text-primary-400 group-hover:text-white transition-colors text-lg"></i>
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -896,7 +961,7 @@
                     <div
                         class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 md:space-x-reverse mb-6 lg:mb-0">
                         <p class="text-secondary-400 text-sm font-medium">
-                            &copy; {{ date('Y') }} Link2u. جميع الحقوق محفوظة.
+                            {{ \App\Models\Setting::get('footer_copyright', '&copy; ' . date('Y') . ' Logistiq. جميع الحقوق محفوظة.') }}
                         </p>
                         <div class="flex items-center space-x-4 space-x-reverse text-xs">
                             <a href="#"
@@ -921,20 +986,6 @@
                         </div>
 
                         <!-- Payment Methods -->
-                        <div class="flex items-center space-x-3 space-x-reverse opacity-60">
-                            <div
-                                class="flex items-center justify-center w-8 h-5 bg-secondary-700 rounded text-xs text-white font-bold">
-                                VISA
-                            </div>
-                            <div
-                                class="flex items-center justify-center w-8 h-5 bg-blue-600 rounded text-xs text-white font-bold">
-                                MC
-                            </div>
-                            <div
-                                class="flex items-center justify-center w-8 h-5 bg-green-600 rounded text-xs text-white font-bold">
-                                مدى
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -1,8 +1,6 @@
 @extends('layouts.admin')
 
 @section('title', 'إدارة المستخدمين')
-@section('page-title', 'إدارة المستخدمين')
-@section('page-description', 'نظام إدارة شامل لجميع المستخدمين والشركات المسجلة')
 
 @section('content')
 <div class="space-y-6">
@@ -105,11 +103,29 @@
         </div>
 
         <!-- Mobile Cards View -->
-        <div class="lg:hidden space-y-4">
+        <div class="lg:hidden">
+            <!-- Mobile Bulk Actions -->
+            <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm mb-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        <input type="checkbox" id="select-all-mobile" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <label for="select-all-mobile" class="text-sm font-medium text-slate-700">تحديد الكل</label>
+                    </div>
+                    <button type="button" onclick="bulkDelete()" id="bulk-delete-mobile" class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm">
+                        <i class="fas fa-trash mr-1"></i>
+                        حذف المحدد
+                    </button>
+                </div>
+            </div>
+
+            <div class="space-y-4">
             @forelse($users as $user)
             <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                 <div class="flex items-start justify-between mb-3">
                     <div class="flex items-center space-x-3 space-x-reverse">
+                        <!-- Checkbox for mobile -->
+                        <input type="checkbox" name="selected_users[]" value="{{ $user->id }}" class="user-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+
                         <!-- User Avatar -->
                         <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0
                             {{ $user->user_type === 'admin' ? 'bg-gradient-to-br from-purple-500 to-pink-500' :
@@ -181,6 +197,11 @@
                             class="px-4 py-2 {{ $user->status === 'active' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600' }} text-white rounded-lg text-sm font-semibold transition-colors">
                         {{ $user->status === 'active' ? 'تعليق' : 'تفعيل' }}
                     </button>
+
+                    <button onclick="deleteUser({{ $user->id }})"
+                            class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-semibold transition-colors">
+                        حذف
+                    </button>
                     @endif
                 </div>
             </div>
@@ -193,15 +214,37 @@
                 <p class="text-slate-500 text-sm">لم يتم العثور على مستخدمين يطابقون معايير البحث</p>
             </div>
             @endforelse
+            </div>
         </div>
 
         <!-- Desktop Table View -->
         <div class="hidden lg:block overflow-hidden rounded-2xl border border-gray-200">
+            <!-- Bulk Actions -->
+            <div id="bulk-actions" class="hidden bg-blue-50 border-b border-blue-200 p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        <span class="text-blue-800 font-medium">تم تحديد <span id="selected-count">0</span> عنصر</span>
+                        <button type="button" onclick="clearSelection()" class="text-blue-600 hover:text-blue-800 font-medium">
+                            إلغاء التحديد
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <button type="button" onclick="bulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>
+                            حذف المحدد
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table class="w-full">
                     <!-- Table Header -->
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="px-6 py-4 text-right text-sm font-bold text-slate-700 border-b border-gray-200">
+                                <input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </th>
                             <th class="px-6 py-4 text-right text-sm font-bold text-slate-700 border-b border-gray-200">
                                 المستخدم
                             </th>
@@ -227,6 +270,9 @@
                     <tbody class="bg-white divide-y divide-gray-100">
                         @forelse($users as $user)
                         <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <input type="checkbox" name="selected_users[]" value="{{ $user->id }}" class="user-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     <!-- User Avatar -->
@@ -290,6 +336,11 @@
                                     <button onclick="resetPassword({{ $user->id }})"
                                             class="w-8 h-8 bg-orange-500 hover:bg-orange-600 text-white rounded-lg flex items-center justify-center transition-all hover-lift">
                                         <i class="fas fa-key text-xs"></i>
+                                    </button>
+
+                                    <button onclick="deleteUser({{ $user->id }})"
+                                            class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center transition-all hover-lift">
+                                        <i class="fas fa-trash text-xs"></i>
                                     </button>
                                     @endif
                                 </div>
@@ -387,6 +438,122 @@
             document.getElementById('filters-form').submit();
         }, 500);
     });
+
+    // Bulk selection management
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllDesktop = document.getElementById('select-all');
+        const selectAllMobile = document.getElementById('select-all-mobile');
+        const userCheckboxes = document.querySelectorAll('.user-checkbox');
+        const bulkActions = document.getElementById('bulk-actions');
+        const bulkDeleteMobile = document.getElementById('bulk-delete-mobile');
+        const selectedCount = document.getElementById('selected-count');
+
+        function updateBulkActions() {
+            const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+            const count = checkedBoxes.length;
+
+            if (selectedCount) selectedCount.textContent = count;
+
+            if (count > 0) {
+                if (bulkActions) bulkActions.classList.remove('hidden');
+                if (bulkDeleteMobile) bulkDeleteMobile.classList.remove('hidden');
+            } else {
+                if (bulkActions) bulkActions.classList.add('hidden');
+                if (bulkDeleteMobile) bulkDeleteMobile.classList.add('hidden');
+            }
+
+            // Update select all checkboxes state
+            const allChecked = count === userCheckboxes.length;
+            const someChecked = count > 0;
+
+            [selectAllDesktop, selectAllMobile].forEach(checkbox => {
+                if (checkbox) {
+                    checkbox.checked = allChecked;
+                    checkbox.indeterminate = someChecked && !allChecked;
+                }
+            });
+        }
+
+        // Handle select all desktop
+        if (selectAllDesktop) {
+            selectAllDesktop.addEventListener('change', function() {
+                userCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateBulkActions();
+            });
+        }
+
+        // Handle select all mobile
+        if (selectAllMobile) {
+            selectAllMobile.addEventListener('change', function() {
+                userCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateBulkActions();
+            });
+        }
+
+        // Handle individual checkboxes
+        userCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateBulkActions);
+        });
+    });
+
+    function clearSelection() {
+        document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        document.getElementById('select-all').checked = false;
+        document.getElementById('select-all-mobile').checked = false;
+        document.getElementById('bulk-actions').classList.add('hidden');
+        document.getElementById('bulk-delete-mobile').classList.add('hidden');
+    }
+
+    function bulkDelete() {
+        const selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:checked'))
+            .map(checkbox => checkbox.value);
+
+        if (selectedUsers.length === 0) {
+            alert('يرجى تحديد مستخدم واحد على الأقل للحذف');
+            return;
+        }
+
+        if (confirm(`هل أنت متأكد من حذف ${selectedUsers.length} مستخدم؟ هذا الإجراء لا يمكن التراجع عنه.`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("admin.users.bulk-delete") }}';
+            form.innerHTML = `
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="DELETE">
+            `;
+
+            selectedUsers.forEach(userId => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'user_ids[]';
+                input.value = userId;
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    function deleteUser(userId) {
+        if (confirm('هل أنت متأكد من حذف هذا المستخدم؟ هذا الإجراء لا يمكن التراجع عنه.')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/users/${userId}`;
+            form.innerHTML = `
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="DELETE">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
 
     // Status management
     function toggleStatus(userId, currentStatus) {

@@ -8,6 +8,7 @@ use App\Models\LogisticsCompany;
 use App\Models\ClientDebt;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class FundingRequestController extends Controller
 {
@@ -152,13 +153,41 @@ class FundingRequestController extends Controller
             return redirect()->back()->with('error', 'لا يمكن الموافقة على هذا الطلب في حالته الحالية');
         }
 
-        $fundingRequest->update([
-            'status' => 'approved',
-            'approved_at' => now(),
-            'admin_notes' => $request->admin_notes,
-        ]);
+        DB::beginTransaction();
+        try {
+            $fundingRequest->update([
+                'status' => 'approved',
+                'approved_at' => now(),
+                'admin_notes' => $request->admin_notes,
+            ]);
 
-        return redirect()->back()->with('success', 'تم الموافقة على طلب التمويل بنجاح');
+            // إرسال إيميلات للشركات الطالبة للخدمة
+            foreach ($fundingRequest->clientDebts as $clientDebt) {
+                if ($clientDebt->status === \App\Models\ClientDebt::STATUS_PENDING) {
+                    // إنشاء token آمن للتسجيل
+                    $token = md5($clientDebt->id . $clientDebt->email . config('app.key'));
+
+                    // إنشاء رابط التسجيل
+                    $registrationUrl = route('service-company.register.form', [
+                        'token' => $token,
+                        'email' => $clientDebt->email
+                    ]);
+
+                    // إرسال الإيميل
+                    Mail::to($clientDebt->email)->send(
+                        new \App\Mail\ServiceCompanyInvitationMail($clientDebt, $registrationUrl)
+                    );
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'تم الموافقة على طلب التمويل وتم إرسال إيميلات الدعوة للشركات الطالبة للخدمة');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -334,5 +363,43 @@ class FundingRequestController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * حذف طلبات التمويل المحددة
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|json'
+        ]);
+
+        $ids = json_decode($request->ids, true);
+
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'لم يتم تحديد أي طلبات للحذف');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // التأكد من وجود الطلبات
+            $requests = FundingRequest::whereIn('id', $ids)->get();
+
+            if ($requests->count() !== count($ids)) {
+                throw new \Exception('بعض الطلبات المحددة غير موجودة');
+            }
+
+            // حذف الطلبات
+            FundingRequest::whereIn('id', $ids)->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', "تم حذف {$requests->count()} طلب تمويل بنجاح");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف الطلبات: ' . $e->getMessage());
+        }
     }
 }

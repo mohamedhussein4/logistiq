@@ -43,34 +43,45 @@
                             <i class="fas fa-users ml-2"></i>
                             نوع الحساب
                         </label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <label class="relative flex cursor-pointer rounded-xl border border-secondary-200 bg-white/80 p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary-300">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <label class="relative flex cursor-pointer rounded-xl border border-secondary-200 bg-white/80 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-primary-300 hover:-translate-y-1">
                                 <input type="radio" name="user_type" value="logistics" class="sr-only" required>
-                                <span class="flex flex-1">
-                                    <span class="flex flex-col">
-                                        <span class="block text-sm font-semibold text-secondary-800">شركة لوجستية</span>
-                                        <span class="mt-1 flex items-center text-sm text-secondary-600">
-                                            <i class="fas fa-truck text-primary-600 ml-1"></i>
-                                            خدمات التمويل واللوجستية
-                                        </span>
+                                <span class="flex flex-1 flex-col items-center text-center">
+                                    <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-4">
+                                        <i class="fas fa-truck text-white text-2xl"></i>
+                                    </div>
+                                    <span class="block text-lg font-bold text-secondary-800 mb-2">شركة لوجستية</span>
+                                    <span class="text-sm text-secondary-600 leading-relaxed">
+                                        طلب تمويل وخدمات لوجستية متقدمة
                                     </span>
                                 </span>
-                                <span class="pointer-events-none absolute -inset-px rounded-xl border-2" aria-hidden="true"></span>
+                                <span class="pointer-events-none absolute -inset-px rounded-xl border-2 opacity-0" aria-hidden="true"></span>
                             </label>
 
-                            <label class="relative flex cursor-pointer rounded-xl border border-secondary-200 bg-white/80 p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary-300">
-                                <input type="radio" name="user_type" value="regular" class="sr-only" required>
-                                <span class="flex flex-1">
-                                    <span class="flex flex-col">
-                                        <span class="block text-sm font-semibold text-secondary-800">مستخدم عادي</span>
-                                        <span class="mt-1 flex items-center text-sm text-secondary-600">
-                                            <i class="fas fa-user text-emerald-600 ml-1"></i>
-                                            خدمات عامة ومتجر
-                                        </span>
+                            <label class="relative flex cursor-pointer rounded-xl border border-secondary-200 bg-white/80 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:border-emerald-300 hover:-translate-y-1">
+                                <input type="radio" name="user_type" value="regular" class="sr-only" required checked {{ old('user_type') == 'logistics' ? '' : 'checked' }}>
+                                <span class="flex flex-1 flex-col items-center text-center">
+                                    <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4">
+                                        <i class="fas fa-user text-white text-2xl"></i>
+                                    </div>
+                                    <span class="block text-lg font-bold text-secondary-800 mb-2">مستخدم عادي</span>
+                                    <span class="text-sm text-secondary-600 leading-relaxed">
+                                        تسوق من المتجر والاستفادة من الخدمات
                                     </span>
                                 </span>
-                                <span class="pointer-events-none absolute -inset-px rounded-xl border-2" aria-hidden="true"></span>
+                                <span class="pointer-events-none absolute -inset-px rounded-xl border-2 opacity-0" aria-hidden="true"></span>
                             </label>
+                        </div>
+
+                        <!-- ملاحظة للشركات الطالبة للخدمة -->
+                        <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                            <div class="flex items-start">
+                                <i class="fas fa-info-circle text-amber-600 mt-1 ml-2"></i>
+                                <div class="text-amber-800">
+                                    <p class="font-semibold mb-1">للشركات الطالبة للخدمة</p>
+                                    <p class="text-sm">يتم التسجيل عن طريق دعوة خاصة من الإدارة. للاستفسار تواصل معنا</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -286,6 +297,29 @@
                                     </div>
                                 @enderror
                             </div>
+
+                            <div class="group">
+                                <label for="company_type" class="block text-sm font-semibold text-secondary-700 mb-2 group-focus-within:text-primary-600 transition-colors">
+                                    <i class="fas fa-industry ml-2"></i>
+                                    نوع النشاط اللوجيستي
+                                </label>
+                                <select id="company_type"
+                                        name="company_type"
+                                        class="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 hover:border-primary-300 bg-white/80 @error('company_type') border-red-500 @else border-secondary-200 @enderror">
+                                    <option value="">اختر نوع النشاط</option>
+                                    <option value="transport" {{ old('company_type') == 'transport' ? 'selected' : '' }}>شحن وتوصيل</option>
+                                    <option value="warehouse" {{ old('company_type') == 'warehouse' ? 'selected' : '' }}>مستودعات وتخزين</option>
+                                    <option value="freight" {{ old('company_type') == 'freight' ? 'selected' : '' }}>شحن بحري وجوي</option>
+                                    <option value="mixed" {{ old('company_type') == 'mixed' ? 'selected' : '' }}>خدمات متنوعة</option>
+                                </select>
+
+                                @error('company_type')
+                                    <div class="mt-2 text-red-600 text-sm flex items-center animate-slide-down">
+                                        <i class="fas fa-exclamation-circle ml-2"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
                         </div>
                     </div>
 
@@ -466,4 +500,51 @@
     }
 </script>
 @endpush
+@push('styles')
+<style>
+    .radio-card input[type="radio"]:checked + span .pointer-events-none {
+        border-color: #0ea5e9;
+        border-width: 2px;
+        opacity: 1;
+    }
+
+    .radio-card input[type="radio"]:checked + span {
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        border-color: #0ea5e9;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.2);
+    }
+
+    .radio-card:hover {
+        transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    .gradient-border {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2px;
+        border-radius: 0.75rem;
+    }
+
+    .gradient-border-inner {
+        background: white;
+        border-radius: 0.625rem;
+    }
+</style>
+@endpush
+
 @endsection

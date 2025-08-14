@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\LogisticsCompany;
 use App\Models\ServiceCompany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -278,74 +280,202 @@ class UserController extends Controller
                 'phone' => 'nullable|string|max:20',
                 'user_type' => 'required|in:admin,logistics,service_company,regular',
                 'password' => 'nullable|string|min:8|confirmed',
-                'status' => 'required|in:active,pending,suspended',
+                'status' => 'required|in:active,pending,suspended,inactive',
                 'admin_notes' => 'nullable|string',
 
                 // Company fields (conditional)
-                'company_name' => 'nullable:user_type,logistics,service_company|string|max:255',
-                'commercial_register' => 'nullable|string|max:100',
+                'company_name' => 'nullable|string|max:255',
+                'company_registration' => 'nullable|string|max:100',
                 'address' => 'nullable|string',
-                'city' => 'nullable|string|max:100',
-                'postal_code' => 'nullable|string|max:20',
+                'contact_person' => 'nullable|string|max:255',
+
+                // Balance adjustments
+                'balance_adjustment' => 'nullable|numeric',
+                'adjustment_type' => 'nullable|in:add,subtract',
 
                 // Logistics company fields
-                'available_balance' => 'nullable|numeric|min:0',
                 'credit_limit' => 'nullable|numeric|min:0',
+                'company_type' => 'nullable|string|max:100',
 
                 // Service company fields
-                'total_outstanding' => 'nullable|numeric|min:0',
-                'total_paid' => 'nullable|numeric|min:0',
+                'service_credit_limit' => 'nullable|numeric|min:0',
+                'payment_status' => 'nullable|in:regular,overdue,under_review',
+                'tax_number' => 'nullable|string|max:100',
+                'bank_account' => 'nullable|string|max:255',
             ]);
 
-            $userData = $request->only([
-                'name', 'email', 'phone', 'user_type', 'status', 'admin_notes'
-            ]);
+            DB::beginTransaction();
+
+            // تحديث البيانات الأساسية للمستخدم
+            $userData = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'user_type' => $request->user_type,
+                'status' => $request->status,
+                'company_name' => $request->company_name,
+                'company_registration' => $request->company_registration,
+            ];
 
             if ($request->filled('password')) {
                 $userData['password'] = bcrypt($request->password);
             }
 
-            // تحديث بيانات المستخدم
             $user->update($userData);
 
-            // تحديث أو إنشاء بيانات الشركة حسب النوع
+            // معالجة تعديل الرصيد للشركات اللوجيستية
+            if ($request->user_type === 'logistics' && $request->filled('balance_adjustment')) {
+                $logisticsCompany = $user->logisticsCompany;
+                if ($logisticsCompany) {
+                    $adjustment = floatval($request->balance_adjustment);
+                    if ($request->adjustment_type === 'subtract') {
+                        $adjustment = -$adjustment;
+                    }
+
+                    // تحديث الرصيد
+                    $newBalance = $logisticsCompany->available_balance + $adjustment;
+                    $logisticsCompany->update(['available_balance' => max(0, $newBalance)]);
+
+                    // تسجيل المعاملة في جدول BalanceTransaction إذا كان موجوداً
+                    try {
+                        if (class_exists('App\Models\BalanceTransaction')) {
+                            \App\Models\BalanceTransaction::create([
+                                'user_id' => $user->id,
+                                'type' => $adjustment > 0 ? 'credit' : 'debit',
+                                'amount' => abs($adjustment),
+                                'description' => 'تعديل رصيد من لوحة التحكم',
+                                'reference_type' => 'admin_adjustment',
+                                'reference_id' => $user->id,
+                                'balance_before' => $logisticsCompany->available_balance - $adjustment,
+                                'balance_after' => $logisticsCompany->available_balance,
+                                'created_by' => Auth::id(),
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        // تجاهل أخطاء جدول المعاملات إذا لم يكن موجوداً
+                    }
+                }
+            }
+
+            // تحديث أو إنشاء بيانات الشركة اللوجيستية
             if ($request->user_type === 'logistics') {
+                $logisticsData = [
+                    'company_name' => $request->company_name,
+                    'contact_person' => $request->contact_person,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'address' => $request->address,
+                    'commercial_register' => $request->company_registration,
+                    'credit_limit' => $request->credit_limit ?? 0,
+                    'company_type' => $request->company_type,
+                    'status' => $request->status,
+                ];
+
                 $user->logisticsCompany()->updateOrCreate(
                     ['user_id' => $user->id],
-                    [
-                        'company_name' => $request->company_name,
-                        'commercial_register' => $request->commercial_register,
-                        'address' => $request->address,
-                        'city' => $request->city,
-                        'postal_code' => $request->postal_code,
-                        'available_balance' => $request->available_balance ?? 0,
-                        'credit_limit' => $request->credit_limit ?? 0,
-                    ]
-                );
-            } elseif ($request->user_type === 'service_company') {
-                $user->serviceCompany()->updateOrCreate(
-                    ['user_id' => $user->id],
-                    [
-                        'company_name' => $request->company_name,
-                        'commercial_register' => $request->commercial_register,
-                        'address' => $request->address,
-                        'city' => $request->city,
-                        'postal_code' => $request->postal_code,
-                        'total_outstanding' => $request->total_outstanding ?? 0,
-                        'total_paid' => $request->total_paid ?? 0,
-                    ]
+                    $logisticsData
                 );
             }
 
-            return redirect()->route('admin.users.index')
+            // تحديث أو إنشاء بيانات الشركة الطالبة للخدمة
+            elseif ($request->user_type === 'service_company') {
+                $serviceData = [
+                    'company_name' => $request->company_name,
+                    'contact_person' => $request->contact_person,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'address' => $request->address,
+                    'commercial_register' => $request->company_registration,
+                    'credit_limit' => $request->service_credit_limit ?? 0,
+                    'payment_status' => $request->payment_status ?? 'regular',
+                    'tax_number' => $request->tax_number,
+                    'bank_account' => $request->bank_account,
+                    'status' => $request->status,
+                ];
+
+                $user->serviceCompany()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $serviceData
+                );
+            }
+
+            // حذف بيانات الشركة إذا تم تغيير نوع المستخدم
+            if ($user->wasChanged('user_type')) {
+                $oldUserType = $user->getOriginal('user_type');
+
+                if ($oldUserType === 'logistics' && $request->user_type !== 'logistics') {
+                    $user->logisticsCompany()->delete();
+                }
+
+                if ($oldUserType === 'service_company' && $request->user_type !== 'service_company') {
+                    $user->serviceCompany()->delete();
+                }
+            }
+
+            // تحديث ملاحظات الإدارة
+            if ($request->filled('admin_notes')) {
+                $user->update(['admin_notes' => $request->admin_notes]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.users.show', $user)
                 ->with('success', 'تم تحديث بيانات المستخدم "' . $user->name . '" بنجاح');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
             return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->back()
                 ->with('error', 'حدث خطأ أثناء تحديث المستخدم: ' . $e->getMessage())
                 ->withInput();
+        }
+    }
+
+    /**
+     * حذف متعدد للمستخدمين
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'exists:users,id'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // جلب المستخدمين المحددين
+            $users = User::whereIn('id', $request->user_ids)->get();
+
+            // فلترة المستخدمين الإداريين
+            $adminUsers = $users->where('user_type', 'admin');
+            $nonAdminUsers = $users->where('user_type', '!=', 'admin');
+
+            if ($adminUsers->count() > 0) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'لا يمكن حذف المستخدمين الإداريين');
+            }
+
+            $deletedCount = $nonAdminUsers->count();
+
+            if ($deletedCount === 0) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'لم يتم تحديد مستخدمين صالحين للحذف');
+            }
+
+            // حذف المستخدمين
+            User::whereIn('id', $nonAdminUsers->pluck('id'))->delete();
+
+            DB::commit();
+
+            return redirect()->route('admin.users.index')
+                ->with('success', "تم حذف {$deletedCount} مستخدم بنجاح");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف المستخدمين: ' . $e->getMessage());
         }
     }
 }

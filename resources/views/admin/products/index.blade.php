@@ -114,9 +114,29 @@
 
         <!-- Mobile Cards View -->
         <div class="lg:hidden space-y-4">
+            <!-- Mobile Bulk Actions -->
+            <div id="mobile-bulk-actions" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        <span class="text-blue-800 font-medium">تم تحديد <span id="mobile-selected-count">0</span> عنصر</span>
+                        <button type="button" onclick="clearSelection()" class="text-blue-600 hover:text-blue-800 font-medium">
+                            إلغاء التحديد
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <button type="button" onclick="bulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>
+                            حذف
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             @forelse($products as $product)
             <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                 <div class="flex items-start space-x-3 space-x-reverse mb-3">
+                    <input type="checkbox" class="product-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-2"
+                           value="{{ $product->id }}" onchange="updateSelectionCount()">
                     @php
                         $images = json_decode($product->images, true) ?? [];
                         $firstImage = $images[0] ?? null;
@@ -198,12 +218,34 @@
         </div>
 
         <!-- Desktop Table View -->
+                <!-- Desktop Table View -->
         <div class="hidden lg:block overflow-hidden rounded-2xl border border-gray-200">
-            <div class="table-responsive">
+            <!-- Bulk Actions -->
+            <div id="bulk-actions" class="hidden bg-blue-50 border-b border-blue-200 p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        <span class="text-blue-800 font-medium">تم تحديد <span id="selected-count">0</span> عنصر</span>
+                        <button type="button" onclick="clearSelection()" class="text-blue-600 hover:text-blue-800 font-medium">
+                            إلغاء التحديد
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <button type="button" onclick="bulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                            <i class="fas fa-trash mr-2"></i>
+                            حذف المحدد
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
                 <table class="w-full">
                     <!-- Table Header -->
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="px-6 py-4 text-right text-sm font-bold text-slate-700 border-b border-gray-200">
+                                <input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </th>
                             <th class="px-6 py-4 text-right text-sm font-bold text-slate-700 border-b border-gray-200">
                                 المنتج
                             </th>
@@ -232,6 +274,10 @@
                     <tbody class="bg-white divide-y divide-gray-100">
                         @forelse($products as $product)
                         <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <input type="checkbox" class="product-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                       value="{{ $product->id }}" onchange="updateSelectionCount()">
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     @if($firstImage)
@@ -473,6 +519,103 @@
             closeStockModal();
         }
     });
+
+    // Bulk delete functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.getElementById('select-all');
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateSelectionCount();
+            });
+        }
+    });
+
+    function updateSelectionCount() {
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        const checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
+        const count = checkedBoxes.length;
+
+        const selectedCountElements = document.querySelectorAll('#selected-count, #mobile-selected-count');
+        selectedCountElements.forEach(element => {
+            if (element) element.textContent = count;
+        });
+
+        const bulkActionsBar = document.getElementById('bulk-actions');
+        const mobileBulkActionsBar = document.getElementById('mobile-bulk-actions');
+
+        if (count > 0) {
+            if (bulkActionsBar) bulkActionsBar.classList.remove('hidden');
+            if (mobileBulkActionsBar) mobileBulkActionsBar.classList.remove('hidden');
+        } else {
+            if (bulkActionsBar) bulkActionsBar.classList.add('hidden');
+            if (mobileBulkActionsBar) mobileBulkActionsBar.classList.add('hidden');
+        }
+
+        const selectAllCheckbox = document.getElementById('select-all');
+        if (selectAllCheckbox) {
+            if (count === 0) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = false;
+            } else if (count === checkboxes.length) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.indeterminate = true;
+                selectAllCheckbox.checked = false;
+            }
+        }
+    }
+
+    function clearSelection() {
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        updateSelectionCount();
+    }
+
+    function bulkDelete() {
+        const checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
+
+        if (checkedBoxes.length === 0) {
+            alert('يرجى تحديد المنتجات المراد حذفها');
+            return;
+        }
+
+        if (confirm(`هل أنت متأكد من حذف ${checkedBoxes.length} منتج؟ هذا الإجراء لا يمكن التراجع عنه.`)) {
+            const ids = Array.from(checkedBoxes).map(cb => cb.value);
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("admin.products.bulk-delete") }}';
+
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            form.appendChild(csrfToken);
+
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
+            form.appendChild(methodField);
+
+            const idsField = document.createElement('input');
+            idsField.type = 'hidden';
+            idsField.name = 'ids';
+            idsField.value = JSON.stringify(ids);
+            form.appendChild(idsField);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
 </script>
 @endpush
 @endsection

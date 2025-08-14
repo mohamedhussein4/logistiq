@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\User\ServiceCompanyRegistrationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServiceCompany\ServiceCompanyController;
-
 /*
 |--------------------------------------------------------------------------
 | Service Company Routes
@@ -11,8 +11,14 @@ use App\Http\Controllers\ServiceCompany\ServiceCompanyController;
 | هذه المسارات مخصصة للشركات الطالبة للخدمة
 |
 */
+Route::prefix('service-company')->name('service-company.')->group(function () {
+
+    Route::get('/register', [ServiceCompanyRegistrationController::class, 'showRegistrationForm'])->name('register.form');
+    Route::post('/register', [ServiceCompanyRegistrationController::class, 'register'])->name('register');
+});
 
 Route::middleware(['auth', 'service_company'])->prefix('service-company')->name('service_company.')->group(function () {
+
 
     // الصفحة الرئيسية للشركة الطالبة للخدمة
     Route::get('/', [ServiceCompanyController::class, 'dashboard'])->name('dashboard');
@@ -33,6 +39,9 @@ Route::middleware(['auth', 'service_company'])->prefix('service-company')->name(
         Route::post('/{id}/installment', [ServiceCompanyController::class, 'requestInstallment'])->name('installment');
         Route::get('/{id}/payment-history', [ServiceCompanyController::class, 'paymentHistory'])->name('payment_history');
     });
+
+    // API لجلب تفاصيل الفاتورة
+    Route::get('/invoice/{id}/details', [ServiceCompanyController::class, 'getInvoiceDetails'])->name('invoice.details');
 
     // إدارة المدفوعات
     Route::prefix('payments')->name('payments.')->group(function () {
@@ -112,4 +121,5 @@ Route::middleware(['auth', 'service_company'])->prefix('service-company')->name(
         Route::post('/{id}/mark-read', [ServiceCompanyController::class, 'markNotificationAsRead'])->name('mark_read');
         Route::post('/mark-all-read', [ServiceCompanyController::class, 'markAllNotificationsAsRead'])->name('mark_all_read');
     });
+
 });

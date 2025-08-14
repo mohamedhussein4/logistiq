@@ -15,12 +15,10 @@ class DatabaseSeeder extends Seeder
 
         // تشغيل جميع Seeders بالترتيب الصحيح
         $this->call([
-            UserSeeder::class,          // إنشاء المستخدمين والشركات
-            CompaniesSeeder::class,     // إنشاء بيانات الشركات وطلبات التمويل
-            ProductsSeeder::class,      // إنشاء المنتجات والطلبات
-            InvoicesSeeder::class,      // إنشاء الفواتير والمدفوعات
-            PaymentAccountsSeeder::class, // إضافة Seeder الحسابات البنكية والمحافظ
-            WebsiteSettingsSeeder::class, // إضافة Seeder إعدادات الموقع
+            UserSeeder::class,
+            ProductsSeeder::class,
+            PaymentAccountsSeeder::class,
+            CompleteSettingsSeeder::class
         ]);
 
         $this->command->info('✅ تم إنشاء جميع البيانات التجريبية بنجاح!');

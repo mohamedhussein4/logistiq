@@ -147,6 +147,80 @@
                 @endif
             </div>
 
+            <!-- المستندات المرفقة -->
+            @if($fundingRequest->documents && is_array($fundingRequest->documents) && count($fundingRequest->documents) > 0)
+            <div class="glass-effect rounded-3xl p-8 border border-white/20">
+                <h3 class="text-2xl font-bold gradient-text mb-6">
+                    <i class="fas fa-file-alt mr-2"></i>
+                    المستندات المرفقة
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach($fundingRequest->documents as $index => $document)
+                    @php
+                        $extension = pathinfo($document, PATHINFO_EXTENSION);
+                        $filename = pathinfo($document, PATHINFO_FILENAME);
+
+                        // تحديد نوع الملف والأيقونة
+                        $fileTypeInfo = [
+                            'pdf' => ['icon' => 'fas fa-file-pdf', 'color' => 'text-red-600', 'bg' => 'bg-red-50'],
+                            'jpg' => ['icon' => 'fas fa-file-image', 'color' => 'text-green-600', 'bg' => 'bg-green-50'],
+                            'jpeg' => ['icon' => 'fas fa-file-image', 'color' => 'text-green-600', 'bg' => 'bg-green-50'],
+                            'png' => ['icon' => 'fas fa-file-image', 'color' => 'text-green-600', 'bg' => 'bg-green-50'],
+                            'doc' => ['icon' => 'fas fa-file-word', 'color' => 'text-blue-600', 'bg' => 'bg-blue-50'],
+                            'docx' => ['icon' => 'fas fa-file-word', 'color' => 'text-blue-600', 'bg' => 'bg-blue-50'],
+                            'default' => ['icon' => 'fas fa-file', 'color' => 'text-gray-600', 'bg' => 'bg-gray-50']
+                        ];
+
+                        $fileInfo = $fileTypeInfo[$extension] ?? $fileTypeInfo['default'];
+                    @endphp
+
+                    <div class="flex items-center p-4 {{ $fileInfo['bg'] }} rounded-2xl border border-white/40 hover:shadow-md transition-all">
+                        <div class="w-12 h-12 {{ $fileInfo['bg'] }} rounded-xl flex items-center justify-center ml-4 border-2 border-white">
+                            <i class="{{ $fileInfo['icon'] }} {{ $fileInfo['color'] }} text-xl"></i>
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold text-slate-900 truncate">
+                                المستند #{{ $index + 1 }}
+                            </h4>
+                            <p class="text-xs text-slate-600 truncate">
+                                {{ $filename . '.' . $extension }}
+                            </p>
+                            <p class="text-xs text-slate-500 mt-1">
+                                نوع الملف: {{ strtoupper($extension) }}
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col space-y-2">
+                            <!-- زر العرض -->
+                            <a href="{{ asset('/' . $document) }}" target="_blank"
+                               class="inline-flex items-center px-3 py-1 bg-white text-slate-700 border border-slate-300 rounded-lg text-xs font-medium hover:bg-slate-50 transition-colors">
+                                <i class="fas fa-eye mr-1"></i>
+                                عرض
+                            </a>
+
+                            <!-- زر التحميل -->
+                            <a href="{{ asset('/' . $document) }}" download
+                               class="inline-flex items-center px-3 py-1 {{ $fileInfo['color'] }} hover:{{ $fileInfo['bg'] }} border border-current rounded-lg text-xs font-medium transition-colors">
+                                <i class="fas fa-download mr-1"></i>
+                                تحميل
+                            </a>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+
+                <!-- إحصائيات المستندات -->
+                <div class="mt-6 p-4 bg-slate-50 rounded-2xl">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-slate-600">عدد المستندات المرفقة:</span>
+                        <span class="font-bold text-slate-900">{{ count($fundingRequest->documents) }}</span>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- Recent Requests from Same Company -->
             @if($recentRequests && $recentRequests->count() > 0)
             <div class="glass-effect rounded-3xl p-8 border border-white/20">
@@ -339,13 +413,46 @@
                             </div>
                             <div>
                                 @if($debt->invoice_document)
-                                <a href="{{ asset('/' . $debt->invoice_document) }}" target="_blank"
-                                   class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 rounded-lg text-xs hover:bg-blue-200 transition-colors">
-                                    <i class="fas fa-file-pdf mr-1"></i>
-                                    الفاتورة الأصلية
-                                </a>
+                                @php
+                                    $extension = pathinfo($debt->invoice_document, PATHINFO_EXTENSION);
+                                    $filename = pathinfo($debt->invoice_document, PATHINFO_FILENAME);
+
+                                    $fileTypeInfo = [
+                                        'pdf' => ['icon' => 'fas fa-file-pdf', 'color' => 'text-red-600', 'bg' => 'bg-red-100', 'name' => 'PDF'],
+                                        'jpg' => ['icon' => 'fas fa-file-image', 'color' => 'text-green-600', 'bg' => 'bg-green-100', 'name' => 'صورة'],
+                                        'jpeg' => ['icon' => 'fas fa-file-image', 'color' => 'text-green-600', 'bg' => 'bg-green-100', 'name' => 'صورة'],
+                                        'png' => ['icon' => 'fas fa-file-image', 'color' => 'text-green-600', 'bg' => 'bg-green-100', 'name' => 'صورة'],
+                                        'doc' => ['icon' => 'fas fa-file-word', 'color' => 'text-blue-600', 'bg' => 'bg-blue-100', 'name' => 'Word'],
+                                        'docx' => ['icon' => 'fas fa-file-word', 'color' => 'text-blue-600', 'bg' => 'bg-blue-100', 'name' => 'Word'],
+                                        'default' => ['icon' => 'fas fa-file', 'color' => 'text-gray-600', 'bg' => 'bg-gray-100', 'name' => 'ملف']
+                                    ];
+
+                                    $fileInfo = $fileTypeInfo[$extension] ?? $fileTypeInfo['default'];
+                                @endphp
+
+                                <div class="space-y-2">
+                                    <span class="text-gray-500 text-xs">العقد/الفاتورة الأصلية:</span>
+                                    <div class="flex items-center space-x-2 space-x-reverse">
+                                        <a href="{{ asset('/' . $debt->invoice_document) }}" target="_blank"
+                                           class="inline-flex items-center px-3 py-2 {{ $fileInfo['bg'] }} {{ $fileInfo['color'] }} rounded-lg text-xs font-medium hover:shadow-md transition-all group">
+                                            <i class="{{ $fileInfo['icon'] }} mr-2"></i>
+                                            <div class="text-right">
+                                                <div class="font-bold">{{ $fileInfo['name'] }} - عرض</div>
+                                                <div class="text-xs opacity-75">{{ $filename }}</div>
+                                            </div>
+                                        </a>
+
+                                        <a href="{{ asset('/' . $debt->invoice_document) }}" download
+                                           class="inline-flex items-center px-2 py-2 bg-gray-100 text-gray-700 rounded-lg text-xs hover:bg-gray-200 transition-colors">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </div>
+                                </div>
                                 @else
-                                <span class="text-gray-400 text-xs">لا يوجد مرفقات</span>
+                                <div class="text-center py-2">
+                                    <i class="fas fa-file-slash text-gray-300 text-lg mb-1"></i>
+                                    <p class="text-gray-400 text-xs">لا يوجد عقد مرفق</p>
+                                </div>
                                 @endif
                             </div>
                         </div>

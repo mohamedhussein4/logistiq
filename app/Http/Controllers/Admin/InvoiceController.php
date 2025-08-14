@@ -204,5 +204,42 @@ class InvoiceController extends Controller
         }
     }
 
+    /**
+     * حذف الفواتير المحددة
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|json'
+        ]);
+
+        $ids = json_decode($request->ids, true);
+
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'لم يتم تحديد أي فواتير للحذف');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // التأكد من وجود الفواتير
+            $invoices = Invoice::whereIn('id', $ids)->get();
+
+            if ($invoices->count() !== count($ids)) {
+                throw new \Exception('بعض الفواتير المحددة غير موجودة');
+            }
+
+            // حذف الفواتير
+            Invoice::whereIn('id', $ids)->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', "تم حذف {$invoices->count()} فاتورة بنجاح");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف الفواتير: ' . $e->getMessage());
+        }
+    }
 
 }

@@ -11,15 +11,28 @@ class LogisticsCompany extends Model
 
     protected $fillable = [
         'user_id',
+        'company_name',
+        'company_type',
+        'contact_person',
+        'email',
+        'phone',
+        'address',
+        'commercial_register',
+        'credit_limit',
+        'used_credit',
         'available_balance',
         'total_funded',
         'total_requests',
         'last_request_status',
+        'status',
     ];
 
     protected $casts = [
+        'credit_limit' => 'decimal:2',
+        'used_credit' => 'decimal:2',
         'available_balance' => 'decimal:2',
         'total_funded' => 'decimal:2',
+        'total_requests' => 'integer',
     ];
 
     // Relationships
@@ -54,11 +67,11 @@ class LogisticsCompany extends Model
     // Helper methods
     public function getFormattedBalanceAttribute()
     {
-        return number_format($this->available_balance, 0) . ' ر.س';
+        return number_format((float) ($this->available_balance ?? 0), 0) . ' ر.س';
     }
 
     public function getFormattedTotalFundedAttribute()
     {
-        return number_format($this->total_funded, 0) . ' ر.س';
+        return number_format((float) ($this->total_funded ?? 0), 0) . ' ر.س';
     }
 }

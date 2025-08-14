@@ -80,20 +80,6 @@
                                 <p class="font-semibold mt-1 font-mono text-sm">{{ $paymentRequest->bankAccount->iban }}</p>
                             </div>
                             @endif
-                            @elseif($paymentRequest->electronicWallet)
-                            <div>
-                                <span class="text-gray-600">المحفظة:</span>
-                                <p class="font-semibold mt-1">{{ $paymentRequest->electronicWallet->wallet_name }}</p>
-                            </div>
-                            <div>
-                                <span class="text-gray-600">اسم الحساب:</span>
-                                <p class="font-semibold mt-1">{{ $paymentRequest->electronicWallet->account_name }}</p>
-                            </div>
-                            <div>
-                                <span class="text-gray-600">رقم الحساب:</span>
-                                <p class="font-semibold mt-1">{{ $paymentRequest->electronicWallet->account_number }}</p>
-                            </div>
-                            @endif
                         </div>
                     </div>
                 </div>
