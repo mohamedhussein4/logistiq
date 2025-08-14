@@ -41,8 +41,8 @@
 
 إذا كان لديكم أي استفسارات حول هذا الطلب أو تحتاجون لمساعدة في عملية التسجيل، يمكنكم التواصل معنا على:
 
-**بريد الدعم الفني**: {{ \App\Models\Setting::get('contact_support_email', config('mail.from.address')) }}
-**الهاتف**: {{ \App\Models\Setting::get('contact_phone', '+966 11 123 4567') }}
+**بريد الدعم الفني**: {{ \App\Models\Setting::get('site_email', config('mail.from.address')) }}
+**الهاتف**: {{ \App\Models\Setting::get('site_phone', '+966 11 123 4567') }}
 
 شكراً لكم،<br>
 فريق منصة LogistiQ
