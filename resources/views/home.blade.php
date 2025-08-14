@@ -53,11 +53,11 @@
             <!-- Statistics -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 animate-slide-up" style="animation-delay: 0.3s;">
                 <div class="glass rounded-2xl p-6 hover-lift">
-                    <div class="text-3xl font-bold gradient-text mb-2">٢٠٠+</div>
+                    <div class="text-3xl font-bold gradient-text mb-2">20+</div>
                     <div class="text-secondary-600 text-sm">شركة مربوطة</div>
                 </div>
                 <div class="glass rounded-2xl p-6 hover-lift">
-                    <div class="text-3xl font-bold gradient-text mb-2">٥٠+</div>
+                    <div class="text-3xl font-bold gradient-text mb-2">15+</div>
                     <div class="text-secondary-600 text-sm">شركة تمويل مرخصة</div>
                 </div>
                 <div class="glass rounded-2xl p-6 hover-lift">
@@ -175,7 +175,7 @@
                         <div class="text-secondary-600 text-sm">سنوات في الربط</div>
                     </div>
                     <div class="group hover-lift">
-                        <div class="text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform">٣٠+</div>
+                        <div class="text-4xl font-bold gradient-text mb-2 group-hover:scale-110 transition-transform">20+</div>
                         <div class="text-secondary-600 text-sm">خبير متخصص</div>
                     </div>
                     <div class="group hover-lift">
@@ -492,11 +492,11 @@
                         <div class="text-sm text-primary-200">متوسط وقت الربط</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold mb-1">٢٠٠+</div>
+                        <div class="text-2xl font-bold mb-1">20+</div>
                         <div class="text-sm text-primary-200">شركة مربوطة</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold mb-1">٥٠+</div>
+                        <div class="text-2xl font-bold mb-1">10+</div>
                         <div class="text-sm text-primary-200">شريك تمويل</div>
                     </div>
                 </div>
@@ -703,7 +703,7 @@
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-secondary-800 mb-1">الهاتف</h4>
-                                        <p class="text-secondary-600">+966 11 123 4567</p>
+                                        <p class="text-secondary-600">{{ \App\Models\Setting::get('site_phone', '+966 11 123 4567') }}</p>
                                         <p class="text-secondary-500 text-sm">متاح ٢٤/٧</p>
                                     </div>
                                 </div>
@@ -714,7 +714,7 @@
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-secondary-800 mb-1">البريد الإلكتروني</h4>
-                                        <p class="text-secondary-600">info@Link2u.com</p>
+                                        <p class="text-secondary-600">{{ \App\Models\Setting::get('site_email', 'info@Link2u.com') }}</p>
                                         <p class="text-secondary-500 text-sm">نرد خلال ساعة</p>
                                     </div>
                                 </div>
@@ -725,7 +725,7 @@
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-secondary-800 mb-1">العنوان</h4>
-                                        <p class="text-secondary-600">الرياض، المملكة العربية السعودية</p>
+                                        <p class="text-secondary-600">{{ \App\Models\Setting::get('site_address', 'الرياض، المملكة العربية السعودية') }}</p>
                                         <p class="text-secondary-500 text-sm">برج الأعمال، الطابق ١٥</p>
                                     </div>
                                 </div>

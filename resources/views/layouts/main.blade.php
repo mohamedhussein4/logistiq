@@ -778,19 +778,8 @@
                     <div class="lg:col-span-2">
                         <div class="flex items-center space-x-3 space-x-reverse mb-6 group">
                             <div class="relative">
-                                <div
-                                    class="absolute inset-0 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl opacity-30 group-hover:opacity-40 transition-opacity duration-300">
-                                </div>
-                                <div
-                                    class="relative bg-gradient-to-br from-primary-500 to-primary-600 p-3 rounded-xl shadow-glow">
-                                    @if(\App\Models\Setting::get('site_logo'))
-                                        <img src="{{ asset('images/' . \App\Models\Setting::get('site_logo')) }}" alt="{{ \App\Models\Setting::get('site_name', 'Logistiq') }}" class="w-8 h-8 object-contain">
-                                    @else
-                                        <i class="fas fa-truck text-white text-2xl"></i>
-                                    @endif
-                                </div>
+                                <img src="{{ asset('images/' . \App\Models\Setting::get('site_logo')) }}" alt="{{ \App\Models\Setting::get('site_name', 'Logistiq') }}" width="120" class="object-contain">
                             </div>
-                            <span class="text-2xl font-bold gradient-text">{{ \App\Models\Setting::get('site_name', 'Logistiq') }}</span>
                         </div>
                         <p class="text-secondary-300 text-base leading-relaxed mb-6 max-w-md">
                             {{ \App\Models\Setting::get('footer_description', 'نقدم حلول التمويل المتقدمة للشركات اللوجستية وخدمات بيع أجهزة التتبع بأحدث التقنيات') }}
