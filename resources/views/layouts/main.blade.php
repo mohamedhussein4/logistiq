@@ -16,7 +16,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url('/') }}">
     @if(\App\Models\Setting::get('site_logo'))
-    <meta property="og:image" content="{{ asset('images/' . \App\Models\Setting::get('site_logo')) }}">
+    <meta property="og:image" content="{{ asset('images/' . \App\Models\Setting::get('site_favicon')) }}">
     @endif
 
     <!-- Favicon -->
